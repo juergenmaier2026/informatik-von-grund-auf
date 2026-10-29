@@ -1,5 +1,7 @@
 # Informatik von Grund auf
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23773283.svg)](https://doi.org/10.5281/zenodo.23773283)
+
 **Eine Einführung in sechsundzwanzig Bänden — 4143 Seiten.** Vom Schalter bis zur Quanteninformatik, von der Turingmaschine bis zum fertigen Programm. Jeder Schritt erklärt, jede Übungsaufgabe vollständig gelöst, jedes Kapitel mit Geschichte und Stand der Forschung; was in diesem Fach nur behauptet wird, wird geprüft. Achtundzwanzig kommentierte Quellen je Band.
 
 Herausgeber und Urheber: **Jürgen Maier**. Entstanden 2026 in Zusammenarbeit mit Claude (Anthropic); Konzeption, Vorgaben, Prüfung und Herausgeberschaft: Jürgen Maier.
@@ -89,6 +91,6 @@ Alle Bände stehen unter [CC BY-SA 4.0](https://creativecommons.org/licenses/by-
 
 Zitiervorschlag (siehe auch `CITATION.cff`):
 
-> Maier, J. (2026). *Informatik von Grund auf, Band 2: Die Grenze der Maschine*. Fassung 1.0.0. https://github.com/juergenmaier2026/informatik-von-grund-auf
+> Maier, J. (2026). *Informatik von Grund auf, Band 2: Die Grenze der Maschine*. Fassung 1.0.1. https://doi.org/10.5281/zenodo.23773283
 
-Fassung 1.0.0, Oktober 2026. Mit der ersten archivierten Fassung bei Zenodo erhält die Reihe eine DOI; sie wird in Fassung 1.0.1 in alle Bände eingetragen.
+Fassung 1.0.1, Oktober 2026. Jede Fassung ist bei Zenodo dauerhaft archiviert; die DOI der Reihe (alle Fassungen) ist 10.5281/zenodo.23773283.

@@ -6,9 +6,14 @@ type: dataset
 authors:
   - family-names: Maier
     given-names: Jürgen
-version: "1.0.0"
+version: "1.0.1"
 date-released: "2026-10-29"
 license: CC-BY-SA-4.0
+doi: 10.5281/zenodo.23773283
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23773283
+    description: "Konzept-DOI für alle Fassungen"
 repository-code: "https://github.com/juergenmaier2026/informatik-von-grund-auf"
 url: "https://juergenmaier2026.github.io/informatik-von-grund-auf"
 keywords:
