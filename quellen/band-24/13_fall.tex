@@ -1,0 +1,170 @@
+\chapter{Die Wiederholung ohne Kennung}\label{fall:wiederholung}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Übertragung, Go. Sendet Messwertblöcke an die Speicherung und wiederholt bei Fehlschlag.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func sende(ctx context.Context, b Block) error \{}\\
+\code{\ \ \ \ var letzter error}\\
+\code{\ \ \ \ for versuch := 0; versuch < 5; versuch++ \{}\\
+\code{\ \ \ \ \ \ \ \ if err := ziel.Schreibe(ctx, b); err == nil \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ return nil}\\
+\code{\ \ \ \ \ \ \ \ \} else \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ letzter = err}\\
+\code{\ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ warte(versuch)\ \ \ \ // verdoppelnd, mit Streuung}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ return letzter}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwölf Zeilen mit begrenzter Versuchszahl, verdoppelnden Abständen und Streuung --- alles, was Band 23, Kapitel~10 verlangt. Die Wiederholung ist vorbildlich umgesetzt.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Was bei einem Zeitablauf geschieht.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Tatsächlich} & \textbf{Sender sieht} & \textbf{Folge}\\
+\midrule
+Nicht angekommen & Zeitablauf & \textcolor{gruen}{Wiederholung richtig}\\
+Unterwegs & Zeitablauf & \textcolor{akzent}{\textbf{doppelt}}\\
+Geschrieben, Antwort weg & \textbf{Zeitablauf} & \textcolor{akzent}{\textbf{doppelt}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei Lagen, ein Signal --- der Sender kann sie nicht unterscheiden. In zwei von drei Fällen erzeugt die Wiederholung einen doppelten Eintrag, und der Block ist nicht idempotent: Er enthält keine Kennung, an der die Speicherung eine Wiederholung erkennen könnte.}
+\end{minipage}
+\end{center}
+
+\textbf{Was im Bestand gefunden wurde.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Befund} & \textbf{Anzahl} & \\
+\midrule
+Doppelte Messwerte & $\mathbf{31\,400}$ & \textbf{in $18$ Monaten}\\
+Davon bemerkt & $\mathbf{0}$ & \\
+Wirkung auf Verläufe & \textcolor{mittel}{Punkte doppelt} & \textcolor{mittel}{unauffällig}\\
+\textbf{Wirkung auf Mittelwerte} & \textcolor{akzent}{\textbf{verzerrt}} & \textcolor{akzent}{\textbf{Gleitmittel}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Einunddreißigtausend doppelte Werte in achtzehn Monaten, keiner davon bemerkt. Im Verlauf liegen zwei Punkte übereinander und fallen nicht auf --- im Gleitmittel bekommt der doppelte Wert das doppelte Gewicht.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{type Block struct \{}\\
+\code{\ \ \ \ Geraet\ \ GeraetID}\\
+\code{\ \ \ \ Folge\ \ \ uint64\ \ \ \ // fortlaufend je Geraet}\\
+\code{\ \ \ \ Werte\ \ \ []Messwert}\\
+\code{\}}\\
+\\
+\code{// Speicherung: EINFUEGEN ... BEI KONFLIKT (geraet, folge)}\\
+\code{//\ \ \ \ \ \ \ \ \ \ \ \ \ NICHTS TUN}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Zwei Felder im Block und eine Bedingung beim Einfügen. Die Kennung kommt vom Sender --- Band 23, Kapitel~2 --- und besteht aus Gerät und Folgenummer, die das Gerät ohnehin führt.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen (Sender) & $12$ & $\mathbf{12}$ & \textcolor{gruen}{unverändert}\\
+Felder je Block & $1$ & $\mathbf{3}$ & \\
+Doppelte Werte & $\mathbf{31\,400}$ & $\mathbf{0}$ & \\
+Schreibdauer & $8$ ms & $\mathbf{9}$ ms & \textcolor{gruen}{$+12\,\%$}\\
+Zusätzlicher Index & --- & $\mathbf{1{,}4}$ GB & \\
+Aufwand & --- & $\mathbf{3}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist bemerkenswert: Am Sender ändert sich keine Zeile. Die Wiederholung war richtig --- es fehlte die Voraussetzung, unter der sie zulässig ist. Die Behebung liegt vollständig im Vertrag und in der Speicherung.}
+\end{minipage}
+\end{center}
+
+\textbf{Was mit den $31\,400$ geschah.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Vorgehen} & \textbf{Gewählt?} & \\
+\midrule
+Löschen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Nachvollzug}}\\
+\textbf{Als Doppel markieren} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Auswertung ignoriert}\\
+Unverändert lassen & \textcolor{akzent}{nein} & \textcolor{akzent}{Mittelwerte bleiben falsch}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Gelöscht wird nichts --- in einem Bestand mit Aufbewahrungspflicht ist das Markieren die einzige zulässige Form der Korrektur. Die Auswertung überspringt markierte Werte, die Historie bleibt vollständig.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Nicht wiederholen} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{dann Verlust}\\
+\enquote{Der Empfänger soll erkennen} & \textcolor{akzent}{\textbf{nein}} & \textbf{ohne Kennung unmöglich}\\
+\enquote{Zeitstempel als Kennung} & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{Uhr unzuverlässig}}\\
+\textbf{\enquote{Wiederholung setzt Idempotenz voraus}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile war der erste Vorschlag und wäre in diesem Vorhaben besonders falsch gewesen: Das Erfassungsgerät hat keine verlässliche Uhr --- Fall aus Band 23, Kapitel~4. Zwei Blöcke könnten denselben Zeitstempel tragen oder derselbe zwei verschiedene.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Folgenummer war die richtige Wahl, weil das Gerät sie ohnehin führte. Die beste Kennung ist meist keine neue, sondern eine, die es schon gibt und die man nur übertragen muss.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Waldo und Mit\-au\-to\-ren\zit{27} erklären, warum ein Zeit\-ab\-lauf drei Lagen nicht un\-ter\-schei\-det; Nygard\zit{22} behandelt Wie\-der\-ho\-lung mit ihren Vor\-aus\-set\-zun\-gen.

@@ -1,0 +1,152 @@
+\documentclass[11pt,a4paper,twoside]{book}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage[scaled=0.90]{helvet}
+\usepackage{courier}
+\usepackage[a4paper,inner=3.0cm,outer=2.4cm,top=2.6cm,bottom=2.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[german=quotes]{csquotes}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{tief}{HTML}{1F3A5F}
+\definecolor{mittel}{HTML}{2E5F8A}
+\definecolor{akzent}{HTML}{A34A28}
+\definecolor{sand}{HTML}{F4F1EA}
+\definecolor{grau}{HTML}{5A5A5A}
+\definecolor{gruen}{HTML}{2F6B4F}
+\definecolor{purpur}{HTML}{5B3A72}
+
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\newcommand{\kursiv}[1]{{\itshape\color{grau}#1}}
+\newcommand{\code}[1]{{\ttfamily\small #1}}
+\newcommand{\Person}[1]{\textbf{#1}}
+\newcommand{\Begriff}[1]{\textbf{#1}}
+\newcommand{\zit}[1]{\textsuperscript{[#1]}}
+\newcommand{\Oh}{\mathcal{O}}
+\newcommand{\boxtitel}[1]{{\bfseries\color{tief}#1}\par\vspace{6pt}}
+\newcommand{\boxtitelr}[1]{{\bfseries\color{akzent}#1}\par\vspace{6pt}}
+\newcommand{\loesung}{\par\vspace{8pt}{\bfseries\color{mittel}Lösung}\par\vspace{4pt}}
+
+\newtcolorbox{grundbox}[1][tief]{
+  breakable, enhanced, colback=sand, colframe=sand,
+  boxrule=0pt, leftrule=3pt, borderline west={3pt}{0pt}{#1},
+  left=12pt, right=10pt, top=10pt, bottom=10pt,
+  sharp corners, before skip=12pt, after skip=12pt}
+
+\newenvironment{merksatz}{\begin{grundbox}[tief]}{\end{grundbox}}
+\newenvironment{warnung}{\begin{grundbox}[akzent]}{\end{grundbox}}
+\newenvironment{technik}{\begin{grundbox}[mittel]}{\end{grundbox}}
+\newenvironment{aktuell}{\begin{grundbox}[gruen]}{\end{grundbox}}
+\newenvironment{definition}{\begin{grundbox}[purpur]}{\end{grundbox}}
+\newenvironment{aufgabe}{\begin{grundbox}[grau]\boxtitel{Übungsaufgaben}}{\end{grundbox}}
+\newtcolorbox{geschichte}[1][]{
+  breakable, enhanced, colback=sand, colframe=sand,
+  boxrule=0pt, borderline west={3pt}{0pt}{purpur},
+  left=12pt, right=10pt, top=10pt, bottom=10pt,
+  sharp corners, before skip=12pt, after skip=12pt,
+  title=\relax, #1}
+\tcbset{gestitel/.style={}}
+
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{tief}}{\Large\color{grau}Fall \thechapter}{8pt}{\Huge}
+\titleformat{\part}[display]
+  {\normalfont\huge\bfseries\color{tief}\filcenter}{\Large\color{grau}Teil \thepart}{10pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{10pt}{28pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,LO]{\small\itshape\color{grau}\leftmark}
+\fancyfoot[LE,LO]{\small\color{grau}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\hyphenation{be-grün-den Ent-wurfs-do-ku-men-te Sprich-wort-samm-lung
+Aus-las-sung Aus-las-sun-gen Schnitt-stel-len Zu-sam-men-set-zung
+Ne-ben-läu-fig-keit Feh-ler-be-hand-lung Über-tra-gungs-schicht
+Spei-cher-be-rei-ni-gung Wie-der-ho-lung Vor-her-sag-bar-keit
+Da-ten-mo-dell Ge-ne-ri-zi-tät Pro-gram-mie-rer Ver-er-bung}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\renewcommand{\arraystretch}{1.4}
+
+\title{Die Kunst}
+\author{}
+\date{}
+
+\begin{document}
+\frontmatter
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2.2cm}
+{\color{grau}\scshape\large Informatik von Grund auf --- Band 24}\\[1.8cm]
+{\color{tief}\fontsize{44}{50}\selectfont\bfseries Die Kunst}\\[1.0cm]
+{\color{akzent}\Large Zwanzig Fälle und ihre Begründung}\\[1.6cm]
+\begin{tikzpicture}[scale=0.95]
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (1.30,2.60) {1};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (3.08,2.60) {2};
+  \node[draw=akzent, fill=akzent!8, text=akzent, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (4.86,2.60) {3};
+  \node[draw=akzent, fill=akzent!8, text=akzent, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (6.64,2.60) {4};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (8.42,2.60) {5};
+  \node[draw=akzent, fill=akzent!8, text=akzent, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (1.30,1.88) {6};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (3.08,1.88) {7};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (4.86,1.88) {8};
+  \node[draw=akzent, fill=akzent!8, text=akzent, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (6.64,1.88) {9};
+  \node[draw=akzent, fill=akzent!8, text=akzent, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (8.42,1.88) {10};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (1.30,1.16) {11};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (3.08,1.16) {12};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (4.86,1.16) {13};
+  \node[draw=tief, fill=tief!10, text=tief, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (6.64,1.16) {14};
+  \node[draw=grau!55, dashed, fill=white, text=grau, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (8.42,1.16) {15};
+  \node[draw=grau!55, dashed, fill=white, text=grau, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (1.30,0.44) {16};
+  \node[draw=grau!55, dashed, fill=white, text=grau, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (3.08,0.44) {17};
+  \node[draw=grau!55, dashed, fill=white, text=grau, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (4.86,0.44) {18};
+  \node[draw=grau!55, dashed, fill=white, text=grau, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (6.64,0.44) {19};
+  \node[draw=grau!55, dashed, fill=white, text=grau, line width=0.8pt, rounded corners=2pt, inner sep=0pt, minimum width=1.42cm, minimum height=0.52cm, font=\scriptsize] at (8.42,0.44) {20};
+  \draw[grau!40, line width=0.5pt] (0.5,0.10)--(8.9,0.10);
+  \node[font=\scriptsize, color=tief] at (2.05,-0.30) {überarbeitet};
+  \node[font=\scriptsize, color=akzent] at (4.70,-0.30) {umgebaut};
+  \node[font=\scriptsize, color=grau] at (7.30,-0.30) {so gelassen};
+\end{tikzpicture}\\[1.6cm]
+{\color{grau}Was man nicht aus Regeln lernt}\\[4pt]
+{\color{grau}Jeder Schritt erklärt. Mit vollständig entwickelten Programmen.}\\[2.6cm]
+{\color{grau}\small Stand der Forschung: August 2026}
+\end{center}
+\input{impressum}
+\cleardoublepage
+\tableofcontents
+\mainmatter
+\input{00_vorwort}
+\input{01_fall}
+\input{02_fall}
+\input{03_fall}
+\input{04_fall}
+\input{05_fall}
+\input{06_fall}
+\input{07_fall}
+\input{08_fall}
+\input{09_fall}
+\input{10_fall}
+\input{11_fall}
+\input{12_fall}
+\input{13_fall}
+\input{14_fall}
+\input{15_fall}
+\input{16_fall}
+\input{17_fall}
+\input{18_fall}
+\input{19_fall}
+\input{20_fall}
+\input{A_anhang}
+\end{document}

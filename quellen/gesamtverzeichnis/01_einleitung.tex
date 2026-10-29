@@ -1,0 +1,126 @@
+\chapter{Einleitung}
+
+\section{Der Gedanke}
+
+Dieses Werk ist aus einer Unzufriedenheit entstanden. Es gibt hervorragende Bücher über Algorithmen, über Betriebssysteme, über Kryptographie --- aber kaum eines, das die Informatik als \emph{einen} Gegenstand behandelt und dabei jeden Schritt erklärt, statt ihn vorauszusetzen.
+
+\begin{merksatz}
+\boxtitel{Die Regeln, nach denen alle sechsundzwanzig Bände geschrieben sind}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{6.0cm}@{}}
+\toprule
+\textbf{Vollständigkeit} & Kein Band setzt einen anderen voraus; jeder beginnt beim Anfang seines Gebiets\\
+\textbf{Durchgerechnet} & Jede Aufgabe wird Schritt für Schritt gelöst, mit allen Zwischenrechnungen\\
+\textbf{Menschliche Sprache} & Keine Formel ohne Deutung, kein Begriff ohne Anschauung\\
+\textbf{Ehrliche Grenzen} & Was offen ist, wird als offen benannt; was überschätzt wird, wird geprüft\\
+\textbf{Kommentierte Quellen} & Achtundzwanzig je Band, mit Urteil statt bloßer Nennung\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Regel ist die ungewöhnlichste. In einem Fach, das stark von Ankündigungen lebt, gehört zu jeder Darstellung die Frage, was tatsächlich belegt ist. Mehrere Bände enthalten deshalb ein eigenes Kapitel, das verbreitete Behauptungen einzeln nachprüft.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\section{Was die Informatik zusammenhält}
+
+Die fünfundzwanzig Fachbände behandeln Gebiete, die im Studium selten miteinander in Verbindung gebracht werden. Trotzdem kehren dieselben Fragen wieder.
+
+\begin{merksatz}
+\boxtitel{Fünf durchgehende Fäden}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{6.0cm}@{}}
+\toprule
+\textbf{Abstraktion} & Jede Schicht verbirgt die darunterliegende und erkauft das mit Kosten: Bände 0, 4, 5, 6, 21\\
+\textbf{Grenzen} & Was ein System kann, bestimmt zugleich, was es nicht kann: Bände 2, 3, 7, 9\\
+\textbf{Der Umgang mit Unsicherheit} & Zufall, Rauschen, Fehler, unvollständige Daten: Bände 7, 8, 13, 15, 19\\
+\textbf{Selbstbezug} & Systeme, die über sich selbst sprechen: der Begleitband\\
+\textbf{Das Urteil} & Wann eine Regel greift und wann nicht: Bände 17, 20--24\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der fünfte Faden ist mit den Bänden 20 bis 24 hinzugekommen und war beim Entwurf der Reihe nicht vorgesehen. Er ergab sich aus einer Beobachtung: Die Regeln der Softwaretechnik lassen sich in wenigen Seiten aufschreiben --- die Entscheidung, ob sie im vorliegenden Fall greifen, nicht.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+Band 0 beginnt mit einem Schalter, der zwei Zustände unterscheidet; Band 15 endet mit einem Bauteil, dessen Zustand sich grundsätzlich nicht vollständig auslesen lässt. Dazwischen taucht immer wieder dieselbe Frage auf: Was kann ein System über sich selbst wissen?
+
+Die Bände 16 bis 24 stellen eine zweite Frage daneben, die keine theoretische ist: Was kann ein Mensch über ein System wissen, das andere Menschen gebaut haben und das er ändern soll?
+
+\begin{warnung}
+\boxtitelr{Eine Warnung vorweg}
+Mehrere Bände widersprechen der verbreiteten Darstellung ihres Gegenstands.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.2cm}P{6.6cm}@{}}
+\toprule
+\textbf{Band 11} & Die Kleine-Welt-Eigenschaft ist bei dichten Netzen kein Befund\\
+\textbf{Band 13} & Ein Modell, das die Daten perfekt trifft, hat meist nichts gelernt\\
+\textbf{Band 14} & Eine Simulation, die das Verhalten nachbildet, erklärt es nicht\\
+\textbf{Band 15} & Ein Quantenrechner probiert nicht alle Antworten gleichzeitig aus\\
+\textbf{Band 17} & Mehr Personen machen ein verspätetes Vorhaben später\\
+\textbf{Band 22} & Eine Sprache ohne Speicherfehler hat trotzdem Wettläufe\\
+\textbf{Band 24} & Der zweite Entwurf ist nicht immer der bessere\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Diese Berichtigungen sind nicht als Provokation gemeint. Sie stehen dort, weil die verbreitete Fassung jeweils die Sache verfehlt und weil ein Lehrbuch dafür da ist, das zu sagen.}
+\end{minipage}
+\end{center}
+\end{warnung}
+
+\section{Wie man das Werk benutzt}
+
+\begin{technik}
+\boxtitel{Fünf Wege durch die Reihe}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{4.2cm}P{1.6cm}@{}}
+\toprule
+\textbf{Ziel} & \textbf{Bände in dieser Folge} & \textbf{Umfang}\\
+\midrule
+Grund\-verständnis & $0$, $1$, $2$, $4$, $5$ & $970$ S.\\
+Theoretische Informatik & $1$, $2$, $3$, $7$, Begleitband & $838$ S.\\
+Systeme und Betrieb & $4$, $5$, $9$, $10$, $19$ & $814$ S.\\
+Lernende Systeme & $12$, $13$, $14$, $11$ & $672$ S.\\
+\textbf{Programmieren} & \textbf{$20$, $21$, $22$, $23$, $24$} & \textbf{$619$ S.}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der letzte Weg ist der einzige, der eine Reihenfolge zwingend vorschreibt: Band 24 setzt die Fälle aus den Bänden 20 bis 23 voraus, weil er ihre Regeln gegen den Einzelfall prüft.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Was in jedem Band gleich aufgebaut ist}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{6.0cm}@{}}
+\toprule
+\textbf{Fünfzehn Kapitel} & in vier bis sechs Teilen; Band 24 weicht ab und hat zwanzig Fallkapitel\\
+\textbf{Vorletztes Kapitel} & \enquote{Der Stand im Jahr 2026} --- was heute gilt und was offen ist\\
+\textbf{Anhang} & Formeln, Landkarte, Glossar, Zeittafel\\
+\textbf{Achtundzwanzig Quellen} & jede mit einem Satz, warum sie dort steht\\
+\textbf{Drei Bücher} & am Schluss: die Empfehlung, wenn man nur drei kauft\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{merksatz}

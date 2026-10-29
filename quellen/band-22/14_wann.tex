@@ -1,0 +1,222 @@
+\chapter{Wann Go und wann nicht}\label{kap:wann}
+
+\begin{merksatz}
+\boxtitel{Die vier Gründe, die tragen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Grund} & \textbf{Trägt?} & \\
+\midrule
+\textbf{Viele gleichzeitige Verbindungen} & \textcolor{gruen}{\textbf{ja}} & \textbf{Kap.~\ref{kap:goroutinen}}\\
+\textbf{Große Mannschaft} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{kleine Sprache}\\
+\textbf{Einfache Auslieferung} & \textcolor{gruen}{\textbf{ja}} & eine Datei\\
+\textbf{Schnelle Einarbeitung} & \textcolor{gruen}{ja} & $2$--$5$ Tage\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der zweite Grund wird selten genannt und ist in der Praxis der wichtigste: Wenn zwanzig Leute an einem Bestand arbeiten, ist eine Sprache, die man in einer Woche kennt und in der es nur einen Stil gibt, mehr wert als jede Ausdrucksstärke.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Gründe, die nicht tragen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Behauptung} & \textbf{Trägt?} & \\
+\midrule
+\enquote{Go ist schnell} & \textcolor{mittel}{teils} & \textbf{$\approx1{,}3\times$ C}\\
+\enquote{Nebenläufigkeit ist gelöst} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Kap.~\ref{kap:schiefgeht}}}\\
+\enquote{Einfach heißt fehlerfrei} & \textcolor{akzent}{nein} & \\
+\enquote{Alle benutzen es} & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die verbreitetste Fehlannahme dieses Bandes: Goroutinen und Kanäle machen Nebenläufigkeit \kursiv{ausdrückbar}, nicht sicher. Die drei Fehlerklassen aus Kapitel~\ref{kap:schiefgeht} sind alle in Go leichter zu erzeugen als in C.}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Wo Go nicht passt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.8cm}@{}}
+\toprule
+\textbf{Aufgabe} & \textbf{Go?} & \textbf{Besser}\\
+\midrule
+Harte Zeitschranken & \textcolor{akzent}{\textbf{nein}} & \textbf{C, Rust, Ada}\\
+Sehr wenig Speicher & \textcolor{akzent}{nein} & \textcolor{akzent}{Laufzeit\-umgebung}\\
+Ohne Betriebssystem & \textcolor{akzent}{nein} & \\
+Mathematik, Vektoren & \textcolor{akzent}{\textbf{nein}} & \textbf{C, Fortran}\\
+Oberflächen & \textcolor{akzent}{schwach} & \\
+Datenauswertung & \textcolor{akzent}{schwach} & \textbf{Python, R}\\
+Wissenschaftliches Rechnen & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Bereiche, in denen Go nicht die richtige Wahl ist --- eine längere Liste als bei den meisten Sprachen. Das ist die Kehrseite der Spezialisierung: Go wurde für einen bestimmten Zweck gebaut und ist außerhalb davon unauffällig bis ungeeignet.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist eine harte Grenze: Ein Go-Programm bringt eine Laufzeitumgebung von etwa zwei Megabyte mit --- mehr, als der Messdatenerfasser aus Band 21 insgesamt hat.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Das Vorhaben, vollständig verteilt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Schranke} & \textbf{Merkmal} & \textbf{Wahl}\\
+\midrule
+Messerfassung & \textbf{$2$ ms hart} & $64$ KB & \textcolor{gruen}{\textbf{C}}\\
+Übertragung & $50$ ms weich & \textbf{$1000$ Verb.} & \textcolor{gruen}{\textbf{Go}}\\
+Auswertung & keine & viel Fachlogik & \textcolor{gruen}{\textbf{Python}}\\
+Oberfläche & keine & --- & \textcolor{gruen}{Web}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Vier Bestandteile, vier Sprachen, und jede Wahl folgt aus einer Eigenschaft der Aufgabe. Das ist die Antwort, auf die die Bände 20 bis 22 zusammen hinauslaufen --- nicht \enquote{welche Sprache}, sondern \enquote{welche wofür}.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Rechnen Sie Go gegen die Alternativen.
+\item Bewerten Sie die Auslieferung.
+\item Bestimmen Sie, was an der Grenze zu beachten ist.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Go gegen die Alternativen.}
+
+\textbf{Der Fall.} Die Übertragungsschicht, fünf Jahre gerechnet.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{1.6cm}P{1.6cm}P{1.6cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Go} & \textbf{C} & \textbf{Rust} & \textbf{Python}\\
+\midrule
+Zeilen & $\mathbf{3000}$ & $8000$ & $3400$ & $\mathbf{2100}$\\
+Erstellung (PM) & $\mathbf{6}$ & $14$ & $11$ & $\mathbf{5}$\\
+Speicherfehler & \textcolor{gruen}{$0$} & \textcolor{akzent}{$\approx19$} & \textcolor{gruen}{$0$} & \textcolor{gruen}{$0$}\\
+Wettlauffehler & \textcolor{mittel}{$\approx4$} & \textcolor{akzent}{$\approx7$} & \textcolor{gruen}{$\mathbf{0}$} & \textcolor{gruen}{$\approx1$}\\
+Durchsatz & $\mathbf{495}$ & $530$ & $525$ & \textcolor{akzent}{$\mathbf{78}$}\\
+Über $5$ J.\ (PM) & $\mathbf{19}$ & $40$ & $24$ & $\mathbf{17}$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Python ist billiger und sechsmal langsamer --- damit fällt es an der Durchsatzanforderung aus, nicht an der Kostenrechnung. Rust hat null Wettläufe und kostet fünf Personenmonate mehr; ob das lohnt, hängt davon ab, wie teuer ein Wettlauf im Betrieb ist.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist die ehrlichste Aussage über Go: Es beseitigt Speicherfehler und nicht die Wettläufe. Rust tut beides --- und das ist ein sachliches Argument, das ein Go-Buch nennen muss.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Auslieferung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Go} & \textbf{Python} & \textbf{Java}\\
+\midrule
+Auslieferung & \textbf{eine Datei} & \textcolor{akzent}{Umgebung} & Laufzeit\\
+Größe & $\approx12$ MB & $\approx$ Behälter & $\approx180$ MB\\
+Fremdrechner & \textcolor{gruen}{\textbf{nichts nötig}} & \textcolor{akzent}{Version} & \textcolor{mittel}{Laufzeit}\\
+Übersetzen für anderes System & \textcolor{gruen}{\textbf{ein Befehl}} & --- & --- \\
+Startzeit & \textcolor{gruen}{$\approx\mathbf{8}$ ms} & $\approx90$ ms & $\approx400$ ms\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist im Klinikbetrieb praktisch wertvoll: Man übersetzt auf dem Entwicklungsrechner für das Zielsystem und kopiert eine Datei. Keine Abhängigkeiten, keine Versionskonflikte, keine Installationsanleitung.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Für ein Medizinprodukt kommt hinzu: Eine einzelne Binärdatei mit einer Prüfsumme ist leichter zu dokumentieren und zu validieren als eine Umgebung mit vierzig Paketen in bestimmten Versionen.}
+\end{center}
+
+\medskip
+\textbf{(c) An der Grenze.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Antwort} & \\
+\midrule
+Aufruf nach C & \textcolor{akzent}{\textbf{teuer}} & \textbf{Band 21, Kap.~14}\\
+Faden blockiert & \textcolor{akzent}{ja} & \textcolor{akzent}{bei blockierendem C}\\
+Zeiger nach C geben & \textcolor{akzent}{\textbf{Regeln beachten}} & \textcolor{akzent}{\textbf{Bereinigung}}\\
+Besser & \textbf{eigener Prozess} & \textcolor{gruen}{\textbf{Rohr oder Steckdose}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die harte: Ein Go-Zeiger darf nicht dauerhaft in C gehalten werden, weil die Speicherbereinigung Objekte verschieben und freigeben kann. Es gibt Regeln dafür, und sie werden regelmäßig gebrochen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist der Rat, der aus dem Vorhaben folgt: Statt die Messerfassung in denselben Prozess zu binden, läuft sie als eigenes Programm und schickt Werte über eine Verbindung. Der Grenzübertritt kostet mehr Nanosekunden und spart eine ganze Fehlerklasse.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die ehrliche Einordnung}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Antwort} & \\
+\midrule
+Beste Sprache? & \textcolor{akzent}{\textbf{nein}} & \textbf{gibt es nicht}\\
+Beste für Netzdienste? & \textcolor{gruen}{\textbf{unter den besten}} & \\
+Für alles brauchbar? & \textcolor{akzent}{nein} & \textbf{sieben Bereiche}\\
+Lernenswert? & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{in einer Woche}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist ein eigenes Argument: Der Aufwand, Go zu lernen, ist so gering, dass sich die Kenntnis auch dann lohnt, wenn man es selten benutzt --- schon um Code lesen zu können, den andere schreiben.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Brooks\zit{24} er\-in\-nert daran, dass keine Sprache die we\-sent\-li\-che Kom\-ple\-xi\-tät der Aufgabe be\-sei\-tigt; Dijkstra\zit{5} legte die Grund\-la\-gen ne\-ben\-läu\-fi\-ger Ko\-or\-di\-na\-tion; Valsorda\zit{22} beschreibt die Si\-cher\-heits\-fra\-gen der Go-Aus\-lie\-fe\-rung.

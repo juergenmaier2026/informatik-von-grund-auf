@@ -1,0 +1,279 @@
+\chapter{Beobachtbarkeit}\label{kap:beobachtbarkeit}
+
+\begin{merksatz}
+\boxtitel{Drei Arten von Aufzeichnung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{2.4cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Protokolle} & \textbf{Zählwerte} & \textbf{Verfolgung}\\
+\midrule
+Antwortet & \textbf{was geschah} & \textbf{wie viel} & \textbf{wo die Zeit}\\
+Menge & \textcolor{akzent}{groß} & \textcolor{gruen}{klein} & \textcolor{mittel}{Stichprobe}\\
+Kosten & \textcolor{akzent}{hoch} & \textcolor{gruen}{gering} & \textcolor{mittel}{mittel}\\
+Einzelfall & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}}\\
+Trend & \textcolor{akzent}{mühsam} & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei Werkzeuge für drei Fragen, und keines ersetzt die anderen. Wer nur Protokolle hat, kann keinen Trend erkennen; wer nur Zählwerte hat, kann keinen Einzelfall aufklären.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Frage entscheidet über das Mittel.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Mittel} & \\
+\midrule
+Läuft es? & \textbf{Zählwerte} & \textcolor{gruen}{Warnung}\\
+Wird es schlechter? & Zählwerte & \textcolor{gruen}{Trend}\\
+Warum war diese Anfrage langsam? & \textbf{Verfolgung} & \textcolor{gruen}{Kap.~\ref{kap:zeit_hin}}\\
+Was ist bei Patient X passiert? & \textbf{Protokolle} & \textcolor{gruen}{\textbf{Einzelfall}}\\
+Wer hat wann was gesehen? & \textbf{Protokolle} & \textcolor{gruen}{\textbf{regulatorisch}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist in der Klinik keine Betriebsfrage, sondern eine Pflicht --- und sie verlangt ein Protokoll mit anderen Anforderungen: unveränderlich, vollständig, aufbewahrungspflichtig. Es ist ein eigener Bestand, kein Betriebsprotokoll.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die zwei Protokolle}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Betrieb} & \textbf{Nachweis}\\
+\midrule
+Zweck & \textbf{Fehlersuche} & \textbf{wer sah was}\\
+Aufbewah\-rung & $7$--$30$ Tage & \textcolor{gruen}{\textbf{Jahre}}\\
+Veränderbar & \textcolor{mittel}{ja} & \textcolor{akzent}{\textbf{nein}}\\
+Patientendaten & \textcolor{akzent}{\textbf{keine}} & \textcolor{gruen}{Kennungen}\\
+Wer liest & Entwickler & \textcolor{akzent}{Prüfer, Gericht}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die vierte Zeile ist die Regel aus Band 19 und Band 21: In ein Betriebsprotokoll gehören Kennungen, keine Inhalte. Es wandert in Auswertungssysteme mit anderen Zugriffsrechten --- und ein Kaliumwert in einer Protokollzeile ist eine Offenlegung.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Was ein Zählwert braucht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Warum} & \\
+\midrule
+Merkmale (Dienst, Art) & \textbf{aufschlüsselbar} & \\
+\textbf{Wenige Merkmalswerte} & \textcolor{akzent}{\textbf{Zahl der Reihen}} & \textcolor{akzent}{\textbf{nie Patientenkennung}}\\
+Als Histogramm & \textbf{Perzentile} & \textcolor{gruen}{Kap.~\ref{kap:messen}}\\
+Monoton steigend & \textbf{Neustart erkennbar} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die häufigste Kostenfalle: Ein Zählwert mit der Patientenkennung als Merkmal erzeugt eine Reihe je Patient --- bei zweihunderttausend Patienten zweihunderttausend Reihen, und das Überwachungssystem bricht zusammen.}
+\end{minipage}
+\end{center}
+
+\textbf{Die vier, die immer gebraucht werden.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Zählwert} & \textbf{Warnt bei} & \\
+\midrule
+Anfragen je Sekunde & \textbf{Einbruch} & \textcolor{gruen}{\textbf{oft der erste Hinweis}}\\
+Fehlerquote & Anstieg & \\
+Antwortzeit\-verteilung & $99.$ Perzentil & \\
+Sättigung & \textbf{$>70\,\%$} & \textcolor{gruen}{\textbf{Vorwarnung}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile wird oft übersehen: Ein Einbruch der Anfragezahl ist ein Störungshinweis --- irgendwer vorne fragt nicht mehr. Wer nur auf Fehler achtet, merkt einen ausgefallenen Sender gar nicht, weil er keine Fehler erzeugt.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Alarme, die niemand mehr liest}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Regel} & \\
+\midrule
+Löst aus bei & \textbf{Symptom, nicht Ursache} & \textcolor{gruen}{Benutzer betroffen}\\
+Handlung ableitbar & \textcolor{gruen}{\textbf{muss}} & \textcolor{akzent}{sonst weglassen}\\
+Fehlalarme & \textcolor{akzent}{$<10\,\%$} & \textbf{Band 18}\\
+Nachts wecken & \textcolor{akzent}{nur wenn nötig} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die wichtigste Umstellung: Nicht \enquote{Speicherbelegung über achtzig Prozent} melden, sondern \enquote{Befunde erreichen die Station verspätet}. Das erste ist eine Vermutung über eine Ursache, das zweite ist der Schaden.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Dieselbe Alarmermüdung wie bei den klinischen Geräten aus Band 18: Bei mehr als zehn Prozent Fehlalarmen wird jeder Alarm zum Rauschen --- und dann auch der echte.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Legen Sie die Aufzeichnung je Bestandteil fest.
+\item Bestimmen Sie die Alarme.
+\item Untersuchen Sie die Kosten.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Aufzeichnung je Bestandteil.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.0cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Protokoll} & \textbf{Zählwerte} & \textbf{Verfolgung}\\
+\midrule
+Erfassung & \textcolor{mittel}{knapp} & \textcolor{gruen}{$6$} & \textcolor{akzent}{nein}\\
+Übertragung & \textcolor{gruen}{voll} & \textcolor{gruen}{$\mathbf{14}$} & \textcolor{gruen}{\textbf{ja}}\\
+Speicherung & voll & $11$ & \textcolor{gruen}{ja}\\
+Auswertung & voll & $9$ & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile folgt aus Band 21: Der Messdatenerfasser hat vierundsechzig Kilobyte und kann keine Verfolgung mitführen. Er zählt --- gemessen, gesendet, verworfen, Puffer voll, Fehler, Neustarts --- und das genügt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist der Ort, an dem die Verfolgung beginnt: Die Übertragungsschicht vergibt die Kennung und reicht sie weiter. Damit ist jeder Messwert vom Eintritt in das Werk bis zur Anzeige verfolgbar.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Alarme.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Alarm} & \textbf{Dringend?} & \textbf{Bedeutet}\\
+\midrule
+\textbf{Keine Befunde seit $10$ min} & \textcolor{akzent}{\textbf{ja}} & \textbf{Kette unterbrochen}\\
+Fehlerquote $>1\,\%$ & \textcolor{akzent}{ja} & \\
+$99.$ Perzentil $>2$ s & \textcolor{mittel}{tagsüber} & \\
+Sonderablage wächst & \textcolor{mittel}{tagsüber} & \textcolor{gruen}{Kap.~\ref{kap:fehler}}\\
+Puffer $>70\,\%$ & \textcolor{mittel}{tagsüber} & \textcolor{gruen}{\textbf{Vorwarnung}}\\
+Rechner ausgelastet & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{keine Handlung}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der Alarm, den fast jedes Überwachungssystem voreingestellt mitbringt und der fast nie etwas bedeutet: Ein ausgelasteter Rechner, der seine Antwortzeiten hält, arbeitet wie vorgesehen. Er gehört in ein Schaubild, nicht in einen Alarm.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist der wichtigste Alarm des ganzen Werks und der am seltensten eingerichtete: Wenn keine Befunde mehr ankommen, ist die Kette irgendwo unterbrochen --- und niemand erzeugt dabei einen Fehler.}
+\end{center}
+
+\medskip
+\textbf{(c) Die Kosten.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.2cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+\textbf{Art} & \textbf{Menge/Tag} & \textbf{Speicher} & \textbf{Laufzeit}\\
+\midrule
+Protokolle, alles & \textcolor{akzent}{$\mathbf{240}$ GB} & \textcolor{akzent}{teuer} & \textcolor{akzent}{$8\,\%$}\\
+Protokolle, gefiltert & $\mathbf{12}$ GB & \textcolor{gruen}{tragbar} & $2\,\%$\\
+Zählwerte & \textcolor{gruen}{$\mathbf{80}$ MB} & \textcolor{gruen}{\textbf{gering}} & \textcolor{gruen}{$<0{,}5\,\%$}\\
+Verfolgung, $1\,\%$ & $\mathbf{1{,}4}$ GB & \textcolor{gruen}{gering} & $1\,\%$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist das beste Verhältnis: Achtzig Megabyte je Tag beantworten alle Fragen nach Trend und Zustand. Die erste Zeile ist dreitausendmal so groß und beantwortet Fragen, die man selten stellt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Was gefiltert wird} & \textbf{Anteil} & \\
+\midrule
+Erfolgreiche Routine & $\mathbf{94\,\%}$ & \textcolor{gruen}{\textbf{Zählwert genügt}}\\
+Fehler & $\mathbf{100\,\%}$ behalten & \\
+Langsame Anfragen & $100\,\%$ behalten & \textcolor{gruen}{über Schwelle}\\
+Stichprobe der Routine & $\mathbf{1\,\%}$ & \textcolor{gruen}{für Vergleiche}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor zwanzig durch eine einfache Regel: Alles Fehlerhafte und alles Langsame vollständig, vom Rest ein Prozent. Damit bleibt jede interessante Anfrage im Protokoll und die uninteressante Mehrheit verschwindet.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Aufzeichnung gehört zum Entwurf}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Zeitpunkt} & \textbf{Aufwand} & \\
+\midrule
+Beim Entwurf & \textcolor{gruen}{$\approx3\,\%$} & \textcolor{gruen}{\textbf{eingebaut}}\\
+Nach der Fertigstellung & $\approx12\,\%$ & \\
+Während einer Störung & \textcolor{akzent}{\textbf{unmöglich}} & \textcolor{akzent}{\textbf{man braucht sie jetzt}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der Grund für dieses Kapitel: Man kann eine Verfolgung nicht einbauen, während man eine Störung untersucht. Entweder sie war da, oder man rät --- und Raten ist bei einem Werk aus fünf Bestandteilen aussichtslos.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Drei Prozent des Aufwands beim Entwurf gegen zwölf danach. Das ist dieselbe Rechnung wie bei der Prüfbarkeit in Band 20, Kapitel~9 --- und sie wird aus demselben Grund verschoben: Beides sieht aus wie Arbeit, die nichts hervorbringt.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Majors und Mit\-au\-to\-rin\-nen\zit{16} entwickeln den Begriff der Be\-ob\-acht\-bar\-keit; das Be\-triebs\-hand\-buch\zit{3} verbindet ihn mit Zielen und Alar\-men; Gregg\zit{11} liefert die Mess\-tech\-nik darunter.

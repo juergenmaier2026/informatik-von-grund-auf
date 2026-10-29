@@ -1,0 +1,164 @@
+\part{Die Daten}
+
+\chapter{Der Wert ohne Einheit}\label{fall:einheit}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Die Funktion prüft, ob ein Laborwert außerhalb des Referenzbereichs liegt. Sie läuft seit vier Jahren, etwa $40\,000$ mal am Tag.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{def ist\_auffaellig(wert: float, unten: float, oben: float) -> bool:}\\
+\code{\ \ \ \ return wert < unten or wert > oben}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei Zeilen, richtig benannt, mit Typangaben, ohne Nebenwirkung. Nach den Maßstäben aus Band 20, Kapitel~5 ist das eine vorbildliche Funktion --- kurze Zuständigkeit, sprechender Name, prüfbar in einer Zeile.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Geprüft} & \textbf{Befund} & \\
+\midrule
+Benennung & \textcolor{gruen}{gut} & \\
+Zerlegung & \textcolor{gruen}{gut} & \\
+Prüfbarkeit & \textcolor{gruen}{gut} & \\
+\textbf{Einheiten} & \textcolor{akzent}{\textbf{nicht ausgedrückt}} & \textcolor{akzent}{\textbf{Band 23, Kap.~6}}\\
+\textbf{Genauigkeit} & \textcolor{akzent}{\textbf{verloren}} & \textcolor{akzent}{\code{float}}\\
+Grenzwerte & \textcolor{akzent}{nicht behandelt} & \enquote{$<0{,}1$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei Befunde, und alle drei liegen nicht in der Funktion, sondern in ihrer Signatur. Die Funktion ist richtig; was sie entgegennimmt, ist es nicht. Der Aufrufer kann Kalium in mmol/l mit einem Bereich in mg/dl vergleichen, und nichts hält ihn auf.}
+\end{minipage}
+\end{center}
+
+\textbf{Ist das theoretisch?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Aufrufstellen} & $\mathbf{31}$ & \\
+Bereich aus dem Befund & $24$ & \textcolor{gruen}{gleiche Einheit}\\
+Bereich aus Stammdaten & $\mathbf{5}$ & \textcolor{mittel}{meist gleich}\\
+\textbf{Bereich fest im Code} & $\mathbf{2}$ & \textcolor{akzent}{\textbf{eine falsch}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Nein. Eine der einunddreißig Aufrufstellen vergleicht einen Glukosewert in mmol/l mit einer fest eingetragenen Grenze in mg/dl --- Faktor achtzehn. Der Fehler ist seit zwei Jahren im Bestand und fiel nicht auf, weil die Warnung dadurch nie ausgelöst wurde.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{@dataclass(frozen=True)}\\
+\code{class Groesse:}\\
+\code{\ \ \ \ betrag: int\ \ \ \ \ \ \ \ \ \ \ \# in Einheiten von 10**exp}\\
+\code{\ \ \ \ exp: int}\\
+\code{\ \ \ \ einheit: str\ \ \ \ \ \ \ \ \ \# UCUM}\\
+\\
+\code{def ist\_auffaellig(wert: Groesse, bereich: Bereich) -> bool:}\\
+\code{\ \ \ \ if wert.einheit != bereich.einheit:}\\
+\code{\ \ \ \ \ \ \ \ raise EinheitFehler(wert.einheit, bereich.einheit)}\\
+\code{\ \ \ \ return wert < bereich.unten or wert > bereich.oben}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Nicht die Funktion wurde geändert, sondern der Typ, den sie entgegennimmt. Die Prüfung in Zeile acht ist der eigentliche Gewinn --- sie macht aus einem stillen Rechenfehler eine Ausnahme.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen (Funktion) & $2$ & $\mathbf{4}$ & \\
+Zeilen (Typen) & $0$ & $\mathbf{18}$ & \\
+Aufrufstellen geändert & --- & $\mathbf{31}$ & \textcolor{akzent}{$3$ PT}\\
+Einheitenfehler möglich & \textcolor{akzent}{\textbf{ja}} & \textcolor{gruen}{\textbf{nein}} & \\
+Genauigkeit erhalten & \textcolor{akzent}{nein} & \textcolor{gruen}{ja} & \\
+Laufzeit je Aufruf & $0{,}2$ µs & $0{,}9$ µs & \textcolor{mittel}{$4{,}5\times$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der Aufwand liegt nicht bei den zwanzig Zeilen, sondern bei den einunddreißig Aufrufstellen --- drei Personentage. Die Laufzeit vervierfacht sich und bleibt bei vierzigtausend Aufrufen täglich unter einer Zehntelsekunde am Tag.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum nicht die kleinere Lösung?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Alternative} & \textbf{Aufwand} & \textbf{Wirkung}\\
+\midrule
+Einheit als Argument & \textcolor{gruen}{$1$ PT} & \textcolor{akzent}{\textbf{trennbar}}\\
+Kommentar & \textcolor{gruen}{$0$} & \textcolor{akzent}{keine}\\
+Prüfung am Rand & $1$ PT & \textcolor{mittel}{nur dort}\\
+\textbf{Eigener Typ} & $3$ PT & \textcolor{gruen}{\textbf{unmöglich zu trennen}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Alternative kostet ein Drittel und lässt zu, dass jemand die Einheit vergisst --- zwei Felder sind trennbar, ein Verbund nicht. Das ist die Entscheidung aus Band 21, Kapitel~5: den Fehler unmöglich machen statt ihn zu prüfen.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Nie \code{float} für Zahlen} & \textcolor{akzent}{\textbf{nein}} & \textbf{Fall 16}\\
+\enquote{Jeder Wert braucht einen Typ} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Aufwand}\\
+\enquote{Zwei Zeilen sind zu wenig} & \textcolor{akzent}{nein} & \\
+\textbf{\enquote{Die Signatur ist Teil des Entwurfs}} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{das ist die Lehre}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der teuerste Fehlschluss: Wer nach diesem Fall für jede Zahl einen eigenen Typ einführt, hat einen Bestand mit vierzig Wertetypen, von denen achtunddreißig nie verwechselt werden konnten. Der Typ lohnt dort, wo zwei Einheiten koexistieren.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Prüffrage lautet nicht \enquote{ist es eine Zahl}, sondern \enquote{gibt es mehr als eine Darstellung, die hier auftreten kann}. Bei Laborwerten lautet die Antwort ja, bei einer Anzahl von Datensätzen nein.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Wirth\zit{28} begründet die Rang\-ord\-nung, in der die Da\-ten\-struk\-tur vor dem Ver\-fah\-ren steht; Goldberg\zit{12} zeigt, was bei \code{float} an In\-for\-ma\-tion verlorengeht.

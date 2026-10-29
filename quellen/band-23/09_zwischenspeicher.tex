@@ -1,0 +1,278 @@
+\chapter{Zwischenspeicher}\label{kap:zwischenspeicher}
+
+\begin{merksatz}
+\boxtitel{Der Handel}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Man bekommt} & \textbf{Man bezahlt} & \\
+\midrule
+Geschwin\-digkeit & \textbf{Aktualität} & \textcolor{akzent}{\textbf{der ganze Handel}}\\
+Entlastung & Speicher & \\
+Verfügbarkeit & \textcolor{akzent}{Komplexität} & \textcolor{akzent}{Ungültigmachen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist der ganze Begriff: Ein Zwischenspeicher liefert schnell und möglicherweise veraltet. Die Frage ist nie, ob er veraltet, sondern wie lange und ob das erträglich ist.}
+\end{minipage}
+\end{center}
+
+\textbf{Was erträglich ist, hängt vom Gegenstand ab.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Gegenstand} & \textbf{Erträglich veraltet} & \\
+\midrule
+Messgrößen\-katalog & \textbf{Stunden} & \textcolor{gruen}{ändert sich selten}\\
+Referenzbereiche & \textcolor{mittel}{\textbf{Minuten}} & \textcolor{akzent}{Band 21, Kap.~11}\\
+Patienten\-stammdaten & Minuten & \\
+Befunde & \textcolor{akzent}{Sekunden} & \\
+\textbf{Kritische Warnung} & \textcolor{akzent}{\textbf{gar nicht}} & \textcolor{akzent}{\textbf{nie zwischenspeichern}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine fachliche Festlegung, keine technische: Eine kritische Warnung darf nicht aus einem Zwischenspeicher kommen, weil ein veralteter Wert hier unmittelbar schadet. Wer alles zwischenspeichert, hat diese Unterscheidung nicht getroffen.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die drei Arten, ungültig zu machen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{2.8cm}@{}}
+\toprule
+\textbf{Art} & \textbf{Aufwand} & \textbf{Veralterung}\\
+\midrule
+\textbf{Ablaufzeit} & \textcolor{gruen}{\textbf{sehr gering}} & \textbf{bis zur Frist}\\
+Bei Änderung löschen & \textcolor{mittel}{mittel} & \textcolor{gruen}{kurz}\\
+Bei Änderung neu füllen & \textcolor{akzent}{hoch} & \textcolor{gruen}{\textbf{keine}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die erste Zeile ist fast immer die richtige Wahl und wird zugunsten der beiden anderen verworfen, weil sie zu einfach wirkt. Eine Ablaufzeit braucht keine Benachrichtigung, keine Reihenfolge und keine Behandlung verlorener Nachrichten --- sie kann nur zu lang gewählt sein.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite und dritte Zeile setzen voraus, dass jede Änderung zuverlässig gemeldet wird. Über eine Naht ist das die Annahme aus Kapitel~\ref{kap:naht}, die nicht zutrifft --- eine verlorene Ungültigmeldung erzeugt einen Zwischenspeicher, der dauerhaft falsch ist.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Wo der Zwischenspeicher liegt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+\textbf{Ort} & \textbf{Zugriff} & \textbf{Ungültig machen} & \textbf{Kohärent}\\
+\midrule
+Im Prozess & $\mathbf{0{,}1}$ µs & \textcolor{akzent}{\textbf{schwer}} & \textcolor{akzent}{\textbf{nein}}\\
+Gemeinsam im Haus & $200$ µs & \textcolor{gruen}{leicht} & \textcolor{gruen}{ja}\\
+Beim Aufrufer & $\mathbf{0{,}1}$ µs & \textcolor{akzent}{sehr schwer} & \textcolor{akzent}{nein}\\
+Datenbankseitig & $80$ µs & \textcolor{gruen}{\textbf{eingebaut}} & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist zweitausendmal schneller und nicht kohärent: Bei zehn Prozessen gibt es zehn Zwischenspeicher, die verschiedene Werte halten können. Ein Arzt sieht $5{,}1$, sein Kollege gleichzeitig $4{,}8$ --- und beide Bildschirme stimmen mit ihrem Prozess überein.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb gilt: Prozesseigene Zwischenspeicher nur für Dinge, die sich fast nie ändern --- Katalog, Codelisten, Konfiguration. Alles, was ein Benutzer als \enquote{aktuell} erwartet, gehört in einen gemeinsamen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Was bei leerem Zwischenspeicher geschieht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Last dahinter} & \\
+\midrule
+Normalbetrieb, $95\,\%$ Treffer & $\mathbf{5\,\%}$ & \\
+Nach Neustart & $\mathbf{100\,\%}$ & \textcolor{akzent}{$\times20$}\\
+Alle Einträge zugleich abgelaufen & \textcolor{akzent}{$\mathbf{100\,\%}$} & \textcolor{akzent}{\textbf{Gleichtakt}}\\
+Beliebter Eintrag fehlt & \textcolor{akzent}{\textbf{Ansturm}} & \textcolor{akzent}{\textbf{$n$ gleichzeitige Anfragen}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein System, das mit fünfundneunzig Prozent Trefferquote läuft, ist auf fünf Prozent der Last ausgelegt. Nach einem Neustart trifft es die zwanzigfache Last --- und wenn es die nicht verkraftet, kommt es nicht wieder hoch.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist vermeidbar: Wer alle Ablaufzeiten um einen zufälligen Betrag streut, verhindert, dass sie gleichzeitig ablaufen. Fünf Zeilen, und ein wiederkehrender Lastberg verschwindet.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Legen Sie die Zwischenspeicherung fest.
+\item Verhindern Sie den Ansturm.
+\item Bestimmen Sie, wann Veralterung erträglich ist.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die Festlegung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+\textbf{Gegenstand} & \textbf{Ort} & \textbf{Frist} & \textbf{Trefferquote}\\
+\midrule
+Messgrößen & \textbf{Prozess} & $1$ h & $\mathbf{99{,}9\,\%}$\\
+Referenzbereiche & Prozess & $\mathbf{5}$ min & $99{,}5\,\%$\\
+Stammdaten & \textbf{gemeinsam} & $2$ min & $87\,\%$\\
+Verläufe & gemeinsam & $\mathbf{30}$ s & $41\,\%$\\
+Warnungen & \textcolor{akzent}{\textbf{keiner}} & --- & --- \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile lohnt kaum: Bei einundvierzig Prozent Trefferquote spart der Zwischenspeicher weniger als die Hälfte der Last und bringt die volle Komplexität mit. Eine Trefferquote unter etwa sechzig Prozent ist ein Grund, es zu lassen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Ohne} & \textbf{Mit} & \\
+\midrule
+Last auf Speicherung & $\mathbf{100\,\%}$ & $\mathbf{18\,\%}$ & \\
+$95.$ Perzentil & $410$ ms & $\mathbf{95}$ ms & \\
+Veralterung möglich & \textcolor{gruen}{nein} & \textcolor{akzent}{bis $2$ min} & \\
+Zusätzliche Zeilen & $0$ & $\approx160$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die Frage, die fachlich zu beantworten ist: Sind zwei Minuten veraltete Stammdaten erträglich? Für die Anzeige des Patientennamens ja, für die Prüfung einer Medikamentenunverträglichkeit nicht.}
+\end{center}
+
+\medskip
+\textbf{(b) Den Ansturm verhindern.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Mittel} & \textbf{Aufwand} & \\
+\midrule
+\textbf{Ablaufzeiten streuen} & \textcolor{gruen}{\textbf{$5$ Zeilen}} & \textcolor{gruen}{gegen Gleichtakt}\\
+\textbf{Nur einer füllt nach} & \textcolor{gruen}{gering} & \textcolor{gruen}{\textbf{gegen Ansturm}}\\
+Alten Wert weiterliefern & mittel & \textcolor{gruen}{während des Nachfüllens}\\
+Vorwärmen beim Start & mittel & \textcolor{gruen}{gegen Neustartlast}\\
+Last begrenzen & gering & \textbf{Band 22, Kap.~4}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der Kunstgriff: Wenn hundert Anfragen gleichzeitig denselben fehlenden Eintrag brauchen, holt ihn eine und die anderen warten auf das Ergebnis. Ohne diese Sperre stellen alle hundert dieselbe Anfrage an die Speicherung.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Ohne} & \textbf{Mit} & \\
+\midrule
+Anfragen nach hinten & $\mathbf{100}$ & $\mathbf{1}$ & \\
+Dauer & $\mathbf{2{,}4}$ s & $\mathbf{51}$ ms & \\
+Last auf Speicherung & \textcolor{akzent}{Spitze} & \textcolor{gruen}{flach} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor siebenundvierzig, und die Ursache ist nicht Geschwindigkeit, sondern vermiedene Arbeit. Die dritte Zeile ist der eigentliche Gewinn: Die Speicherung sieht eine flache Last statt Spitzen, und ihre eigenen Perzentile bleiben stabil.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann Veralterung erträglich ist.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Prüffrage} & \textbf{Antwort} & \\
+\midrule
+Was geschieht bei $2$ min alt? & \textbf{fachlich prüfen} & \\
+Merkt es jemand? & \textbf{oft nein} & \\
+Schadet es jemandem? & \textcolor{akzent}{\textbf{entscheidend}} & \\
+Ist es nachvollziehbar? & \textcolor{gruen}{\textbf{muss ja sein}} & \textcolor{gruen}{\textbf{Kap.~\ref{kap:zeit}}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile wird selten gestellt und ist regulatorisch die wichtigste: Wenn ein Arzt eine Entscheidung auf Grundlage veralteter Daten trifft, muss später feststellbar sein, welchen Stand er gesehen hat. Das ist die Systemzeit aus Kapitel~\ref{kap:zeit} --- und ein Zwischenspeicher, der sie nicht mitführt, macht die Frage unbeantwortbar.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die praktische Folge: Jede zwischengespeicherte Antwort trägt den Zeitpunkt, zu dem sie erhoben wurde. Ein Feld mehr, und die Anzeige kann \enquote{Stand: 14:32} zeigen --- was den Arzt in die Lage versetzt, selbst zu entscheiden, ob ihm das reicht.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Zwischenspeicher ist ein zweiter Datenbestand}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Beant\-wortet?} & \\
+\midrule
+Wer darf es lesen? & \textcolor{akzent}{\textbf{oft nicht geprüft}} & \textcolor{akzent}{\textbf{Band 19}}\\
+Wird es verschlüsselt? & \textcolor{akzent}{selten} & \\
+Steht es in der Löschfrist? & \textcolor{akzent}{\textbf{fast nie}} & \textcolor{akzent}{\textbf{Patienten\-daten}}\\
+Wird es gesichert? & \textcolor{gruen}{muss nicht} & \textcolor{gruen}{ableitbar}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist ein regelmäßiger Befund bei Prüfungen: Patientendaten liegen in einem Zwischenspeicher, der in keinem Löschkonzept auftaucht --- weil ihn niemand für einen Datenbestand hält. Er ist einer, mit denselben Pflichten.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die gefährlichste: Wenn die Rechteprüfung vor dem Zwischenspeicher liegt und der Schlüssel die Benutzerkennung nicht enthält, sieht der zweite Benutzer die Daten des ersten. Ein Fehler, der bei jeder Einführung eines Zwischenspeichers zu prüfen ist.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Kleppmann\zit{15} ordnet Zwi\-schen\-spei\-che\-rung und Ko\-hä\-renz ein; Vogels\zit{24} beschreibt, was ver\-zö\-ger\-te Kon\-sis\-tenz praktisch bedeutet; Brewer\zit{4} liefert den Rahmen, in dem diese Ab\-wä\-gung steht.

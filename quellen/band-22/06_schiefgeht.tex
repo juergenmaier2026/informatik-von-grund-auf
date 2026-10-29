@@ -1,0 +1,313 @@
+\chapter{Wo es schiefgeht}\label{kap:schiefgeht}
+
+\begin{merksatz}
+\boxtitel{Drei Fehlerklassen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Klasse} & \textbf{Symptom} & \textbf{Findet}\\
+\midrule
+\textbf{Wettlauf} & \textcolor{akzent}{falsche Werte, selten} & \textbf{Wettlaufprüfer}\\
+\textbf{Verklemmung} & \textbf{alles steht} & \textcolor{gruen}{Laufzeit\-umgebung}\\
+\textbf{Goroutinenleck} & \textcolor{akzent}{\textbf{Speicher wächst}} & \textcolor{akzent}{Profil, mühsam}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Klasse gibt es in C nicht, weil dort niemand hunderttausend Fäden startet. Sie ist der Preis dafür, dass Goroutinen billig sind --- und die einzige der drei, für die es kein zuverlässiges Werkzeug gibt.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Verklemmung, die erkannt wird.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Erkannt?} & \\
+\midrule
+\textbf{Alle Goroutinen warten} & \textcolor{gruen}{\textbf{ja}} & \textbf{Programm bricht ab}\\
+Einige warten, andere laufen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{sieht gesund aus}\\
+Warten auf Netz & \textcolor{akzent}{nein} & \textcolor{akzent}{zählt als Arbeit}\\
+Warten auf Sperre & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Nur die vollständige Verklemmung wird gemeldet, und die ist der harmlose Fall --- sie fällt beim ersten Lauf auf. Die zweite Zeile ist die gefährliche: Eine Teilverklemmung sieht von außen aus wie ein System, das gerade nichts zu tun hat.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Der Wettlaufprüfer}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Wert} & \\
+\midrule
+Laufzeit & $\times5$--$10$ & \\
+Speicher & $\times5$--$10$ & \\
+Fehlalarme & \textcolor{gruen}{\textbf{keine}} & \textbf{meldet nur Echtes}\\
+Übersieht & \textcolor{akzent}{nicht ausgeführte Pfade} & \textcolor{akzent}{Band 21, Kap.~10}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die dritte Zeile ist die entscheidende Eigenschaft: Der Prüfer meldet keine Fehlalarme --- was er meldet, ist ein Wettlauf. Damit entfällt die Abwägung aus Band 21, Kapitel~10, und jede Meldung wird ernst genommen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Preis steht in der letzten Zeile: Er sieht nur, was ausgeführt wurde. Ein Wettlauf in einem Fehlerpfad, den die Prüfung nie erreicht, bleibt unentdeckt --- deshalb gehört der Prüfer über den vollständigen Prüfbestand, nicht über ein Beispiel.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Das Goroutinenleck}
+\textbf{Der häufigste Fall.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func hole(urls []string) string \{}\\
+\code{\ \ \ \ aus := make(chan string)\ \ \ \ // ohne Puffer!}\\
+\code{\ \ \ \ for \_, u := range urls \{}\\
+\code{\ \ \ \ \ \ \ \ go func(u string) \{ aus <- lade(u) \}(u)}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ return <-aus\ \ \ \ \ \ \ \ \ \ \ \ \ \ // nur einer wird gelesen}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Bei $n$ Adressen} & \textbf{Ergebnis} & \\
+\midrule
+Gelesen & $1$ & \\
+Beendet & $\mathbf{1}$ & \\
+\textbf{Blockiert für immer} & $\mathbf{n-1}$ & \textcolor{akzent}{\textbf{das Leck}}\\
+Speicher je Aufruf & \textcolor{akzent}{$(n{-}1)\cdot$Keller} & \textcolor{akzent}{wächst}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Zeilen, funktioniert scheinbar, und bei jedem Aufruf bleiben $n-1$ Goroutinen für immer stehen. Nach einem Tag Betrieb sind das Millionen --- und in keiner Speicherstatistik erscheint ein Leck, weil formal alles erreichbar ist.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Abhilfe: drei Möglichkeiten.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Weg} & \textbf{Aufwand} & \\
+\midrule
+Puffer der Größe $n$ & \textcolor{gruen}{\textbf{ein Zeichen}} & \textbf{alle senden, alle enden}\\
+Abbruchkontext & gering & \textcolor{gruen}{sauberer}\\
+Alle Ergebnisse lesen & gering & wenn man sie braucht\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist ein Lehrstück: \code{make(chan string, len(urls))} --- ein Argument mehr, und die Fehlerklasse verschwindet. Solche Ein-Zeichen-Unterschiede zwischen richtig und falsch sind der Grund für Kapitel~\ref{kap:werkzeuge}.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Warum das Leck so schwer zu finden ist}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Wert} & \\
+\midrule
+Meldung & \textcolor{akzent}{\textbf{keine}} & \\
+Absturz & \textcolor{akzent}{erst nach Tagen} & \textbf{Speicher voll}\\
+Wettlaufprüfer & \textcolor{akzent}{\textbf{sieht nichts}} & \textcolor{akzent}{kein Wettlauf}\\
+Verklemmungs\-melder & \textcolor{akzent}{nein} & \textcolor{akzent}{andere laufen}\\
+\textbf{Goroutinenprofil} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{das einzige Mittel}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Werkzeuge schweigen, eines hilft. Das Goroutinenprofil zeigt, wie viele Goroutinen an welcher Zeile warten --- und eine Zeile mit zweihunderttausend wartenden Goroutinen ist ein eindeutiger Befund.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt eine Betriebsregel: Die Zahl der Goroutinen gehört überwacht, wie der Speicherverbrauch. Sie ist die einzige Kennzahl, die diese Fehlerklasse früh sichtbar macht.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Verfolgen Sie einen Wettlauf.
+\item Bauen Sie eine Verklemmung nach.
+\item Prüfen Sie auf Goroutinenlecks.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Einen Wettlauf verfolgen.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{var zaehler int\ \ \ \ \ \ \ \ \ \ \ \ \ \ // ungeschuetzt}\\
+\\
+\code{for i := 0; i < 1000; i++ \{}\\
+\code{\ \ \ \ go func() \{ zaehler++ \}()}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Lauf} & \textbf{Ergebnis} & \textbf{Erwartet} & \\
+\midrule
+$1$ & $947$ & $1000$ & \textcolor{akzent}{falsch}\\
+$2$ & $1000$ & $1000$ & \textcolor{mittel}{zufällig richtig}\\
+$3$ & $982$ & $1000$ & \textcolor{akzent}{falsch}\\
+Mit Prüfer & --- & --- & \textcolor{gruen}{\textbf{gemeldet}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die gefährliche: Manchmal stimmt das Ergebnis. Ein Wettlauf, der in neun von zehn Läufen richtig rechnet, überlebt jede Prüfung, die ihn nicht gezielt sucht --- und der Prüfer meldet ihn beim ersten Lauf.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Abhilfe} & \textbf{Dauer} & \\
+\midrule
+\code{sync.Mutex} & $18$ ns & \\
+\code{atomic.AddInt64} & $\mathbf{6}$ ns & \textcolor{gruen}{\textbf{für Zähler}}\\
+Kanal & $260$ ns & \textcolor{akzent}{unpassend}\\
+Je Goroutine zählen & $\mathbf{0{,}4}$ ns & \textcolor{gruen}{\textbf{am Ende addieren}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die beste und wird selten gewählt: Wenn jede Goroutine ihren eigenen Zähler führt und erst am Ende addiert wird, gibt es keinen gemeinsamen Zustand --- die Fehlerklasse verschwindet durch die Bauform, nicht durch Schutz.}
+\end{center}
+
+\medskip
+\textbf{(b) Eine Verklemmung nachbauen.}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\code{// Goroutine A}\ \ \ \ \ \ \ \ \ \ \code{// Goroutine B}\\
+\code{a.Lock()}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{b.Lock()}\\
+\code{b.Lock()}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{a.Lock()}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Bedingung} & \textbf{Erfüllt?} & \\
+\midrule
+Gegenseitiger Ausschluss & \textcolor{gruen}{ja} & \\
+Halten und Warten & \textcolor{gruen}{ja} & \\
+Kein Entzug & \textcolor{gruen}{ja} & \\
+\textbf{Zirkuläres Warten} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{hier ansetzen}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Coffmans vier Bedingungen aus Band 4 --- alle vier müssen erfüllt sein. Die vierte ist die einzige, die man in der Praxis billig beseitigt: Wenn alle Sperren in derselben Reihenfolge genommen werden, kann kein Zyklus entstehen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Regel lautet deshalb: eine feste, aufgeschriebene Sperrreihenfolge --- und sie gehört in die Kopfkommentare des Pakets, nicht in den Kopf des Entwicklers.}
+\end{center}
+
+\medskip
+\textbf{(c) Auf Goroutinenlecks prüfen.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func TestKeinLeck(t *testing.T) \{}\\
+\code{\ \ \ \ vorher := runtime.NumGoroutine()}\\
+\code{\ \ \ \ hole(adressen)}\\
+\code{\ \ \ \ time.Sleep(100 * time.Millisecond)}\\
+\code{\ \ \ \ if n := runtime.NumGoroutine(); n > vorher \{}\\
+\code{\ \ \ \ \ \ \ \ t.Errorf("\%d Goroutinen uebrig", n-vorher)}\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Bewertung} & \\
+\midrule
+Aufwand & \textcolor{gruen}{$8$ Zeilen} & \\
+Findet das Beispiel & \textcolor{gruen}{\textbf{ja}} & \\
+Zuverlässig & \textcolor{mittel}{\textbf{Wartezeit nötig}} & \textcolor{akzent}{sprödes Element}\\
+Als Bibliothek & \textcolor{gruen}{vorhanden} & \textcolor{gruen}{besser}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die Schwäche: Die Wartezeit ist geraten. Zu kurz, und die Prüfung meldet falsche Lecks; zu lang, und der Prüflauf wird langsam. Fertige Bibliotheken lösen das mit wiederholtem Nachsehen statt einer festen Pause.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Trotz der Schwäche lohnt die Prüfung: Acht Zeilen je Paket finden die Fehlerklasse, für die es sonst kein Werkzeug gibt --- und sie laufen bei jeder Übergabe mit.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Reihenfolge der Maßnahmen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{1.0cm}P{7.6cm}@{}}
+\toprule
+$1$ & \textbf{Keinen gemeinsamen Zustand} --- dann gibt es nichts zu schützen\\
+$2$ & Wenn nötig, Werte über Kanäle weiterreichen\\
+$3$ & Wenn das unpassend ist, atomare Operationen\\
+$4$ & \textbf{Wenn das nicht reicht, Sperren --- mit fester Reihenfolge}\\
+$5$ & \textbf{Immer: Wettlaufprüfer in der Prüfstrecke}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Reihenfolge ist nach Fehleranfälligkeit geordnet, nicht nach Eleganz. Der erste Schritt löst mehr Probleme als alle anderen zusammen --- und wird am seltensten erwogen, weil er eine Entwurfsänderung verlangt statt eines Sprachmittels.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Der Wett\-lauf\-prü\-fer\zit{28} findet die erste Klasse zu\-ver\-läs\-sig; das Spei\-cher\-mo\-dell\zit{10} legt fest, was über\-haupt ein Wett\-lauf ist; Lamport\zit{15} begründete den Begriff der Ord\-nung von Er\-eig\-nis\-sen, auf dem das beruht.

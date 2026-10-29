@@ -1,0 +1,276 @@
+\part{Das Urteil}
+
+\chapter{Der zweite Entwurf in Go}\label{kap:zweiter}
+
+\begin{merksatz}
+\boxtitel{Was hier zusätzlich zählt}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Kriterium} & \textbf{Band 20} & \textbf{Hier}\\
+\midrule
+Verstehenszeit & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Änderbarkeit & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Prüfbarkeit & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Größenordnung & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+\midrule
+\textbf{Endet jede Goroutine?} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\textbf{Wirkt der Abbruch?} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei zusätzliche Bedingungen, beide aus Kapitel~\ref{kap:schiefgeht}. Sie sind nicht ästhetisch, sondern prüfbar --- und ein Entwurf, der sie nicht erfüllt, hat ein Leck, gleichgültig wie gut er sich liest.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Fall: der Empfänger}
+\textbf{Der erste Entwurf.}
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{func Empfange(port int) \{}\\
+\code{\ \ \ \ l, \_ := net.Listen("tcp", fmt.Sprint(":", port))}\\
+\code{\ \ \ \ for \{}\\
+\code{\ \ \ \ \ \ \ \ c, \_ := l.Accept()}\\
+\code{\ \ \ \ \ \ \ \ go func() \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ d, \_ := io.ReadAll(c)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ speichere(entpacke(d))}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ c.Close()}\\
+\code{\ \ \ \ \ \ \ \ \}()}\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.4cm}@{}}
+\toprule
+\textbf{Schwäche} & \textbf{Folge} & \\
+\midrule
+Fehler verworfen & \textcolor{akzent}{\textbf{stille Verluste}} & \textbf{Kap.~\ref{kap:fehler}}\\
+Kein Abbruch & \textcolor{akzent}{Beenden unmöglich} & \\
+Unbegrenzte Goroutinen & \textcolor{akzent}{\textbf{Lastspitze}} & \textcolor{akzent}{Kap.~\ref{kap:goroutinen}}\\
+\code{ReadAll} ohne Grenze & \textcolor{akzent}{\textbf{Speicher}} & \textcolor{akzent}{\textbf{Angriff}}\\
+Keine Zeitschranke & \textcolor{akzent}{hängende Verbindung} & \\
+\code{Close} nach Fehler & \textcolor{akzent}{übersprungen} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Elf Zeilen, funktioniert im Versuch, und sechs Schwächen --- von denen zwei ausreichen, um den Empfänger mit einer einzigen Verbindung lahmzulegen. Die vierte ist die gefährlichste: Ein Gegenüber, das nie aufhört zu senden, füllt den Speicher.}
+\end{minipage}
+\end{center}
+
+\textbf{Der zweite Entwurf.}
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{func Empfange(ctx context.Context, l net.Listener,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ max int64, gleichzeitig int) error \{}\\
+\code{\ \ \ \ sem := make(chan struct\{\}, gleichzeitig)}\\
+\code{\ \ \ \ var wg sync.WaitGroup}\\
+\code{\ \ \ \ go func() \{ <-ctx.Done(); l.Close() \}()}\\
+\\
+\code{\ \ \ \ for \{}\\
+\code{\ \ \ \ \ \ \ \ c, err := l.Accept()}\\
+\code{\ \ \ \ \ \ \ \ if err != nil \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ wg.Wait()}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ return ctx.Err()}\\
+\code{\ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ sem <- struct\{\}\{\}}\\
+\code{\ \ \ \ \ \ \ \ wg.Add(1)}\\
+\code{\ \ \ \ \ \ \ \ go func() \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ defer func() \{ wg.Done(); <-sem; c.Close() \}()}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ c.SetDeadline(time.Now().Add(30 * time.Second))}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ d, err := io.ReadAll(io.LimitReader(c, max))}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ if err != nil \{ melde(err); return \}}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ if err := speichere(entpacke(d)); err != nil \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ melde(err)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ \}()}\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vierundzwanzig Zeilen statt elf. Der Abbruch wirkt über das Schließen des Lauschers --- ein Kunstgriff, weil \code{Accept} sich nicht anders unterbrechen lässt. Die Zählgruppe wartet auf alle laufenden Verbindungen, bevor die Funktion zurückkehrt.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Bilanz.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{1.8cm}P{2.0cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Erster} & \textbf{Zweiter} & \\
+\midrule
+Zeilen & $11$ & $\mathbf{24}$ & $+118\,\%$\\
+Argumente & $1$ & $4$ & \\
+Schwächen & $\mathbf{6}$ & $\mathbf{0}$ & \\
+Sauber beendbar & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}} & \\
+Speicher unter Angriff & \textcolor{akzent}{$\infty$} & \textcolor{gruen}{\textbf{begrenzt}} & \\
+Verstehenszeit & $34$ s & $\mathbf{71}$ s & \textcolor{akzent}{$2{,}1\times$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist unangenehm und wird hier nicht verschwiegen: Der zweite Entwurf ist \kursiv{schwerer} zu lesen. Das ist ein echter Preis, und er unterscheidet diesen Fall von den meisten in Band 20.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die Antwort auf die längere Lesezeit}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Weg} & \textbf{Wirkung} & \\
+\midrule
+Zurückbauen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Schwächen kehren zurück}\\
+Zerlegen & \textcolor{gruen}{\textbf{ja}} & \textbf{Annahme, Behandlung}\\
+Kommentar zum Abbruch & \textcolor{gruen}{ja} & \textcolor{gruen}{drei Zeilen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Nach der Zerlegung in \code{Empfange} und \code{behandle} liegt die Verstehenszeit bei $44$ Sekunden --- immer noch mehr als beim ersten Entwurf, aber deutlich besser. Das ist Band 20, Kapitel~5 als Antwort auf ein Problem, das Band 20 nicht hatte.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Prüfen Sie die sechs Bedingungen.
+\item Untersuchen Sie, was ohne Nebenläufigkeit bliebe.
+\item Bestimmen Sie, wann man aufhört.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die sechs Bedingungen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bedingung} & \textbf{Prüfung} & \textbf{Ergebnis}\\
+\midrule
+Verstehenszeit & $5$ Fragen & \textcolor{mittel}{$44$ s nach Umbau}\\
+Änderbarkeit & neue Grenze & \textcolor{gruen}{ein Argument}\\
+Prüfbarkeit & \code{httptest} & \textcolor{gruen}{\textbf{$18$ Fälle}}\\
+Größenordnung & $1000$ Verbindungen & \textcolor{gruen}{$495$ k/s}\\
+Goroutinen enden & \textbf{Leckprüfung} & \textcolor{gruen}{\textbf{ja}}\\
+Abbruch wirkt & eigener Prüfling & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Bedingungen, sechs Prüfungen --- keine davon Geschmackssache. Die fünfte ist die, die Band 20 nicht kannte, und sie hat den Umbau erst nötig gemacht: Ohne Zählgruppe kehrte \code{Empfange} zurück, während Verbindungen noch liefen.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{(b) Was ohne Nebenläufigkeit bliebe.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{1.8cm}P{1.6cm}@{}}
+\toprule
+\textbf{Schwäche} & \textbf{Neben\-läufig?} & \textbf{Bliebe} & \\
+\midrule
+Fehler verworfen & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{ja}} & \\
+Grenze beim Lesen & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{ja}} & \\
+Zeitschranke & \textcolor{akzent}{nein} & \textcolor{akzent}{ja} & \\
+Abbruch & \textcolor{gruen}{ja} & \textcolor{gruen}{nein} & \\
+Begrenzung & \textcolor{gruen}{ja} & \textcolor{gruen}{nein} & \\
+Zählgruppe & \textcolor{gruen}{ja} & \textcolor{gruen}{nein} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Hälfte der Schwächen hat mit Nebenläufigkeit nichts zu tun --- ignorierte Fehler, fehlende Grenzen, fehlende Zeitschranken. Das sind die Themen aus Band 19 und Band 20, und sie fallen in jedem nebenläufigen Code doppelt auf, weil dort mehr auf einmal geschieht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Lehre: Wer nebenläufigen Code überarbeitet, sollte zuerst die gewöhnlichen Schwächen beheben. Sie sind einfacher zu finden und machen die nebenläufigen Fragen danach übersichtlicher.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann man aufhört.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Möglich wäre noch} & \textbf{Nötig?} & \\
+\midrule
+Wiederholung mit Rückzug & \textcolor{gruen}{\textbf{ja}} & \textbf{Netz fällt aus}\\
+Zählwerte je Verbindung & \textcolor{gruen}{ja} & \textcolor{gruen}{Betrieb}\\
+Eigener Fadenverwalter & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Kap.~\ref{kap:goroutinen}}\\
+Sperrfreie Warteschlange & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{kein Anlass}}\\
+Eigenes Netzprotokoll & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die ersten beiden Zeilen sind Anforderungen und gehören dazu; die letzten drei sind Reize. Der Unterschied ist, ob eine der sechs Bedingungen sie verlangt --- und keine tut es.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{In Go ist die Versuchung geringer als in C, weil die Sprache tiefe Eingriffe erschwert. Sie ist nicht null: Die vierte Zeile ist eine reizvolle Aufgabe, hundert Zeilen lang, und für tausend Verbindungen je Sekunde vollständig überflüssig.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der zweite Entwurf kann schlechter lesbar sein}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Band} & \textbf{Zeilen} & \textbf{Verstehen} & \\
+\midrule
+$20$, Kap.~$13$ & $+9\,\%$ & \textcolor{gruen}{$-74\,\%$} & \\
+$21$, Kap.~$13$ & $+64\,\%$ & \textcolor{mittel}{$+27\,\%$} & \\
+\textbf{Hier} & $+118\,\%$ & \textcolor{akzent}{$\mathbf{+29\,\%}$} & \textcolor{akzent}{nach Umbau}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei Bände, drei Ergebnisse. In Python wurde der zweite Entwurf besser lesbar; in C und Go schlechter. Der Grund ist derselbe: Was hinzukommt, sind Fälle, die vorher nicht behandelt waren --- Speichergrenzen, Abbruch, Beendigung.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt keine Kritik am zweiten Entwurf, sondern eine Warnung vor dem einfachen Maßstab: \enquote{Kürzer und klarer} ist kein Gesetz. Manchmal ist richtig einfach länger und schwerer --- und trotzdem richtig.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Fowler\zit{8} liefert die Schritte des Um\-baus; die Sprich\-wort\-samm\-lung\zit{20} verdichtet die Go-Haltung dazu; Ous\-ter\-hout\zit{16} begründet, warum Ein\-fach\-heit nicht Kürze bedeutet.

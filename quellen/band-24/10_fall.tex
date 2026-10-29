@@ -1,0 +1,173 @@
+\part{Die Struktur}
+
+\chapter{Die Hierarchie, die nicht mehr passt}\label{fall:hierarchie}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Das Befundmodell, gewachsen über sechs Jahre.
+
+\begin{center}
+\begin{minipage}{0.72\textwidth}
+\code{Befund}\\
+\code{\ \ Laborbefund}\\
+\code{\ \ \ \ Klinischchemie}\\
+\code{\ \ \ \ Mikrobiologie}\\
+\code{\ \ \ \ Haematologie}\\
+\code{\ \ Bildbefund}\\
+\code{\ \ Funktionsbefund}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Klassen, drei Ebenen, vier Schablonenmethoden in der Basis. Die Hierarchie bildet die Organisation des Hauses ab --- Labor, Radiologie, Funktionsdiagnostik --- und war in den ersten Jahren eine gute Landkarte.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Vier Anforderungen aus den letzten zwei Jahren.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Anforderung} & \textbf{Behandelt durch} & \\
+\midrule
+Blutgasanalyse bettseitig & \textbf{Doppelklasse} & \textcolor{akzent}{Code doppelt}\\
+Befund mit Bild und Zahlen & \textcolor{akzent}{\textbf{Feld \code{bilder} in Basis}} & \textcolor{akzent}{\textbf{überall \code{None}}}\\
+Fremdbefund & Sonderklasse & \textcolor{akzent}{quer zu allem}\\
+Befund ohne Zuordnung & \textcolor{akzent}{\textbf{\code{Laborbefund} missbraucht}} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Anforderungen, vier Notlösungen. Die zweite ist die verräterischste: Um einen Befund mit Bild \kursiv{und} Zahlen darzustellen, wurde ein Bildfeld in die Basisklasse gezogen --- wo es bei sechs von sieben Klassen leer bleibt.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Zustand der Basis.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Felder in \code{Befund}} & \textbf{Anzahl} & \\
+\midrule
+Von allen genutzt & $\mathbf{5}$ & \textcolor{gruen}{gehören dorthin}\\
+Von der Mehrheit & $3$ & \\
+\textbf{Von einer Klasse} & \textcolor{akzent}{$\mathbf{6}$} & \textcolor{akzent}{\textbf{hochgezogen}}\\
+Nie genutzt & $\mathbf{2}$ & \textcolor{akzent}{Reste}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Sechzehn Felder in der Basisklasse, von denen fünf dorthin gehören. Das ist das Kennzeichen einer Hierarchie am Ende ihrer Tragfähigkeit: Die gemeinsame Wurzel wächst, weil Sonderfälle keinen anderen Platz finden.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: umgebaut}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{class Befund(Protocol):}\\
+\code{\ \ \ \ def kennung(self) -> BefundID: ...}\\
+\code{\ \ \ \ def patient(self) -> PatientID: ...}\\
+\code{\ \ \ \ def abnahme(self) -> Zeitpunkt: ...}\\
+\\
+\code{class Messbar(Protocol):}\\
+\code{\ \ \ \ def wert(self) -> Ergebnis: ...}\\
+\code{\ \ \ \ def bereich(self) -> Referenz: ...}\\
+\\
+\code{class Bebildert(Protocol):}\\
+\code{\ \ \ \ def bilder(self) -> list[BildID]: ...}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Drei kleine Schnittstellen statt eines Baums; fünf konkrete Typen ohne gemeinsame Wurzel. Ein Befund mit Bild und Zahlen erfüllt zwei Protokolle --- ohne Mehrfachvererbung, ohne hochgezogenes Feld.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Umgebaut} & \\
+\midrule
+Klassen & $7$ & $\mathbf{5}$ & \\
+Ebenen & $3$ & $\mathbf{1}$ & \\
+Felder in der Basis & $\mathbf{16}$ & --- & \\
+Zeilen & $640$ & $\mathbf{730}$ & $+14\,\%$\\
+Doppelter Code & $0$ & \textcolor{akzent}{$\approx80$} & \\
+\textbf{\enquote{Welche Methode läuft?}} & $\mathbf{91}$ s & $\mathbf{11}$ s & $8{,}3\times$\\
+Neue Befundart & $1$ d & $\mathbf{2}$ h & \\
+Aufwand & --- & $\mathbf{12}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Achtzig Zeilen Wiederholung und vierzehn Prozent mehr Code --- der Preis, unbeschönigt. Dagegen steht die vorletzte Zeile: Eine neue Befundart kostet zwei Stunden statt einen Tag, weil niemand mehr prüfen muss, wo sie in den Baum passt.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum jetzt?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Zeitpunkt} & \textbf{Notlösungen} & \\
+\midrule
+Nach $2$ Jahren & $\mathbf{0}$ & \textcolor{gruen}{\textbf{Hierarchie trug}}\\
+Nach $4$ Jahren & $1$ & \textcolor{mittel}{vertretbar}\\
+\textbf{Heute} & $\mathbf{4}$ & \textcolor{akzent}{\textbf{sie trägt nicht mehr}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die Hierarchie war zwei Jahre lang richtig und ist es seit etwa zwei Jahren nicht mehr. Der Umbau ist keine Korrektur eines Fehlers, sondern die Anpassung an eine Wirklichkeit, die sich geändert hat.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Vererbung ist schlecht} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Fall 17}}\\
+\enquote{Hierarchien sind falsch} & \textcolor{akzent}{nein} & \textbf{zwei Jahre richtig}\\
+\enquote{Von Anfang an Protokolle} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{damals unbegründet}\\
+\textbf{\enquote{Notlösungen zählen}} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{das Maß}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der praktische Ertrag dieses Falls: Man erkennt eine erschöpfte Struktur nicht daran, dass sie hässlich aussieht, sondern daran, dass sich Notlösungen häufen. Null ist gut, eine ist normal, vier sind ein Befund.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die Falle für den Nachfolger: Wer heute liest, dass Protokolle besser waren, schließt daraus, man hätte gleich so anfangen sollen. Vor sechs Jahren gab es drei Befundarten und keinen Anlass --- das wäre die verfrühte Abstraktion aus Fall~\ref{fall:abstraktion} gewesen.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Gamma und Mit\-au\-to\-ren\zit{11} liefern das Vo\-ka\-bu\-lar für Ziel\-for\-men; Ous\-ter\-hout\zit{23} begründet, warum flache Struk\-tu\-ren mit tiefen Schnitt\-stel\-len halt\-ba\-rer sind.

@@ -1,0 +1,173 @@
+\chapter{Der Kanal, der zu viel puffert}\label{fall:kanal}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Übertragung, Go. Nimmt Messwerte von den Geräten entgegen und reicht sie an die Speicherung weiter.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{const puffergroesse = 500000}\\
+\\
+\code{eingang := make(chan Messwert, puffergroesse)}\\
+\\
+\code{go func() \{}\\
+\code{\ \ \ \ for m := range eingang \{}\\
+\code{\ \ \ \ \ \ \ \ speicher.Schreibe(m)}\\
+\code{\ \ \ \ \}}\\
+\code{\}()}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der Puffer war eine Antwort auf ein echtes Problem: Vor zwei Jahren gingen bei Lastspitzen Messwerte verloren. Seit der Vergrößerung auf eine halbe Million ist das nicht mehr vorgekommen --- die Maßnahme hat gewirkt.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.0cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+\textbf{Füllstand} & \textbf{Speicher} & \textbf{Verzögerung} & \textbf{Verlust}\\
+\midrule
+Leer & $\mathbf{2}$ MB & $\mathbf{12}$ ms & $0$\\
+$10\,\%$ & $18$ MB & $3{,}1$ s & $0$\\
+$60\,\%$ & $86$ MB & \textcolor{akzent}{$\mathbf{19}$ \textbf{s}} & $0$\\
+Voll & \textcolor{akzent}{$142$ MB} & \textcolor{akzent}{$\mathbf{31}$ \textbf{s}} & $0$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Kein Verlust in keiner Zeile --- die Maßnahme tut, was sie sollte. Und die dritte Spalte zeigt, was sie stattdessen anrichtet: Bei sechzig Prozent Füllstand erreicht ein Messwert die Klinik neunzehn Sekunden nach der Messung.}
+\end{minipage}
+\end{center}
+
+\textbf{Was das klinisch bedeutet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{Verzögerung erträglich?} & \\
+\midrule
+Verlaufsansicht & \textcolor{gruen}{\textbf{ja}} & $30$ s unerheblich\\
+Auswertung nachts & \textcolor{gruen}{ja} & \\
+\textbf{Kritische Grenzwertwarnung} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{$31$ s zu spät}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist der Befund: Ein kritischer Kaliumwert löst die Warnung einunddreißig Sekunden später aus. Der Puffer hat den sichtbaren Verlust gegen eine unsichtbare Verzögerung getauscht --- und die Verzögerung erscheint in keiner Statistik.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: umgebaut}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{dringend := make(chan Messwert)\ \ \ \ \ \ \ \ // ohne Puffer}\\
+\code{normal\ \ := make(chan Messwert, 2000)}\\
+\\
+\code{go func() \{}\\
+\code{\ \ \ \ for \{}\\
+\code{\ \ \ \ \ \ \ \ select \{}\\
+\code{\ \ \ \ \ \ \ \ case m := <-dringend:\ \ speicher.Schreibe(m)}\\
+\code{\ \ \ \ \ \ \ \ default:}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ select \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ case m := <-dringend: speicher.Schreibe(m)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ case m := <-normal:\ \ \ speicher.Schreibe(m)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \}}\\
+\code{\}()}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Zwei Kanäle statt einem: kritische Werte ohne Puffer mit Vorrang, alles andere mit einem maßvollen Puffer. Die geschachtelte Auswahl erzwingt den Vorrang --- ein einfaches \code{select} über beide würde bei Bereitschaft würfeln.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Umgebaut} & \\
+\midrule
+Zeilen & $8$ & $\mathbf{18}$ & \\
+Speicher & $142$ MB & $\mathbf{2{,}6}$ MB & $55\times$\\
+\textbf{Verzögerung kritisch} & \textcolor{akzent}{$\mathbf{31}$ s} & \textcolor{gruen}{$\mathbf{14}$ \textbf{ms}} & \\
+Verzögerung normal & $31$ s & $\mathbf{1{,}9}$ s & \\
+Verlust bei Überlast & $0$ & \textcolor{mittel}{$\mathbf{0{,}3\,\%}$} & \textcolor{mittel}{gemeldet}\\
+Aufwand & --- & $2$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vorletzte Zeile ist die unbequeme: Der Umbau bringt den Verlust zurück, den der große Puffer beseitigt hatte --- drei Promille der normalen Werte bei Lastspitzen. Dafür ist er gemeldet und betrifft nie einen kritischen Wert.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum das der bessere Handel ist.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Verlust} & \textbf{Verzögerung}\\
+\midrule
+Sichtbar & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{\textbf{nein}}\\
+Zählbar & \textcolor{gruen}{ja} & \textcolor{mittel}{nur mit Messung}\\
+Gerät kann puffern & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein}\\
+Klinisch gefährlich & \textcolor{mittel}{begrenzt} & \textcolor{akzent}{\textbf{bei Warnungen}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile entscheidet: Wenn der Puffer der Übertragung klein ist, greift der Gegendruck bis zum Gerät durch --- und das Gerät hat einen eigenen Puffer und kann entscheiden, was es verwirft. Band 22, Kapitel~5.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Puffer sind schlecht} & \textcolor{akzent}{\textbf{nein}} & \textbf{$2000$ bleiben}\\
+\enquote{Die frühere Änderung war falsch} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{sie war zu grob}}\\
+\enquote{Kein Verlust ist immer besser} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{das ist die Lehre}\\
+\textbf{\enquote{Ein Puffer glättet, er ersetzt keine Kapazität}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist mir wichtig: Die Vergrößerung des Puffers war eine richtige Reaktion auf ein echtes Problem. Falsch war nur, dass sie alle Werte gleich behandelt hat --- die fachliche Unterscheidung fehlte, nicht die Maßnahme.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die eigentliche Einsicht dieses Falls: Null Verlust bei einunddreißig Sekunden Verzögerung ist schlechter als drei Promille Verlust bei vierzehn Millisekunden --- wenn die betroffenen Werte Warnungen auslösen.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Klepp\-mann\zit{18} ordnet den Handel zwischen Ver\-lust und Ver\-zö\-ge\-rung ein; Nygard\zit{22} zeigt, warum groß\-zü\-gi\-ge Puffer den Zu\-sam\-men\-bruch nur ver\-schie\-ben.

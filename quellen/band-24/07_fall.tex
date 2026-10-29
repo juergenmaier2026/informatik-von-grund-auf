@@ -1,0 +1,163 @@
+\chapter{Der Puffer ohne Grenze}\label{fall:puffer}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Messerfassung, C. Baut die Statuszeile für das Gerätedisplay. Läuft einmal je Sekunde.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{void statuszeile(char *ziel, const Geraet *g) \{}\\
+\code{\ \ \ \ char puffer[64];}\\
+\code{\ \ \ \ sprintf(puffer, "\%s \%d/\%d \%s",}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ g->name, g->kanal, g->kanaele, g->zustand);}\\
+\code{\ \ \ \ strcpy(ziel, puffer);}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Zeilen. Der Gerätename ist auf zwanzig Zeichen begrenzt, der Zustand auf zwölf --- rechnerisch passt alles in vierundsechzig Byte. Die Funktion läuft seit fünf Jahren ohne Auffälligkeit.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Befund} & \textbf{Schwere} & \\
+\midrule
+\code{sprintf} ohne Grenze & \textcolor{akzent}{\textbf{hoch}} & \textbf{Band 21, Kap.~4}\\
+\code{strcpy} ohne Grenze & \textcolor{akzent}{hoch} & \textcolor{akzent}{Zielgröße unbekannt}\\
+Rechnung stimmt heute & \textcolor{mittel}{\textbf{ja}} & \textcolor{akzent}{\textbf{morgen?}}\\
+Zielpuffer nicht im Vertrag & \textcolor{akzent}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der Kern: Die Rechnung stimmt, solange die Annahmen gelten. Sie hängt an zwei Grenzen, die anderswo festgelegt sind --- und die Funktion prüft keine davon.}
+\end{minipage}
+\end{center}
+
+\textbf{Was die Annahme brechen würde.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.2cm}@{}}
+\toprule
+\textbf{Änderung} & \textbf{Wahr\-scheinlich?} & \textbf{Folge}\\
+\midrule
+Längerer Gerätename & \textcolor{mittel}{ja} & \textcolor{akzent}{\textbf{Keller\-überlauf}}\\
+Neuer Zustandstext & \textcolor{gruen}{\textbf{sehr}} & \textcolor{akzent}{Überlauf}\\
+Mehr Kanäle & \textcolor{mittel}{ja} & \textcolor{mittel}{$2$ Zeichen}\\
+Zielpuffer kleiner & \textcolor{mittel}{ja} & \textcolor{akzent}{\textbf{Über\-schreibung}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist eingetreten: Beim Umbau des Zustandsmodells kam \code{"kalibrierung laeuft"} hinzu --- neunzehn Zeichen statt zwölf. Der Fehler wurde beim Sanitizerlauf gefunden, bevor er in den Betrieb ging.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{int statuszeile(char *ziel, size\_t n, const Geraet *g) \{}\\
+\code{\ \ \ \ int k = snprintf(ziel, n, "\%s \%d/\%d \%s",}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ g->name, g->kanal, g->kanaele, g->zustand);}\\
+\code{\ \ \ \ if (k < 0 || (size\_t)k >= n)}\\
+\code{\ \ \ \ \ \ \ \ return -ENOSPC;\ \ \ \ \ \ /* abgeschnitten */}\\
+\code{\ \ \ \ return 0;}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Der Zwischenpuffer entfällt --- es wird direkt in das Ziel geschrieben, dessen Größe jetzt Teil der Signatur ist. Die Prüfung in Zeile vier ist die aus Band 21, Kapitel~4: \code{snprintf} liefert die Länge, die geschrieben worden \kursiv{wäre}.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen & $6$ & $7$ & \\
+Puffer & $2$ & $\mathbf{1}$ & \\
+Zielgröße bekannt & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{\textbf{ja}} & \\
+Abschneiden erkennbar & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}} & \\
+Keller belegt & $64$ B & $\mathbf{0}$ B & \textcolor{gruen}{$4$ KB Keller}\\
+Aufrufstellen & --- & $\mathbf{3}$ & $0{,}5$ PT\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vorletzte Zeile ist ein Nebengewinn, der bei einem Gerät mit vier Kilobyte Keller zählt: Der Zwischenpuffer verschwindet, weil er nur der Umweg war. Vierundsechzig Byte sind anderthalb Prozent des Kellers.}
+\end{minipage}
+\end{center}
+
+\textbf{Was das Abschneiden bedeutet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Umgang} & \textbf{Tauglich?} & \\
+\midrule
+Stillschweigend kürzen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{falscher Gerätename}\\
+Zeile leer lassen & \textcolor{akzent}{nein} & \\
+\textbf{Fehler melden} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Aufrufer entscheidet}\\
+Kürzen und markieren & \textcolor{gruen}{ja} & \textbf{\enquote{Gerät A1\ldots}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die Vorlage: Ein abgeschnittener Gerätename ist ein falscher Gerätename, und auf einem Display, an dem jemand ein Gerät identifiziert, ist das ein Sicherheitsproblem und keine Formatierungsfrage.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Der Puffer war zu klein} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{er war ungeprüft}}\\
+\enquote{Puffer größer machen} & \textcolor{akzent}{nein} & \textbf{verschiebt nur}\\
+\enquote{Der Fehler war Nachlässigkeit} & \textcolor{akzent}{nein} & \textbf{die Rechnung stimmte}\\
+\textbf{\enquote{Die Puffergröße gehört in die Signatur}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die häufigste Reaktion und die schlechteste: Ein Puffer von zweihundertsechsundfünfzig Byte hält die nächsten drei Zustandstexte aus und bricht beim vierten. Man kauft Zeit und nichts sonst.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist mir wichtig: Der Verfasser hatte gerechnet, und die Rechnung stimmte. Falsch war nicht die Rechnung, sondern dass sie in keinem Code steht --- eine Annahme im Kopf, die eine Änderung anderswo brechen kann.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Kernighan und Ritchie\zit{17} beschreiben die Funk\-tio\-nen für Zei\-chen\-ket\-ten und ihre Grenzen; Bryant und O'Hallaron\zit{4} zeigen, was ein Kel\-ler\-über\-lauf tat\-säch\-lich anrichtet.

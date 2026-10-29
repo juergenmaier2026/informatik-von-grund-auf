@@ -1,0 +1,162 @@
+\chapter{Die Prüfung, die verschwindet}\label{fall:pruefung}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Messerfassung, C. Prüft, ob die Summe zweier Rohwerte im zulässigen Bereich liegt. Läuft $500$ mal je Sekunde.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{int mittelwert(int a, int b) \{}\\
+\code{\ \ \ \ int s = a + b;}\\
+\code{\ \ \ \ if (s < 0) \{}\\
+\code{\ \ \ \ \ \ \ \ melde\_ueberlauf();}\\
+\code{\ \ \ \ \ \ \ \ return FEHLER;}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ return s / 2;}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Acht Zeilen mit einer ausdrücklichen Überlaufprüfung. Der Verfasser hat an den Fall gedacht, ihn behandelt und eine Meldung vorgesehen --- nach allen Maßstäben sorgfältige Arbeit.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{1.2cm}P{7.4cm}@{}}
+\toprule
+$1$ & Überlauf bei \code{int} ist undefiniertes Verhalten.\\
+$2$ & Der Übersetzer darf annehmen, dass er nicht vorkommt.\\
+$3$ & Bei $a, b \ge 0$ und ohne Überlauf ist $s \ge 0$.\\
+$4$ & \textbf{Also ist \code{s < 0} immer falsch.}\\
+$5$ & \textbf{Die Prüfung wird entfernt.}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Prüfung soll einen Überlauf abfangen und \kursiv{ist} selbst der Überlauf. Sie steht im Quelltext und nicht im übersetzten Programm --- Band 21, Kapitel~7. Der Übersetzer hat nichts falsch gemacht.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Nachweis.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.2cm}P{2.0cm}P{2.4cm}P{2.2cm}@{}}
+\toprule
+\textbf{Stufe} & \textbf{Befehle} & \textbf{Prüfung da?} & \\
+\midrule
+\code{-O0} & $24$ & \textcolor{gruen}{\textbf{ja}} & \textbf{im Versuch}\\
+\code{-O1} & $9$ & \textcolor{gruen}{ja} & \\
+\code{-O2} & $\mathbf{4}$ & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Aus\-lieferung}}\\
+UBSan & --- & \textcolor{gruen}{meldet} & \textcolor{gruen}{$0{,}4$ s Prüflauf}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Der Code wurde mit \code{-O0} geprüft und mit \code{-O2} ausgeliefert. Alle Prüfungen waren grün, und im ausgelieferten Programm fehlte die Sicherung --- der Fehler war zwei Jahre im Bestand.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: umgebaut}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{int mittelwert(int32\_t a, int32\_t b, int32\_t *aus) \{}\\
+\code{\ \ \ \ int64\_t s = (int64\_t)a + (int64\_t)b;\ \ /* kein Ueberlauf */}\\
+\code{\ \ \ \ if (s < MESS\_MIN * 2 || s > MESS\_MAX * 2)}\\
+\code{\ \ \ \ \ \ \ \ return -ERANGE;}\\
+\code{\ \ \ \ *aus = (int32\_t)(s / 2);}\\
+\code{\ \ \ \ return 0;}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Drei Änderungen: breiterer Rechentyp, damit der Überlauf nicht eintreten \kursiv{kann}; Prüfung gegen fachliche Grenzen statt gegen das Vorzeichen; Ergebnis über Zeiger, Fehler als Rückgabewert. Der Umbau betrifft die Signatur --- deshalb umgebaut und nicht überarbeitet.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Umgebaut} & \\
+\midrule
+Zeilen & $8$ & $7$ & \\
+Undefiniertes Verhalten & \textcolor{akzent}{\textbf{ja}} & \textcolor{gruen}{\textbf{nein}} & \\
+Prüfung überlebt \code{-O2} & \textcolor{akzent}{nein} & \textcolor{gruen}{ja} & \\
+Prüft gegen & \textcolor{akzent}{Vorzeichen} & \textcolor{gruen}{\textbf{Fachgrenzen}} & \\
+Aufrufstellen geändert & --- & $\mathbf{4}$ & $0{,}5$ PT\\
+Laufzeit & $0{,}4$ ns & $0{,}6$ ns & \textcolor{gruen}{unerheblich}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist der eigentliche Gewinn und geht über die Behebung hinaus: Die Vorlage prüfte gegen das Vorzeichen --- eine technische Eigenschaft. Der Umbau prüft gegen den Messbereich des Geräts, und das fängt auch Werte ab, die nicht überlaufen und trotzdem unmöglich sind.}
+\end{minipage}
+\end{center}
+
+\textbf{Was daraus für den Bestand folgte.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Aufwand} & \textbf{Funde}\\
+\midrule
+Diese Funktion & $0{,}5$ PT & $1$\\
+\textbf{UBSan über den Prüfbestand} & \textcolor{gruen}{$\mathbf{0{,}5}$ \textbf{PT}} & \textcolor{akzent}{$\mathbf{6}$ \textbf{weitere}}\\
+Prüfstrecke mit \code{-O2} & $1$ PT & \textcolor{gruen}{dauerhaft}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Ein halber Personentag für den Sanitizer, sechs weitere Fälle derselben Art. Das ist die Rechnung aus Band 21, Kapitel~10 --- und der Grund, warum dieser Fall nicht mit der Behebung endet.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Der Übersetzer ist schuld} & \textcolor{akzent}{\textbf{nein}} & \textbf{Band 21, Kap.~9}\\
+\enquote{Nie optimieren} & \textcolor{akzent}{nein} & \textcolor{akzent}{Faktor $10$}\\
+\enquote{Immer \code{int64\_t}} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{doppelter Speicher}\\
+\textbf{\enquote{Mit denselben Einstellungen prüfen wie ausliefern}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die eigentliche Lehre und keine Sprachfrage: Ein Prüfbestand, der eine andere Übersetzung prüft als die ausgelieferte, prüft ein anderes Programm. Das gilt für Optimierungsstufen genauso wie für Konfigurationen und Bibliotheksversionen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die Übertreibung, die teuer wird: Bei einem Gerät mit vierundsechzig Kilobyte verdoppelt ein breiterer Typ den Speicherbedarf jedes Puffers. Der breitere Typ gehört in die \kursiv{Rechnung}, nicht in die Speicherung.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Lattner\zit{20} erklärt, wie der Op\-ti\-mie\-rer aus un\-de\-fi\-nier\-tem Ver\-hal\-ten schließt; Chisnall\zit{5} zeigt, wie weit das C-Modell von der Ma\-schi\-ne ent\-fernt ist.

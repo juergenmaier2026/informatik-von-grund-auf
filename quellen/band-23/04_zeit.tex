@@ -1,0 +1,301 @@
+\part{Über die Grenze}
+
+\chapter{Zeit}\label{kap:zeit}
+
+\begin{merksatz}
+\boxtitel{Sechs Zeitangaben, die verwechselt werden}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.8cm}P{2.2cm}@{}}
+\toprule
+\textbf{Angabe} & \textbf{Bedeutet} & \\
+\midrule
+\textbf{Abnahme} & \textbf{wann entnommen} & \textcolor{gruen}{\textbf{fachlich richtig}}\\
+Eingang & wann im Labor & \\
+Messung & wann analysiert & \\
+Validierung & \textbf{wann freigegeben} & \textcolor{gruen}{klinisch gültig}\\
+Übertragung & wann gesendet & \textcolor{akzent}{technisch}\\
+Speicherung & wann geschrieben & \textcolor{akzent}{\textbf{oft die einzige}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der Normalfall in gewachsenen Systemen: Gespeichert wird der Zeitpunkt des Schreibens, weil die Datenbank ihn ohnehin setzt. Ein Verlauf, der darauf beruht, zeigt die Reihenfolge der Übertragung --- nicht die der Abnahme.}
+\end{minipage}
+\end{center}
+
+\textbf{Wo der Unterschied wirkt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Abstand} & \textbf{Folge}\\
+\midrule
+Regelbetrieb & $\approx45$ min & \textcolor{gruen}{unauffällig}\\
+Nachtdienst & $\approx3$ h & \textcolor{mittel}{spürbar}\\
+Nacherfassung & \textcolor{akzent}{$\mathbf{2}$ \textbf{Tage}} & \textcolor{akzent}{\textbf{Verlauf falsch}}\\
+Fremdhaus & \textcolor{akzent}{Wochen} & \textcolor{akzent}{\textbf{Reihenfolge verdreht}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist der Fall, an dem es auffällt: Ein zwei Tage alter Befund wird nacherfasst und erscheint im Verlauf als der neueste. Die Steigungsprüfung schlägt an, die Warnung ist falsch --- und der Fehler liegt in der Wahl des Zeitpunkts, nicht in der Rechnung.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die zwei Zeitachsen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Fachliche Zeit} & \textbf{Systemzeit}\\
+\midrule
+Sagt & \textbf{wann es geschah} & \textbf{wann wir es wussten}\\
+Kann sich ändern & \textcolor{akzent}{ja, Korrektur} & \textcolor{gruen}{nie}\\
+Für Verläufe & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein}\\
+Für Nachvollzug & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Beide werden gebraucht, und für verschiedene Fragen. \enquote{Wie war der Kaliumverlauf?} braucht die fachliche Zeit. \enquote{Was wusste der Arzt am Dienstag um 14 Uhr?} braucht die Systemzeit --- und diese Frage stellt sich bei jeder Nachprüfung eines Behandlungsverlaufs.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Ein System, das nur eine der beiden führt, kann eine der beiden Fragen nicht beantworten. Der Aufwand für beide ist ein zusätzliches Feld je Datensatz --- und die Antwort auf eine Frage, die in der Klinik regelmäßig vor Gericht gestellt wird.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Zeitzonen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Darstellung} & \textbf{Eindeutig?} & \\
+\midrule
+\code{2026-03-29 02:30} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{existiert nicht}}\\
+\code{2026-10-25 02:30} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{zweimal vorhanden}\\
+\code{...02:30+01:00} & \textcolor{gruen}{\textbf{ja}} & \textbf{Versatz}\\
+\code{...02:30Z} & \textcolor{gruen}{ja} & \\
+Unix-Zeit & \textcolor{gruen}{ja} & \textcolor{akzent}{Ortszeit verloren}\\
+\code{...+01:00} und \code{Europe/Berlin} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{vollständig}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die ersten beiden Zeilen sind kein Sonderfall, sondern kommen zweimal im Jahr vor. In der Nacht der Rückstellung gibt es zwei Uhrzeiten \code{02:30} --- und ein Verlauf, der nur Ortszeit führt, kann sie nicht ordnen.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum der Versatz nicht genügt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Versatz} & \textbf{Zonenname}\\
+\midrule
+Wann war es? & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{ja}\\
+Ortszeit anzeigen & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+\textbf{Termin in $6$ Monaten} & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{\textbf{ja}}\\
+Nach Umstellungsregeländerung & \textcolor{akzent}{nein} & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Für Vergangenes genügt der Versatz --- er sagt, was war. Für Zukünftiges nicht: Ein Termin am 15.\ Juli um 9 Uhr Ortszeit hat einen Versatz, den man erst kennt, wenn feststeht, ob die Umstellung dann noch gilt. Termine speichert man als Ortszeit mit Zonennamen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Uhren gehen verschieden}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Abweichung} & \textbf{Größe} & \\
+\midrule
+Mit Zeitabgleich & $<10$ ms & \textcolor{gruen}{gut gepflegt}\\
+Ohne Abgleich & \textcolor{akzent}{$\approx1$ s/Tag} & \\
+Eingebettetes Gerät & \textcolor{akzent}{$\mathbf{5}$--$\mathbf{30}$ \textbf{s/Tag}} & \textcolor{akzent}{\textbf{Messerfasser}}\\
+Nach Stromausfall & \textcolor{akzent}{\textbf{beliebig}} & \textcolor{akzent}{\textbf{1970}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der praktische Fall: Ein Messdatenerfasser ohne Netzanschluss und ohne Pufferbatterie hat keine verlässliche Uhr. Nach vier Wochen liegt er zwei Minuten daneben --- genug, um zwei Messungen in der falschen Reihenfolge zu ordnen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist die schlimmere: Nach einem Stromausfall startet manches Gerät mit dem 1.\ Januar 1970. Werte mit diesem Zeitpunkt gehören zurückgewiesen --- eine Plausibilitätsprüfung, die drei Zeilen kostet.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Ordnen Sie Werte ohne verlässliche Uhr.
+\item Bestimmen Sie die Darstellung an jeder Naht.
+\item Untersuchen Sie den Umgang mit Korrekturen.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Ordnen ohne verlässliche Uhr.}
+
+\textbf{Das Problem.} Der Erfasser weiß, in welcher Reihenfolge er misst, aber nicht, wann.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Mittel} & \textbf{Leistet} & \\
+\midrule
+Fortlaufende Nummer & \textbf{Reihenfolge} & \textcolor{gruen}{\textbf{zuverlässig}}\\
+Laufzeit seit Start & Abstände & \textcolor{gruen}{genau}\\
+Startzeitpunkt & \textbf{Verankerung} & \textbf{vom Empfänger}\\
+Gerätekennung & Zuordnung & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der Kunstgriff: Das Gerät sendet Nummer und Laufzeit seit dem Start; die Übertragungsschicht verankert den Start an ihrer eigenen, abgeglichenen Uhr. Damit sind Reihenfolge und Abstände vom Gerät und der absolute Zeitpunkt vom Empfänger --- jeder liefert, was er sicher weiß.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.0cm}P{1.6cm}@{}}
+\toprule
+\textbf{Verfahren} & \textbf{Reihen\-folge} & \textbf{Zeitpunkt} & \\
+\midrule
+Geräteuhr & \textcolor{akzent}{\textbf{unsicher}} & \textcolor{akzent}{$\pm2$ min} & \\
+Empfängeruhr & \textcolor{akzent}{Netzverzug} & \textcolor{mittel}{$\pm1$ s} & \\
+\textbf{Nummer und Ver\-ankerung} & \textcolor{gruen}{\textbf{sicher}} & \textcolor{gruen}{$\pm\mathbf{50}$ \textbf{ms}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor zweitausend bei der Genauigkeit gegenüber der Geräteuhr, und die Reihenfolge wird von unsicher zu sicher. Der Aufwand sind zwei zusätzliche Felder in der Nachricht.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Darstellung je Naht.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.8cm}P{2.6cm}@{}}
+\toprule
+\textbf{Naht} & \textbf{Darstellung} & \textbf{Warum}\\
+\midrule
+Erfassung $\to$ Übertragung & \textbf{Nummer + Laufzeit} & \textbf{keine Uhr}\\
+Übertragung $\to$ Speicher & \textbf{RFC 3339, UTC} & \textcolor{gruen}{eindeutig}\\
+Speicher intern & \textbf{Zeitstempel mit Zone} & \textcolor{gruen}{sortierbar}\\
+Speicher $\to$ Auswertung & RFC 3339 & \\
+Auswertung $\to$ Anzeige & \textbf{Ortszeit + Zone} & \textcolor{gruen}{\textbf{für Menschen}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf Nähte, vier Darstellungen --- und das ist kein Mangel, sondern richtig. Jede Naht hat andere Anforderungen: Das Gerät hat keine Uhr, die Datenbank braucht Sortierbarkeit, der Mensch braucht Ortszeit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Regel lautet: intern immer UTC mit Zonenangabe, an den Rändern umwandeln. Wer Ortszeit durch das System reicht, hat an jeder Stelle die Frage zu beantworten, welche Zone gemeint war.}
+\end{center}
+
+\medskip
+\textbf{(c) Korrekturen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.4cm}@{}}
+\toprule
+\textbf{Vorgehen} & \textbf{Nachvoll\-ziehbar?} & \\
+\midrule
+Wert überschreiben & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{regulatorisch unzulässig}}\\
+Alten löschen, neuen anlegen & \textcolor{akzent}{nein} & \\
+\textbf{Neuen mit Verweis anlegen} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Band 20, Kap.~2}}\\
+Beide behalten, Gültigkeit setzen & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist dieselbe Bauform wie in Band 20 und Band 22: Es wird nichts geändert, nur hinzugefügt. Der korrigierte Befund verweist auf den ersetzten, und die Systemzeit sagt, ab wann die Korrektur bekannt war.}
+\end{minipage}
+\end{center}
+
+\textbf{Was der Verlauf dann zeigt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Antwort aus} & \\
+\midrule
+Aktueller Verlauf & \textbf{fachliche Zeit, gültige} & \\
+Verlauf am Dienstag & \textbf{beide Zeiten} & \textcolor{gruen}{\textbf{rekonstruierbar}}\\
+Wurde korrigiert? & Verweiskette & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die Frage, die bei jeder Nachprüfung gestellt wird: Welche Werte lagen dem Arzt am Dienstag vor? Sie ist nur beantwortbar, wenn beide Zeitachsen geführt werden --- und sie ist nicht nachträglich herstellbar.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Sekunde, die es nicht gibt}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Fall} & \textbf{Wirkung} & \\
+\midrule
+Schaltsekunde & \code{23:59:60} & \textcolor{akzent}{\textbf{viele Systeme stürzen ab}}\\
+Uhr springt zurück & \textcolor{akzent}{\textbf{negative Dauer}} & \textcolor{akzent}{Zeitschranken brechen}\\
+Abgleich springt & \textcolor{akzent}{Sprung} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der praktische Fall: Wer eine Dauer als Differenz zweier Uhrzeiten berechnet, bekommt bei einem Rücksprung eine negative Zahl --- und in einem vorzeichenlosen Typ eine sehr große. Der Fehler aus Band 21, Kapitel~8, hier über die Uhr.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Abhilfe ist eine getrennte Uhr für Dauern: eine, die nur vorwärts läuft und nicht abgeglichen wird. Fast jede Sprache bietet sie, und fast niemand benutzt sie --- weil die gewöhnliche Uhr im Versuch dasselbe liefert.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Die Zeit\-dar\-stel\-lung nach RFC 3339\zit{14} legt das Format fest; Tanen\-baum und van Steen\zit{22} behandeln Uhren und Ord\-nung in ver\-teil\-ten Systemen; die FHIR-Spe\-zi\-fi\-ka\-tion\zit{27} zeigt, welche Zeit\-punk\-te ein Befund fachlich trägt.

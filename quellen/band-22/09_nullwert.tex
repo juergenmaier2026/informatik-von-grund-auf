@@ -1,0 +1,303 @@
+\chapter{Der Nullwert}\label{kap:nullwert}
+
+\begin{merksatz}
+\boxtitel{Jeder Typ hat einen brauchbaren Anfangswert}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{3.0cm}@{}}
+\toprule
+\textbf{Typ} & \textbf{Nullwert} & \textbf{Brauchbar?}\\
+\midrule
+Zahl & $0$ & \textcolor{gruen}{ja}\\
+Zeichenkette & \code{""} & \textcolor{gruen}{ja}\\
+\code{sync.Mutex} & \textbf{entsperrt} & \textcolor{gruen}{\textbf{sofort verwendbar}}\\
+\code{bytes.Buffer} & leer & \textcolor{gruen}{\textbf{sofort verwendbar}}\\
+Abschnitt & \code{nil} & \textcolor{gruen}{anhängbar, zählbar}\\
+Abbildung & \code{nil} & \textcolor{akzent}{\textbf{lesbar, nicht schreibbar}}\\
+Zeiger & \code{nil} & \textcolor{akzent}{Absturz beim Zugriff}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte und vierte Zeile sind der Entwurfsgedanke: Eine Sperre und ein Puffer sind ohne Erzeugerfunktion einsatzbereit. Deshalb braucht Go keine Konstruktoren --- der Nullwert ist der gültige Anfangszustand.}
+\end{minipage}
+\end{center}
+
+\textbf{Was das für eigene Typen bedeutet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.8cm}P{6.2cm}@{}}
+\toprule
+\textbf{Die Regel} & Entwirf den Typ so, dass sein Nullwert brauchbar ist\\
+\textbf{Der Gewinn} & \textbf{Keine Erzeugerfunktion, kein Vergessen}\\
+\textbf{Wenn unmöglich} & Eine \code{Neu}-Funktion --- und dann ausnahmslos\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die ehrliche Einschränkung: Nicht jeder Typ hat einen sinnvollen Nullzustand. Ein Ring mit Kapazität null ist unbrauchbar. Dann braucht es eine Erzeugerfunktion --- und die Regel ist, dass es \kursiv{keinen} zweiten Weg gibt, den Typ anzulegen.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die Falle: Abbildung gegen Abschnitt}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{var s []int}\\
+\code{s = append(s, 1)\ \ \ \ \ \ \ \ \ // funktioniert}\\
+\code{len(s)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ // funktioniert}\\
+\\
+\code{var m map[string]int}\\
+\code{x := m["a"]\ \ \ \ \ \ \ \ \ \ \ \ \ \ // funktioniert, liefert 0}\\
+\code{m["a"] = 1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ // panic!}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Zwei ähnlich aussehende Typen, zwei verschiedene Regeln. Ein leerer Abschnitt ist voll benutzbar, eine leere Abbildung nur lesbar. Das ist eine Unstimmigkeit im Entwurf der Sprache, und man muss sie schlicht wissen.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Abschnitte: die drei Zahlen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{2.6cm}P{3.2cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Bedeutung} & \\
+\midrule
+Zeiger & \textbf{auf das Feld} & \textbf{geteilt!}\\
+Länge & sichtbare Elemente & \\
+Kapazität & \textbf{belegter Platz} & \textcolor{akzent}{bestimmt \code{append}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein Abschnitt ist ein Fenster auf ein Feld, kein Feld. Zwei Abschnitte können dasselbe Feld zeigen --- und dann wirkt eine Änderung im einen im anderen. Das ist die Fehlerquelle des Kapitels und dieselbe wie in Band 21, Kapitel~3.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Fall.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{alle := make([]Messwert, 0, 100)}\\
+\code{alle = append(alle, werte...)\ \ \ \ // 60 Elemente}\\
+\\
+\code{erste := alle[:10]}\\
+\code{erste = append(erste, neu)\ \ \ \ \ \ \ // ueberschreibt alle[10]!}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Länge} & \textbf{Kapazität} & \\
+\midrule
+\code{alle} & $60$ & $100$ & \\
+\code{erste} & $10$ & $\mathbf{100}$ & \textcolor{akzent}{\textbf{geerbt}}\\
+Nach \code{append} & $11$ & $100$ & \textcolor{akzent}{\textbf{schreibt in \code{alle}}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Der Teilabschnitt erbt die volle Kapazität --- deshalb schreibt \code{append} in das gemeinsame Feld statt ein neues anzulegen. Ein Messwert wird stillschweigend überschrieben, und niemand bemerkt es.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Abhilfe: die dritte Zahl}
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\code{erste := alle[:10:10]\ \ \ \ // Laenge 10, Kapazitaet 10}\\
+\code{erste = append(erste, neu)\ // legt neu an -- sicher}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Form} & \textbf{Kapazität} & \\
+\midrule
+\code{alle[:10]} & \textcolor{akzent}{$100$} & \textcolor{akzent}{\textbf{teilt das Feld}}\\
+\code{alle[:10:10]} & \textcolor{gruen}{$\mathbf{10}$} & \textcolor{gruen}{\textbf{trennt beim Anhängen}}\\
+Kopie & \textcolor{gruen}{$10$} & \textcolor{gruen}{trennt sofort}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zahl ist wenig bekannt und genau dafür da. Die Regel für Bibliotheken lautet: Wer einen Teilabschnitt nach außen gibt, begrenzt die Kapazität --- sonst kann der Empfänger in fremden Speicher schreiben, ohne es zu wollen.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Entwerfen Sie einen Typ mit brauchbarem Nullwert.
+\item Verfolgen Sie ein Speicherleck über Abschnitte.
+\item Bestimmen Sie, wann eine Erzeugerfunktion nötig ist.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Brauchbarer Nullwert.}
+
+\textbf{Der erste Entwurf.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{type Sammler struct \{ werte []Messwert; grenze int \}}\\
+\\
+\code{func NeuSammler(grenze int) *Sammler \{ ... \}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Ohne Erzeugerfunktion ist die Grenze null --- und ein Sammler, der nichts sammelt, ist unbrauchbar. Man braucht also die Erzeugerfunktion, und jeder muss daran denken.}
+\end{center}
+
+\textbf{Der zweite Entwurf.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{type Sammler struct \{}\\
+\code{\ \ \ \ werte []Messwert}\\
+\code{\ \ \ \ Grenze int\ \ \ \ // 0 bedeutet: keine Grenze}\\
+\code{\}}\\
+\\
+\code{var s Sammler\ \ \ \ \ \ \ // sofort verwendbar}\\
+\code{s.Nimm(m)}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Erster} & \textbf{Zweiter} & \\
+\midrule
+Erzeugerfunktion nötig & \textcolor{akzent}{\textbf{ja}} & \textcolor{gruen}{\textbf{nein}} & \\
+Als Feld einbettbar & \textcolor{akzent}{Zeiger nötig} & \textcolor{gruen}{\textbf{direkt}} & \\
+Vergessbar & \textcolor{akzent}{ja} & \textcolor{gruen}{nein} & \\
+Zeilen & $14$ & $\mathbf{9}$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der praktische Gewinn: Ein Typ mit brauchbarem Nullwert kann als Feld in einer anderen Struktur stehen, ohne dass deren Erzeugerfunktion ihn anlegen muss. Das pflanzt sich fort --- eine Struktur mit fünf solchen Feldern braucht selbst keine.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Kunstgriff steht im Kommentar: Null bedeutet \enquote{keine Grenze} statt \enquote{Grenze null}. Man wählt die Bedeutung so, dass der Nullwert sinnvoll ist --- eine Entwurfsentscheidung, kein Trick.}
+\end{center}
+
+\medskip
+\textbf{(b) Ein Speicherleck über Abschnitte.}
+
+\textbf{Der Fall.} Aus einer Datei von $40$ MB werden zehn Messwerte behalten.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{roh, \_ := os.ReadFile(pfad)\ \ \ \ // 40 MB}\\
+\code{kopf := roh[:200]\ \ \ \ \ \ \ \ \ \ \ \ \ \ // scheinbar 200 Byte}\\
+\code{merke(kopf)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ // haelt 40 MB fest!}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Gemerkt} & \textbf{Belegt} & \\
+\midrule
+Abschnitt & $200$ B & \textcolor{akzent}{\textbf{$40$ MB festgehalten}}\\
+Kopie & $\mathbf{200}$ B & \textcolor{gruen}{\textbf{$200$ B}}\\
+Bei $1000$ Dateien & \textcolor{akzent}{$\mathbf{40}$ \textbf{GB}} & \textcolor{akzent}{Absturz}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Speicherbereinigung gibt ein Feld erst frei, wenn kein Abschnitt mehr darauf zeigt. Zweihundert Byte halten vierzig Megabyte fest --- und das ist kein Fehler der Bereinigung, sondern eine Folge davon, dass ein Abschnitt ein Fenster ist.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Regel: Wer einen kleinen Teil eines großen Puffers länger behält, kopiert ihn. Drei Zeilen mehr, und der Unterschied ist Faktor zweihunderttausend.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann eine Erzeugerfunktion nötig ist.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Nötig?} & \\
+\midrule
+Abbildung im Typ & \textcolor{gruen}{\textbf{ja}} & \textbf{\code{nil} nicht schreibbar}\\
+Kanal im Typ & \textcolor{gruen}{ja} & \textcolor{akzent}{\code{nil} blockiert ewig}\\
+Goroutine zu starten & \textcolor{gruen}{\textbf{ja}} & \\
+Nur Zahlen und Abschnitte & \textcolor{akzent}{nein} & \textcolor{gruen}{Nullwert genügt}\\
+Prüfung der Argumente & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste und zweite Zeile sind die häufigsten Gründe: Ein Typ mit einer Abbildung oder einem Kanal darin hat keinen brauchbaren Nullwert. Wer das vermeiden will, legt die Abbildung erst bei der ersten Verwendung an --- was wiederum eine Sperre braucht, wenn mehrere Goroutinen zugreifen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Damit ist die Abwägung benannt: Der brauchbare Nullwert ist ein Ziel, kein Dogma. Wo er Umwege erzwingt, die schwerer zu lesen sind als eine \code{Neu}-Funktion, nimmt man die \code{Neu}-Funktion.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Wert oder Zeiger?}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Zeiger?} & \\
+\midrule
+Methoden ändern den Wert & \textcolor{gruen}{\textbf{ja}} & \textbf{sonst wirkungslos}\\
+Struktur ist groß & \textcolor{gruen}{ja} & ab $\approx64$ B\\
+Enthält eine Sperre & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{\textbf{Kopie zerstört sie}}\\
+Kleiner Wert, unveränderlich & \textcolor{akzent}{nein} & \textcolor{gruen}{als Wert}\\
+Gemischt im selben Typ & \textcolor{akzent}{\textbf{nie}} & \textcolor{akzent}{verwirrend}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist eine harte Falle: Eine Struktur mit eingebetteter Sperre darf nicht kopiert werden --- die Kopie hat eine eigene Sperre, und der Schutz ist fort. Der Prüfer \code{go vet} findet das, und man sollte ihn deshalb laufen lassen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine Stilregel mit gutem Grund: Ein Typ, dessen Methoden teils Wert- und teils Zeigerempfänger haben, verhält sich unvorhersagbar. Man entscheidet sich einmal je Typ.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Gerrand\zit{9} erklärt Ab\-schnit\-te mit ihren drei Zahlen und den Folgen; die Spe\-zi\-fi\-ka\-tion\zit{11} legt die Null\-wer\-te je Typ fest; Kennedy\zit{14} behandelt die Ent\-wurfs\-fol\-gen aus\-führ\-lich.

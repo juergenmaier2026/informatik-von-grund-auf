@@ -1,0 +1,288 @@
+\chapter{Leistung und Speicherbereinigung}\label{kap:leistung}
+
+\begin{merksatz}
+\boxtitel{Was die Bereinigung kostet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Heute} & \\
+\midrule
+Anhaltezeit & \textcolor{gruen}{$<\mathbf{0{,}5}$ \textbf{ms}} & \textbf{meist $<100$ µs}\\
+Häufigkeit & lastabhängig & \\
+Anteil an der Rechenzeit & $\approx5$--$25\,\%$ & \\
+Vorhersagbar & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{die Grenze}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist besser, als viele glauben --- eine halbe Millisekunde ist für fast jede Anwendung unbemerkbar. Die letzte Zeile bleibt trotzdem: \enquote{meist unter hundert Mikrosekunden} ist keine Zusicherung, und eine harte Schranke verlangt eine.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Vergleich mit Band 21.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{1.6cm}P{1.8cm}P{2.8cm}@{}}
+\toprule
+\textbf{Schranke} & \textbf{C} & \textbf{Go} & \\
+\midrule
+$2$ ms hart & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{\textbf{nein}} & \textbf{Messerfassung}\\
+$50$ ms weich & \textcolor{gruen}{ja} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Übertragung}\\
+$1$ s & \textcolor{gruen}{ja} & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Der Unterschied ist nicht \enquote{schnell} gegen \enquote{langsam}, sondern \enquote{zugesichert} gegen \enquote{fast immer}. Für die Messerfassung entscheidet das; für die Übertragungsschicht nicht.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Der wirksame Hebel: weniger belegen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.0cm}P{2.8cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Wirkung} & \\
+\midrule
+Abschnitt vor\-belegen & \textcolor{gruen}{\textbf{stark}} & \code{make(...,0,n)}\\
+Puffer wieder\-verwenden & \textcolor{gruen}{stark} & \code{sync.Pool}\\
+Werte statt Zeiger & \textcolor{gruen}{\textbf{stark}} & \textbf{kleine Strukturen}\\
+Zeichenketten bauen & \textcolor{gruen}{mittel} & \code{strings.} \code{Builder}\\
+Bereinigungs\-anteil stellen & \textcolor{mittel}{Speicher gegen Zeit} & \code{GOGC}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die Reihenfolge ist nach Wirkung geordnet, und die ersten drei sind Entwurfsentscheidungen, keine Einstellungen. Wer nichts belegt, erzeugt keine Arbeit für die Bereinigung --- das ist wirksamer als jede Stellschraube.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Wo die Werte liegen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Keller} & \textbf{Halde}\\
+\midrule
+Wer entscheidet & \textbf{der Übersetzer} & \textbf{der Übersetzer}\\
+Kosten & \textcolor{gruen}{$\approx0$} & \textcolor{akzent}{Belegung + Bereinigung}\\
+Beeinflussbar & \textcolor{mittel}{mittelbar} & \\
+Sichtbar & \textcolor{gruen}{\code{-gcflags=-m}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Anders als in C entscheidet nicht der Programmierer, wo ein Wert liegt, sondern eine Analyse im Übersetzer: Was die Funktion nicht überlebt, bleibt auf dem Keller. Man kann es nicht anordnen --- aber nachsehen und den Code so ändern, dass die Analyse zum gewünschten Ergebnis kommt.}
+\end{minipage}
+\end{center}
+
+\textbf{Was einen Wert auf die Halde zwingt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ursache} & \textbf{Vermeidbar?} & \\
+\midrule
+Zeiger wird zurückgegeben & \textcolor{akzent}{selten} & \\
+Wert in \code{interface\{\}} & \textcolor{gruen}{\textbf{oft}} & \textbf{häufigste Ursache}\\
+Abschnitt wächst & \textcolor{gruen}{ja} & \textcolor{gruen}{vorbelegen}\\
+Zu groß für den Keller & \textcolor{akzent}{nein} & \\
+An Goroutine übergeben & \textcolor{mittel}{teils} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile überrascht: Jeder Wert, der als leere Schnittstelle übergeben wird --- etwa an eine Ausgabefunktion --- landet auf der Halde. Eine Protokollzeile mit fünf Werten erzeugt fünf Belegungen, auch wenn sie nie ausgegeben wird.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Protokollierung als Leistungsproblem}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{1.8cm}P{1.8cm}P{2.4cm}@{}}
+\toprule
+\textbf{Form} & \textbf{ns/Op} & \textbf{Byte/Op} & \textbf{Abge\-schaltet}\\
+\midrule
+Formatiert & $\mathbf{840}$ & $\mathbf{264}$ & \textcolor{akzent}{$\mathbf{310}$ \textbf{ns}}\\
+Strukturiert & $190$ & $48$ & \textcolor{gruen}{$\mathbf{9}$ ns}\\
+Mit Stufenprüfung & $190$ & $48$ & \textcolor{gruen}{$\mathbf{2}$ ns}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Spalte ist die entscheidende: Was kostet eine Protokollzeile, die wegen der eingestellten Stufe gar nicht ausgegeben wird? Bei formatierter Ausgabe dreihundertzehn Nanosekunden --- die Argumente werden ausgewertet und verpackt, bevor jemand fragt, ob sie gebraucht werden.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Bei fünfhundert Messwerten je Sekunde und drei Protokollzeilen je Wert sind das eine halbe Millisekunde je Sekunde für nichts. Strukturierte Protokollierung mit Stufenprüfung senkt das auf drei Mikrosekunden.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Senken Sie die Belegungen.
+\item Bestimmen Sie die Wirkung von \code{GOGC}.
+\item Untersuchen Sie, wann Go zu langsam ist.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Belegungen senken.}
+
+\textbf{Die Aufgabe.} Bündeln von $500$ Messwerten zu einem Paket, $1000$ mal je Sekunde.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{1.8cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+\textbf{Fassung} & \textbf{µs/Op} & \textbf{Belegungen} & \textbf{Bereinigung}\\
+\midrule
+Naiv & $\mathbf{184}$ & $\mathbf{1503}$ & $\mathbf{22\,\%}$\\
+Abschnitt vorbelegt & $61$ & $3$ & $9\,\%$\\
+Puffer wiederverwendet & $\mathbf{38}$ & $\mathbf{0}$ & \textcolor{gruen}{$\mathbf{4\,\%}$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Faktor fünf bei der Zeit --- und die letzte Spalte zeigt, wo er herkommt: Der Anteil der Speicherbereinigung fällt von zweiundzwanzig auf vier Prozent. Man hat nicht die Rechnung beschleunigt, sondern die Arbeit für die Bereinigung beseitigt.}
+\end{minipage}
+\end{center}
+
+\textbf{Der wiederverwendete Puffer.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{var pakete = sync.Pool\{}\\
+\code{\ \ \ \ New: func() any \{ return make([]Messwert, 0, 500) \},}\\
+\code{\}}\\
+\\
+\code{p := pakete.Get().([]Messwert)[:0]}\\
+\code{defer pakete.Put(p)}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Bewertung} & \\
+\midrule
+Wirkung & \textcolor{gruen}{\textbf{stark}} & bei hoher Frequenz\\
+Lesbarkeit & \textcolor{akzent}{schlechter} & \textcolor{akzent}{Typum\-wandlung}\\
+Fehlerquelle & \textcolor{akzent}{\textbf{Puffer weitergegeben}} & \textcolor{akzent}{\textbf{Kap.~\ref{kap:nullwert}}}\\
+Wann einsetzen & \textcolor{mittel}{\textbf{nach der Messung}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die Gefahr: Wer einen zurückgegebenen Puffer noch irgendwo hält, liest später fremde Daten. Das ist genau der Fehler aus Band 21, Kapitel~3 --- die Speicherbereinigung schützt nicht davor, weil der Speicher gültig ist.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Wirkung von \code{GOGC}.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+\code{GOGC} & \textbf{Speicher} & \textbf{Bereini\-gung} & \textbf{Durch\-satz}\\
+\midrule
+$50$ & \textcolor{gruen}{$\mathbf{120}$ MB} & \textcolor{akzent}{$18\,\%$} & $410$ k/s\\
+$100$ & $210$ MB & $9\,\%$ & $\mathbf{495}$ k/s\\
+$400$ & $\mathbf{680}$ MB & \textcolor{gruen}{$\mathbf{3\,\%}$} & $\mathbf{520}$ k/s\\
+Speichergrenze & \textcolor{gruen}{\textbf{gedeckelt}} & \textcolor{gruen}{passt sich an} & \textcolor{gruen}{\textbf{empfohlen}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine reine Tauschgröße: mehr Speicher gegen weniger Bereinigungsarbeit. Die letzte Zeile ist die bessere Antwort --- statt eines Verhältnisses gibt man eine Speicherobergrenze an, und die Laufzeitumgebung regelt selbst.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist besonders in Behältern wichtig: Ohne Obergrenze kennt die Laufzeitumgebung die Speichergrenze des Behälters nicht und wird von außen abgeschossen, statt häufiger zu bereinigen.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann Go zu langsam ist.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Aufgabe} & \textbf{Go geeignet?} & \\
+\midrule
+Netzarbeit & \textcolor{gruen}{\textbf{sehr}} & \textbf{wartet ohnehin}\\
+Textverarbeitung & \textcolor{gruen}{ja} & \\
+Zahlenrechnen & \textcolor{mittel}{$\approx1{,}3\times$ C} & \textcolor{mittel}{meist genug}\\
+Enge Vektorrechnung & \textcolor{akzent}{$\approx3\times$ C} & \textcolor{akzent}{keine Vektorbefehle}\\
+\textbf{Harte Schranken} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Bereinigung}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile überrascht viele: Bei gewöhnlicher Rechenarbeit ist Go etwa dreißig Prozent langsamer als C --- nicht Faktor drei, wie man bei einer Sprache mit Speicherbereinigung erwarten könnte. Der Übersetzer erzeugt ordentlichen Maschinencode.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist die echte Schwäche: Der Übersetzer nutzt Vektorbefehle kaum, und es gibt keine bequeme Möglichkeit, sie anzufordern. Wer Signalverarbeitung schreibt, ist in C oder mit einer Bibliothek besser bedient.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Reihenfolge, wie in Band 21}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.4cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Schritt} & \textbf{Aufwand} & \textbf{Gewinn}\\
+\midrule
+$1$ & Messen & \textcolor{gruen}{$1$ h} & --- \\
+$2$ & \textbf{Blockierungen prüfen} & \textcolor{gruen}{$2$ h} & \textcolor{gruen}{\textbf{oft $2$--$5\times$}}\\
+$3$ & Belegungen senken & $1$ d & $2$--$5\times$\\
+$4$ & Verfahren verbessern & $2$ d & $2$--$100\times$\\
+$5$ & Teil in C & \textcolor{akzent}{Wochen} & $1{,}3$--$3\times$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der zweite Schritt ist der Go-eigene und steht vorn, weil er bei nebenläufigen Programmen am häufigsten trägt: Ein Kanal ohne Puffer, ein einzelner Leser, eine Sperre mit Streit --- Faktor drei für zwei Stunden Arbeit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der letzte Schritt lohnt in Go noch seltener als in Band 21: Faktor $1{,}3$ für Wochen Arbeit, dazu die Kosten der Sprachgrenze aus Band 21, Kapitel~14. Meist ist die Antwort, den Bestandteil ganz in C zu schreiben --- oder es zu lassen.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Die Werk\-zeug\-do\-ku\-men\-ta\-tion\zit{27} erklärt die Pro\-fil\-ar\-ten; Cheney\zit{2} hat die Mess\-pra\-xis am gründ\-lichs\-ten be\-schrie\-ben; Wirth\zit{23} erinnert daran, dass die Da\-ten\-struk\-tur vor der Ein\-stel\-lung kommt.

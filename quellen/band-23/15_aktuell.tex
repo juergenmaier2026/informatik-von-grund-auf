@@ -1,0 +1,250 @@
+\chapter{Der Stand im Jahr 2026}\label{kap:aktuell}
+
+\begin{merksatz}
+\boxtitel{Was gilt und was behauptet wird}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.6cm}P{2.0cm}P{2.4cm}@{}}
+\toprule
+\textbf{Aussage} & \textbf{Beleglage} & \textbf{Urteil}\\
+\midrule
+Fehler sitzen an den Nähten & \textcolor{gruen}{gut} & \textcolor{gruen}{$\approx45\,\%$}\\
+Der Mittelwert taugt nicht & \textcolor{gruen}{eindeutig} & \textcolor{gruen}{Kap.~\ref{kap:messen}}\\
+Idempotenz ist unverzichtbar & \textcolor{gruen}{eindeutig} & \\
+Verfügbarkeit multipliziert sich & \textcolor{gruen}{\textbf{Rechnung}} & \textcolor{gruen}{\textbf{Kap.~\ref{kap:teilen}}}\\
+Beobachtbarkeit gehört zum Entwurf & \textcolor{gruen}{gut} & \\
+\midrule
+\enquote{Aufteilen macht sauberer} & \textcolor{akzent}{\textbf{falsch}} & \textcolor{akzent}{\textbf{Module genügen}}\\
+\enquote{Verteilt ist skalierbar} & \textcolor{akzent}{unvoll\-ständig} & \textcolor{akzent}{erst messen}\\
+\enquote{Ein Format für alles} & \textcolor{akzent}{falsch} & \textbf{eines je Naht}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist keine Erfahrung, sondern eine Rechnung --- und deshalb die belastbarste Aussage des Bandes. Wer die Zahl der Bestandteile erhöht, senkt die Verfügbarkeit, es sei denn, er erhöht die jedes einzelnen.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{aktuell}
+\boxtitel{Fünf Entwicklungen}
+\textbf{Erstens: Die Pendelbewegung.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.2cm}P{2.8cm}P{2.8cm}@{}}
+\toprule
+\textbf{Zeitraum} & \textbf{Vorherrschend} & \\
+\midrule
+$2005$ & Große Einzelanwendung & \\
+$2015$ & \textbf{möglichst viele Dienste} & \textcolor{akzent}{Übertreibung}\\
+$2022$ & Rückbau & \textcolor{gruen}{gemessene Kosten}\\
+$2026$ & \textbf{wenige, begründete} & \textcolor{gruen}{\textbf{nach Anforderung}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Bemerkenswert ist die dritte Zeile: Mehrere große Anbieter haben Dienste wieder zusammengelegt und die Kosten offengelegt. Das hat die Diskussion versachlicht --- die Frage lautet nicht mehr \enquote{wie viele Dienste}, sondern \enquote{welcher Grund}.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{Zweitens: Fachstandards setzen sich durch.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bereich} & \textbf{Stand} & \\
+\midrule
+Befundaustausch & \textcolor{gruen}{\textbf{etabliert}} & \textbf{FHIR}\\
+Codelisten & \textcolor{gruen}{etabliert} & LOINC, UCUM\\
+Verordnung & \textcolor{gruen}{in Umsetzung} & \textcolor{gruen}{EU}\\
+Hausinterne Nähte & \textcolor{mittel}{eigen} & \textcolor{gruen}{zulässig}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die praktische Empfehlung aus Kapitel~\ref{kap:vertraege}: Fachstandard nach außen, eigenes Format innen, Übersetzung an einer Stelle. Das ist inzwischen die verbreitete Bauform und regulatorisch anerkannt.}
+\end{center}
+
+\medskip
+\textbf{Drittens: Beobachtbarkeit ist Standard geworden.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Praxis} & \textbf{Verbreitung} & \\
+\midrule
+Zählwerte & \textcolor{gruen}{\textbf{üblich}} & \\
+Verfolgung über Nähte & \textcolor{gruen}{verbreitet} & \textbf{einheitliches Format}\\
+Strukturierte Protokolle & \textcolor{gruen}{üblich} & \\
+Ziele schriftlich & \textcolor{mittel}{seltener} & \textcolor{akzent}{\textbf{die Lücke}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die letzte Zeile ist der verbleibende Mangel: Die Werkzeuge sind da, die Zahlen werden erhoben --- und niemand hat festgelegt, welcher Wert gut genug ist. Ohne Zielvorgabe ist ein Schaubild nur ein Schaubild.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{Viertens: Regulierung erreicht die Nähte.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Anforderung} & \textbf{Betrifft} & \\
+\midrule
+Nachvollzieh\-barkeit & \textbf{beide Zeitachsen} & \textcolor{gruen}{Kap.~\ref{kap:zeit}}\\
+Stückliste & alle Bestandteile & \\
+Vollständigkeit belegen & \textbf{Zählwerte} & \textcolor{gruen}{\textbf{Kap.~\ref{kap:beobachtbarkeit}}}\\
+Löschfristen & \textbf{auch Zwischenspeicher} & \textcolor{akzent}{Kap.~\ref{kap:zwischenspeicher}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist neu und folgenreich: Es genügt nicht, dass Befunde ankommen --- man muss belegen können, dass keiner fehlt. Das verlangt einen Abgleich der Zählwerte über die ganze Kette, und den hat kaum jemand.}
+\end{center}
+
+\medskip
+\textbf{Fünftens: Werkzeuge, die Nähte erzeugen.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Wirkung} & \textbf{Befund} & \\
+\midrule
+Gerüst und Umsetzung & \textcolor{gruen}{\textbf{gut}} & \textbf{aus dem Schema}\\
+Fehler\-behandlung & \textcolor{mittel}{brauchbar} & \\
+\textbf{Vertragsfragen} & \textcolor{akzent}{\textbf{unbeant\-wortet}} & \textcolor{akzent}{\textbf{Einheit, Zeitpunkt}}\\
+Idempotenz & \textcolor{akzent}{selten} & \textcolor{akzent}{muss man verlangen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die dritte Zeile ist der Kern: Ein Werkzeug erzeugt aus einem Schema tadellosen Code --- und das Schema enthält genau die sieben Punkte aus Kapitel~\ref{kap:vertraege} nicht, die den Fall aus dem Vorwort verursacht haben. Es kann nur umsetzen, was jemand entschieden hat.}
+\end{minipage}
+\end{center}
+\end{aktuell}
+
+\begin{merksatz}
+\boxtitel{Drei Einsichten}
+\textbf{Erstens: Die Naht ist die teuerste Entscheidung.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Gegenstand} & \textbf{Lebensdauer} & \textbf{Aufwand üblich}\\
+\midrule
+Code & $\approx2$ Jahre & \textcolor{gruen}{hoch}\\
+Bestandteil & $\approx7$ Jahre & \textcolor{gruen}{hoch}\\
+\textbf{Naht} & $\approx\mathbf{20}$ \textbf{Jahre} & \textcolor{akzent}{\textbf{gering}}\\
+\textbf{Kennungs\-schema} & \textcolor{akzent}{\textbf{unbegrenzt}} & \textcolor{akzent}{\textbf{sehr gering}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Das Verhältnis ist umgekehrt proportional: Je länger etwas lebt, desto weniger Sorgfalt bekommt es. Das ist der Befund, aus dem dieser Band entstanden ist.}
+\end{center}
+
+\textbf{Zweitens: Fast die Hälfte der Fehler ist nicht Code.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Fehlerklasse} & \textbf{Ursache} & \textbf{Kapitel}\\
+\midrule
+Falscher Zeitpunkt & \textbf{Vereinbarung} & \ref{kap:zeit}\\
+Falsche Einheit & Vereinbarung & \ref{kap:zahlen}\\
+Werte doppelt & \textbf{fehlende Kennung} & \ref{kap:naht}\\
+Lücke unsichtbar & \textbf{Anzeige\-entscheidung} & \ref{kap:fehler}\\
+Kaskade & fehlende Schranke & \ref{kap:fehler}\\
+Veralteter Wert & Zwischen\-speicher & \ref{kap:zwischenspeicher}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Fehlerklassen, keine davon ein Programmierfehler. Jede entsteht dort, wo zwei richtige Programme sich über etwas nicht geeinigt haben --- und keine wird von einem Werkzeug gefunden, das ein Programm prüft.}
+\end{minipage}
+\end{center}
+
+\textbf{Drittens: Das Handwerk trägt auch hier.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Aus Band 20} & \textbf{Gilt hier?} & \\
+\midrule
+Aufgabe verstehen & \textcolor{gruen}{\textbf{unverändert}} & \\
+Daten zuerst & \textcolor{gruen}{\textbf{verstärkt}} & \textbf{der Vertrag}\\
+Fehlersuche als Verfahren & \textcolor{gruen}{unverändert} & \textbf{plus Verfolgung}\\
+Fremden Code lesen & \textcolor{gruen}{unverändert} & \\
+Wann aufhören & \textcolor{gruen}{plus drei Kriterien} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Viermal dasselbe Ergebnis über vier Bände. Die zweite Zeile fällt hier am stärksten aus: Der Vertrag einer Naht ist ein Datenmodell, das zwanzig Jahre gilt --- Wirths Rangordnung auf ihrer längsten Zeitskala.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Was dieser Band nicht behauptet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.2cm}P{2.2cm}@{}}
+\toprule
+\textbf{Behauptung} & \textbf{Aufgestellt?} & \\
+\midrule
+Verteilen ist schlecht & \textcolor{akzent}{\textbf{nein}} & \textbf{vier Gründe}\\
+Es gibt eine richtige Zahl von Diensten & \textcolor{akzent}{\textbf{nein}} & \\
+Nähte lassen sich fehlerfrei bauen & \textcolor{akzent}{nein} & \\
+Diese Zahlen sind Konstanten & \textcolor{akzent}{nein} & \textbf{Größen\-ordnungen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die wichtigste. Die richtige Zahl folgt aus den Anforderungen: Ein Vierpersonenteam braucht zwei Bestandteile, ein Universitätsklinikum vielleicht zwölf. Wer eine Zahl nennt, ohne die Anforderungen zu kennen, rät.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\bigskip
+\begin{flushright}
+\itshape\color{grau}
+Ein Programm löst eine Aufgabe.\\
+Ein Werk hält ein Versprechen ---\\
+über Jahre, über Ausfälle,\\
+über alle hinweg, die daran gebaut haben.\\[10pt]
+\normalfont\color{grau}\upshape
+--- die Bilanz dieses Bandes.\\
+\itshape Das Versprechen steht in den Nähten.\\
+Nicht im Code.
+\end{flushright}
+\vspace{6pt}
+\noindent Kleppmann\zit{15} ordnet die Ent\-schei\-dun\-gen ver\-teil\-ter Werke; Brewer\zit{4} liefert den Rahmen für die Ab\-wä\-gung; Abbott und Fisher\zit{1} behandeln das Wachs\-tum solcher Werke über Jahre.

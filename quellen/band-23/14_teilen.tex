@@ -1,0 +1,263 @@
+\chapter{Wann teilen und wann nicht}\label{kap:teilen}
+
+\begin{merksatz}
+\boxtitel{Die vier Gründe, die tragen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Grund} & \textbf{Trägt?} & \\
+\midrule
+\textbf{Andere Betriebsanforderung} & \textcolor{gruen}{\textbf{ja}} & \textbf{Zeitschranke, Speicher}\\
+\textbf{Andere Sprache nötig} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Band 21, Kap.~14}\\
+\textbf{Eigenständig erneuerbar} & \textcolor{gruen}{\textbf{ja}} & \\
+\textbf{Eigenes Team, eigener Takt} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Conway}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die ersten beiden sind technisch zwingend --- der Messdatenerfasser \kursiv{muss} ein eigener Prozess in einer anderen Sprache sein. Die letzten beiden sind organisatorisch und deshalb ehrlicher, als sie klingen: Zuschnitt nach Zuständigkeit ist ein legitimer Grund, wenn man ihn benennt.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Gründe, die nicht tragen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Behauptung} & \textbf{Trägt?} & \\
+\midrule
+\enquote{Besser skalierbar} & \textcolor{mittel}{\textbf{selten}} & \textbf{erst messen}\\
+\enquote{Sauberer getrennt} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Module genügen}}\\
+\enquote{Leichter zu prüfen} & \textcolor{akzent}{nein} & \textcolor{akzent}{schwerer}\\
+\enquote{Modern} & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die häufigste und die schwächste: Wer eine saubere Trennung will, führt ein Modul ein --- Band 17, Kapitel~4. Ein eigener Prozess erzwingt die Trennung, und das ist der einzige Unterschied. Er kostet achtzehn Personentage.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Was ein zusätzlicher Bestandteil kostet}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Posten} & \textbf{Aufwand} & \\
+\midrule
+Naht entwerfen und bauen & $\approx18$ PT & \textbf{Kap.~\ref{kap:werk}}\\
+Bereitstellung, Überwachung & $\approx6$ PT & \textcolor{akzent}{laufend}\\
+Ausfallverhalten & $\approx5$ PT & \\
+Prüfung über die Naht & $\approx4$ PT & \textcolor{akzent}{\textbf{je Änderung}}\\
+Verfügbarkeit sinkt & --- & \textcolor{akzent}{\textbf{multiplikativ}}\\
+Verzögerung steigt & $+3$--$80$ ms & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Dreiunddreißig Personentage und eine schlechtere Verfügbarkeit --- das ist der Einstandspreis. Er lohnt, wenn einer der vier Gründe vorliegt, und nicht, wenn man nur eine Grenze ziehen will.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Zuschnitt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Geschnitten nach} & \textbf{Folge} & \\
+\midrule
+Technischer Schicht & \textcolor{akzent}{\textbf{jede Änderung trifft alle}} & \textcolor{akzent}{\textbf{schlecht}}\\
+Fachlichem Bereich & \textcolor{gruen}{\textbf{Änderung bleibt lokal}} & \textcolor{gruen}{gut}\\
+Betriebs\-anforderung & \textcolor{gruen}{ja} & \textcolor{gruen}{zwingend}\\
+Abteilungsgrenze & \textcolor{mittel}{ehrlich benennen} & \textbf{Conway}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist der klassische Fehlschnitt: ein Dienst für die Oberfläche, einer für die Logik, einer für die Daten. Eine neue Befundart ändert dann alle drei --- und jede Änderung braucht drei abgestimmte Bereitstellungen.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Probe.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Typische Änderung} & \textbf{Trifft} & \\
+\midrule
+Neue Befundart & $\mathbf{1}$ & \textcolor{gruen}{\textbf{guter Schnitt}}\\
+Neue Warnungsregel & $1$ & \textcolor{gruen}{gut}\\
+Neues Feld im Befund & $\mathbf{3}$ & \textcolor{mittel}{unvermeidlich}\\
+Andere Anzeige & $1$ & \textcolor{gruen}{gut}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die Probe ist einfach und wird selten gemacht: Man nimmt die zehn letzten Änderungen und zählt, wie viele Bestandteile jede berührt hat. Liegt der Schnitt richtig, ist der Wert meist eins.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Weg zurück}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Teilen} & \textbf{Zusammen\-legen}\\
+\midrule
+Aufwand & $\approx33$ PT & \textcolor{gruen}{$\approx\mathbf{8}$ \textbf{PT}}\\
+Risiko & \textcolor{mittel}{mittel} & \textcolor{gruen}{gering}\\
+Wird gemacht & \textcolor{gruen}{oft} & \textcolor{akzent}{\textbf{fast nie}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zusammenlegen ist viermal billiger als Teilen und wird trotzdem kaum je erwogen --- weil es wie ein Rückschritt aussieht. Dabei ist es die richtige Antwort, sobald zwei Bestandteile immer gemeinsam geändert und gemeinsam bereitgestellt werden.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Prüffrage lautet: Wurden diese beiden in den letzten zwölf Monaten je einzeln bereitgestellt? Lautet die Antwort nein, sind sie ein Bestandteil mit einer überflüssigen Naht dazwischen.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Bewerten Sie das Vorhaben.
+\item Rechnen Sie den Einstiegsfall.
+\item Bestimmen Sie, womit man anfängt.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Das Vorhaben bewerten.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.2cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Grund} & \textbf{Art} & \textbf{Urteil}\\
+\midrule
+Erfassung & Zeitschranke & \textbf{technisch} & \textcolor{gruen}{\textbf{ja}}\\
+Übertragung & \textbf{Verfügbarkeit} & technisch & \textcolor{gruen}{ja}\\
+Speicherung & Standard\-system & technisch & \textcolor{gruen}{ja}\\
+Auswertung & Fachlogik & \textbf{fachlich} & \textcolor{gruen}{ja}\\
+Oberfläche & \textbf{eigener Takt} & organisat. & \textcolor{gruen}{ja}\\
+\midrule
+\textit{Verlaufsdienst} & \textcolor{akzent}{\enquote{sauberer}} & \textcolor{akzent}{keiner} & \textcolor{akzent}{\textbf{nein}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf Bestandteile mit tragenden Gründen und einer ohne. Der letzte ist der Vorschlag aus Kapitel~\ref{kap:werk} --- er hätte zwei zusätzliche Nähte, dreiunddreißig Personentage und eine schlechtere Verfügbarkeit gekostet, für einen Teil, der sich nie unabhängig ändert.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{(b) Der Einstiegsfall.}
+
+\textbf{Die Lage.} Ein kleineres Haus, ein Team von vier Personen.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Fünf Teile} & \textbf{Zwei Teile} & \\
+\midrule
+Erstellung & $\mathbf{34}$ PM & $\mathbf{21}$ PM & \\
+Nähte & $4$ & $\mathbf{1}$ & \\
+Verfügbarkeit & $99{,}3\,\%$ & $\mathbf{99{,}8\,\%}$ & \\
+Bereitstellungen & $5$ & $2$ & \\
+Betriebsaufwand & $\approx0{,}8$ Stellen & $\approx\mathbf{0{,}3}$ & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Bei vier Personen sind zwei Bestandteile richtig: der Messdatenerfasser, weil die Zeitschranke es erzwingt, und alles andere in einem Programm. Dreizehn Personenmonate weniger und bessere Verfügbarkeit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Trennung nach Fachbereichen bleibt --- als Module innerhalb eines Programms, mit denselben Regeln aus Band 17. Wenn ein Teil später eigene Betriebsanforderungen bekommt, lässt er sich herauslösen. Der umgekehrte Weg ist teurer.}
+\end{center}
+
+\medskip
+\textbf{(c) Womit man anfängt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{1.0cm}P{3.4cm}P{3.4cm}@{}}
+\toprule
+$1$ & \textbf{So wenige Bestandteile wie möglich} & \textbf{ein Programm, gut zerlegt}\\
+$2$ & Herauslösen, was muss & Zeitschranke, Sprache\\
+$3$ & \textbf{Messen, wo es klemmt} & \textcolor{gruen}{Kap.~\ref{kap:messen}}\\
+$4$ & \textbf{Herauslösen, was sich belegen lässt} & \\
+$5$ & Zusammenlegen, was nicht trägt & \textcolor{gruen}{\textbf{regelmäßig prüfen}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der erste Schritt ist der unbeliebteste und der richtige: mit einem gut zerlegten Programm beginnen und nur herauslösen, was sich begründen lässt. Der umgekehrte Weg --- viele Bestandteile von Anfang an --- legt Nähte fest, bevor man weiß, wo sie hingehören.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der fünfte Schritt fehlt in fast allen Vorhaben. Er kostet einen halben Tag im Quartal: die Änderungen der letzten Monate ansehen und fragen, welche Bestandteile immer gemeinsam betroffen waren.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Zahl der Nähte wächst schneller als die Zahl der Teile}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.2cm}P{2.4cm}P{2.0cm}@{}}
+\toprule
+\textbf{Teile} & \textbf{Nähte} & \textbf{Aufwand} & \textbf{Verfügbar}\\
+\midrule
+$2$ & $\mathbf{1}$ & $33$ PT & $99{,}8\,\%$\\
+$5$ & $4$ & $132$ PT & $99{,}3\,\%$\\
+$12$ & $\mathbf{18}$ & \textcolor{akzent}{$594$ PT} & \textcolor{akzent}{$97{,}9\,\%$}\\
+$30$ & \textcolor{akzent}{$\mathbf{60}$} & \textcolor{akzent}{$1980$ PT} & \textcolor{akzent}{$\mathbf{94{,}9\,\%}$}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Bei dreißig Bestandteilen ist die Verfügbarkeit auf knapp fünfundneunzig Prozent gefallen --- achtzehn Tage Ausfall im Jahr, ohne dass ein einziger Bestandteil schlecht wäre. Das ist die Rechnung aus Kapitel~\ref{kap:messen}, hier als Entscheidungsgrundlage.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Wer viele Bestandteile will, muss jeden einzelnen verfügbarer machen --- und das kostet je Neun etwa das Dreifache. Der Aufwand wächst damit doppelt: mehr Nähte und höhere Anforderungen an jedes Teil.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Newman\zit{17} behandelt Zu\-schnitt und Grö\-ße ver\-teil\-ter Diens\-te; Conway\zit{6} erklärt, warum der Schnitt den Zu\-stän\-dig\-kei\-ten folgt; Richardson\zit{21} sammelt die Bau\-for\-men mit ihren Kos\-ten.

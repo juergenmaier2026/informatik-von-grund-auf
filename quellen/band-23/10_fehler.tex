@@ -1,0 +1,301 @@
+\part{Der Betrieb}
+
+\chapter{Fehler im Verbund}\label{kap:fehler}
+
+\begin{merksatz}
+\boxtitel{Wiederholen ist gefährlich}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Wiederholen?} & \\
+\midrule
+Verbindung nicht zustande & \textcolor{gruen}{\textbf{ja}} & \textbf{sicher nicht angekommen}\\
+Fehler $5xx$ & \textcolor{gruen}{ja} & \textcolor{gruen}{wenn idempotent}\\
+\textbf{Zeitablauf} & \textcolor{mittel}{\textbf{nur wenn idempotent}} & \textcolor{akzent}{\textbf{unklar}}\\
+Fehler $4xx$ & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{es bleibt falsch}\\
+Zurückweisung wegen Last & \textcolor{gruen}{ja} & \textbf{mit Wartezeit}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile wird am häufigsten verletzt: Eine automatische Wiederholung bei einem Formatfehler erzeugt endlose Versuche mit derselben falschen Nachricht --- und belastet den Empfänger, ohne je zum Ziel zu kommen.}
+\end{minipage}
+\end{center}
+
+\textbf{Wie oft und wie schnell.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Verfahren} & \textbf{Abstände} & \\
+\midrule
+Sofort, unbegrenzt & \textcolor{akzent}{\textbf{$0$, $0$, $0$}} & \textcolor{akzent}{\textbf{Lawine}}\\
+Fester Abstand & $1$ s, $1$ s, $1$ s & \textcolor{akzent}{Gleichtakt}\\
+Verdoppelnd & $1$, $2$, $4$, $8$ s & \textcolor{gruen}{besser}\\
+\textbf{Verdoppelnd mit Streuung} & \textbf{$1$, $1{,}7$, $4{,}4$, $9{,}1$} & \textcolor{gruen}{\textbf{richtig}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist der Standard und wird selten vollständig umgesetzt: Die Streuung verhindert, dass tausend Geräte nach einem Ausfall gleichzeitig wiederholen --- und genau das bringt den Empfänger beim Wiederanlauf ein zweites Mal zu Fall.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Der Sicherungsschalter}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.2cm}P{2.6cm}P{3.4cm}@{}}
+\toprule
+\textbf{Zustand} & \textbf{Verhalten} & \textbf{Übergang}\\
+\midrule
+\textbf{Geschlossen} & durchlassen & \textbf{bei $n$ Fehlern $\to$ offen}\\
+\textbf{Offen} & \textbf{sofort ablehnen} & nach $t$ $\to$ halboffen\\
+\textbf{Halboffen} & \textbf{eine Anfrage durch} & Erfolg $\to$ geschlossen\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Der Zweck ist nicht, den Ausfall zu verhindern --- der ist schon da. Der Zweck ist, den Aufrufer nicht mit hineinzuziehen: Ohne Schalter warten hundert Anfragen je dreißig Sekunden auf einen toten Dienst und blockieren dabei den Aufrufer.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die feine Stelle: Genau eine Anfrage wird durchgelassen, um zu prüfen, ob der Dienst zurück ist. Wer alle durchlässt, bringt den gerade wiederanlaufenden Dienst sofort erneut zu Fall.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Zeitschranken}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ohne Zeitschranke} & \textbf{Folge} & \\
+\midrule
+Aufruf hängt & \textbf{Faden belegt} & \\
+Weitere Aufrufe & \textcolor{akzent}{Warte\-schlange wächst} & \\
+Speicher & \textcolor{akzent}{\textbf{läuft voll}} & \\
+Aufrufer & \textcolor{akzent}{\textbf{fällt ebenfalls aus}} & \textcolor{akzent}{\textbf{Kaskade}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Schritte von einem hängenden Aufruf zum Ausfall des Aufrufers. Das ist der häufigste Weg, auf dem ein Teilausfall zu einem Gesamtausfall wird --- und er ist mit einer Zeitschranke je Aufruf zu verhindern.}
+\end{minipage}
+\end{center}
+
+\textbf{Wie lang?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Grundlage} & \textbf{Wert} & \\
+\midrule
+Geraten & \textcolor{akzent}{$30$ s} & \textcolor{akzent}{\textbf{viel zu lang}}\\
+Mittelwert $\times2$ & $84$ ms & \textcolor{akzent}{zu kurz}\\
+\textbf{$99.$ Perzentil $\times1{,}5$} & $\mathbf{1{,}4}$ \textbf{s} & \textcolor{gruen}{\textbf{begründet}}\\
+Restzeit aus dem Aufruf & \textcolor{gruen}{dynamisch} & \textcolor{gruen}{am besten}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die Vorgabe vieler Bibliotheken und in der Klinik unbrauchbar: Dreißig Sekunden Warten bedeuten, dass der Benutzer längst aufgegeben hat und der Faden trotzdem belegt bleibt. Die Zahl muss aus der Messung kommen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Frist muss durch die Kette}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.4cm}P{2.0cm}@{}}
+\toprule
+\textbf{Ebene} & \textbf{Frist} & \textbf{Verbraucht} & \textbf{Rest}\\
+\midrule
+Benutzer & $\mathbf{2000}$ ms & --- & $2000$\\
+Auswertung & $1900$ ms & $120$ & $1780$\\
+Speicherung & $1700$ ms & $340$ & $\mathbf{1440}$\\
+Datenbank & $\mathbf{1400}$ ms & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Jede Ebene gibt weniger Zeit weiter, als sie selbst hat --- die verbrauchte abgezogen und eine Spanne für die Antwort. Ohne diese Weitergabe wartet die Datenbank noch, wenn der Benutzer längst eine Fehlermeldung sieht: Arbeit ohne Empfänger.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist derselbe Abbruchkontext wie in Band 22, Kapitel~4 --- hier über Prozessgrenzen. Er muss durch jede Naht weitergereicht werden, und wo er verlorengeht, arbeitet ein Dienst für niemanden.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Verfolgen Sie eine Kaskade.
+\item Bestimmen Sie das Verhalten bei Überlast.
+\item Legen Sie fest, was bei endgültigem Fehlschlag geschieht.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine Kaskade verfolgen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.2cm}P{3.4cm}P{3.4cm}@{}}
+\toprule
+\textbf{Zeit} & \textbf{Ereignis} & \textbf{Wirkung}\\
+\midrule
+$t_0$ & Datenbank wird langsam & Antwortzeit $\times8$\\
+$t_1$ & \textbf{Speicherdienst: Fäden belegt} & Warteschlange wächst\\
+$t_2$ & Auswertung: Zeitabläufe & \textbf{wiederholt}\\
+$t_3$ & \textcolor{akzent}{\textbf{Last verdreifacht}} & \textcolor{akzent}{\textbf{durch Wiederholung}}\\
+$t_4$ & Speicherdienst fällt aus & \\
+$t_5$ & \textcolor{akzent}{Auswertung fällt aus} & \textcolor{akzent}{\textbf{Gesamtausfall}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Schritte von einer langsamen Datenbank zum Gesamtausfall, und der entscheidende ist der dritte: Die Wiederholungen verdreifachen die Last auf ein System, das schon überlastet ist. Ohne sie wäre es bei langsam geblieben.}
+\end{minipage}
+\end{center}
+
+\textbf{Was jede Maßnahme verhindert hätte.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Stoppt bei} & \\
+\midrule
+Zeitschranken & $t_1$ & \textcolor{gruen}{Fäden frei}\\
+\textbf{Nebenläufigkeit begrenzt} & $t_1$ & \textcolor{gruen}{\textbf{Band 22, Kap.~4}}\\
+Wiederholungen begrenzt & $t_3$ & \textcolor{gruen}{\textbf{keine Verdreifachung}}\\
+Sicherungs\-schalter & $t_4$ & \textcolor{gruen}{Auswertung überlebt}\\
+Last abweisen & $t_2$ & \textcolor{gruen}{\textbf{Teilbetrieb}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Fünf Maßnahmen, jede hätte allein genügt. Das ist der Regelfall bei Kaskaden --- sie brauchen eine Kette von Versäumnissen, und jedes einzelne Glied bricht sie.}
+\end{center}
+
+\medskip
+\textbf{(b) Verhalten bei Überlast.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Vorgehen} & \textbf{Ergebnis} & \\
+\midrule
+Alles annehmen & \textcolor{akzent}{\textbf{alle werden langsam}} & \textcolor{akzent}{dann Ausfall}\\
+\textbf{Überschuss abweisen} & \textbf{die meisten normal} & \textcolor{gruen}{\textbf{richtig}}\\
+Nach Wichtigkeit & \textcolor{gruen}{\textbf{Warnungen zuerst}} & \textcolor{gruen}{besser}\\
+Warteschlange verlängern & \textcolor{akzent}{verzögert} & \textcolor{akzent}{Kap.~\ref{kap:messen}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die unbequeme Einsicht: Bei Überlast ist es besser, zehn Prozent der Anfragen sofort abzuweisen, als alle langsam zu bedienen. Eine abgewiesene Anfrage kann der Aufrufer wiederholen; eine, die nach zwanzig Sekunden antwortet, hilft niemandem mehr.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist in der Klinik die richtige Verfeinerung: Kritische Warnungen werden immer bedient, Verlaufsansichten bei Überlast abgewiesen. Das setzt voraus, dass die Naht die Wichtigkeit überträgt --- ein Feld, das man vorsehen muss.}
+\end{center}
+
+\medskip
+\textbf{(c) Endgültiger Fehlschlag.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Vorgehen} & \textbf{Tauglich?} & \\
+\midrule
+Verwerfen & \textcolor{akzent}{\textbf{nie}} & \textcolor{akzent}{\textbf{Datenverlust}}\\
+Ewig wiederholen & \textcolor{akzent}{nein} & \textcolor{akzent}{blockiert die Reihe}\\
+\textbf{In Sonderablage} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{mit Meldung}}\\
+Manuell nachbearbeiten & \textcolor{gruen}{ja} & \textbf{jemand muss zuständig sein}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist ein häufiger Entwurfsfehler bei Warteschlangen: Eine Nachricht, die nie verarbeitet werden kann, blockiert alle dahinter --- weil die Reihenfolge gewahrt bleiben soll. Nach drei Versuchen gehört sie beiseite.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Anforderung an die Ablage} & \textbf{Nötig?} & \\
+\midrule
+Vollständige Nachricht & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{wiederholbar}\\
+Fehlergrund & \textcolor{gruen}{ja} & \\
+Zeitpunkt und Versuche & \textcolor{gruen}{ja} & \\
+\textbf{Wird angesehen} & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{\textbf{sonst nutzlos}}\\
+Zählwert überwacht & \textcolor{gruen}{ja} & \textcolor{gruen}{Kap.~\ref{kap:beobachtbarkeit}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist keine technische Anforderung, sondern eine organisatorische --- und sie entscheidet über den Wert der ganzen Bauform. Eine Sonderablage ohne Zuständigen ist ein Ort, an dem Befunde unbemerkt liegenbleiben.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Fehler muss den Benutzer erreichen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Anzeige} & \textbf{Tauglich?} & \\
+\midrule
+\enquote{Ein Fehler ist aufgetreten} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{keine Handlung ableitbar}\\
+\textbf{\enquote{Befunde ab 14:20 fehlen}} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Umfang klar}}\\
+Nichts anzeigen & \textcolor{akzent}{\textbf{gefährlich}} & \textcolor{akzent}{\textbf{sieht vollständig aus}}\\
+Kennung zum Nachfragen & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die gefährlichste Bauform überhaupt: Eine Verlaufsansicht, der Werte fehlen, ohne dass es angezeigt wird. Der Arzt sieht eine vollständige Kurve und trifft eine Entscheidung auf unvollständiger Grundlage.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Regel für klinische Anzeigen lautet deshalb: Unvollständigkeit wird immer sichtbar gemacht. Lieber eine Ansicht mit dem Hinweis \enquote{Zeitraum 14:20 bis 14:50 konnte nicht geladen werden} als eine scheinbar vollständige.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Nygard\zit{18} sammelt die Bau\-for\-men gegen Kas\-ka\-den; Postels Regel\zit{20} legt die Streng\-e je Seite fest; Richardson\zit{21} zeigt die Um\-set\-zung in ver\-teil\-ten Diens\-ten.

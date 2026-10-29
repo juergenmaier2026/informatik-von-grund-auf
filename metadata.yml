@@ -1,0 +1,137 @@
+reihe: Informatik von Grund auf
+herausgeber: Jürgen Maier
+fassung: 1.0.0
+datum: 2026-10-29
+lizenz: CC-BY-SA-4.0
+repository: https://github.com/juergenmaier2026/informatik-von-grund-auf
+baende:
+  - nr: "0"
+    titel: "Die Logik des Schalters"
+    gebiet: "Grundlagen des Rechnens"
+    seiten: 226
+    datei: pdf/Band_00_Die_Logik_des_Schalters.pdf
+  - nr: "1"
+    titel: "Die Ordnung der Daten"
+    gebiet: "Algorithmen und Datenstrukturen"
+    seiten: 216
+    datei: pdf/Band_01_Die_Ordnung_der_Daten.pdf
+  - nr: "2"
+    titel: "Die Grenze der Maschine"
+    gebiet: "Berechenbarkeit und formale Sprachen"
+    seiten: 176
+    datei: pdf/Band_02_Die_Grenze_der_Maschine.pdf
+  - nr: "3"
+    titel: "Der Preis der Berechnung"
+    gebiet: "Komplexitätstheorie"
+    seiten: 166
+    datei: pdf/Band_03_Der_Preis_der_Berechnung.pdf
+  - nr: "4"
+    titel: "Die Anatomie der Geschwindigkeit"
+    gebiet: "Rechnerarchitektur"
+    seiten: 166
+    datei: pdf/Band_04_Die_Anatomie_der_Geschwindigkeit.pdf
+  - nr: "5"
+    titel: "Der Wettlauf der Prozesse"
+    gebiet: "Betriebssysteme und Nebenläufigkeit"
+    seiten: 186
+    datei: pdf/Band_05_Der_Wettlauf_der_Prozesse.pdf
+  - nr: "6"
+    titel: "Die Verwandlung des Textes"
+    gebiet: "Programmiersprachen und Übersetzerbau"
+    seiten: 188
+    datei: pdf/Band_06_Die_Verwandlung_des_Textes.pdf
+  - nr: "7"
+    titel: "Das Maß der Nachricht"
+    gebiet: "Informationstheorie"
+    seiten: 158
+    datei: pdf/Band_07_Das_Mass_der_Nachricht.pdf
+  - nr: "8"
+    titel: "Die Mathematik des Misstrauens"
+    gebiet: "Kryptographie"
+    seiten: 174
+    datei: pdf/Band_08_Die_Mathematik_des_Misstrauens.pdf
+  - nr: "9"
+    titel: "Die Einigung der Getrennten"
+    gebiet: "Netzwerke und verteilte Systeme"
+    seiten: 166
+    datei: pdf/Band_09_Die_Einigung_der_Getrennten.pdf
+  - nr: "10"
+    titel: "Das Gedächtnis der Systeme"
+    gebiet: "Datenbanken und Information Retrieval"
+    seiten: 162
+    datei: pdf/Band_10_Das_Gedaechtnis_der_Systeme.pdf
+  - nr: "11"
+    titel: "Das Muster der Verbindungen"
+    gebiet: "Graphen und Netzwerkanalyse"
+    seiten: 164
+    datei: pdf/Band_11_Das_Muster_der_Verbindungen.pdf
+  - nr: "12"
+    titel: "Der Raum der Möglichkeiten"
+    gebiet: "Symbolische künstliche Intelligenz"
+    seiten: 164
+    datei: pdf/Band_12_Der_Raum_der_Moeglichkeiten.pdf
+  - nr: "13"
+    titel: "Der Schluss aus dem Beispiel"
+    gebiet: "Maschinelles Lernen"
+    seiten: 170
+    datei: pdf/Band_13_Der_Schluss_aus_dem_Beispiel.pdf
+  - nr: "14"
+    titel: "Das Rechnen des Gehirns"
+    gebiet: "Computational Neuroscience"
+    seiten: 174
+    datei: pdf/Band_14_Das_Rechnen_des_Gehirns.pdf
+  - nr: "15"
+    titel: "Die Auslöschung der Irrwege"
+    gebiet: "Quanteninformatik"
+    seiten: 156
+    datei: pdf/Band_15_Die_Ausloeschung_der_Irrwege.pdf
+  - nr: "B"
+    titel: "Der seltsame Kreis"
+    gebiet: "Selbstbezug, Universalität und Grenze"
+    seiten: 124
+    datei: pdf/Band_B_Der_seltsame_Kreis.pdf
+  - nr: "16"
+    titel: "Die Maschine, die rechnen lernte"
+    gebiet: "Eine Geschichte des maschinellen Rechnens"
+    seiten: 146
+    datei: pdf/Band_16_Die_Maschine_die_rechnen_lernte.pdf
+  - nr: "17"
+    titel: "Das Werk vieler Hände"
+    gebiet: "Softwaretechnik"
+    seiten: 150
+    datei: pdf/Band_17_Das_Werk_vieler_Haende.pdf
+  - nr: "18"
+    titel: "Die Übersetzung der Absicht"
+    gebiet: "Mensch-Maschine-Interaktion"
+    seiten: 142
+    datei: pdf/Band_18_Die_Uebersetzung_der_Absicht.pdf
+  - nr: "19"
+    titel: "Der schwächste Punkt"
+    gebiet: "Sicherheit"
+    seiten: 150
+    datei: pdf/Band_19_Der_schwaechste_Punkt.pdf
+  - nr: "20"
+    titel: "Der zweite Entwurf"
+    gebiet: "Programmieren in Python"
+    seiten: 139
+    datei: pdf/Band_20_Der_zweite_Entwurf.pdf
+  - nr: "21"
+    titel: "Was darunter liegt"
+    gebiet: "Programmieren in C"
+    seiten: 132
+    datei: pdf/Band_21_Was_darunter_liegt.pdf
+  - nr: "22"
+    titel: "Die Kunst des Weglassens"
+    gebiet: "Programmieren in Go"
+    seiten: 118
+    datei: pdf/Band_22_Die_Kunst_des_Weglassens.pdf
+  - nr: "23"
+    titel: "Vom Programm zum Werk"
+    gebiet: "Programme, die zusammenwirken"
+    seiten: 122
+    datei: pdf/Band_23_Vom_Programm_zum_Werk.pdf
+  - nr: "24"
+    titel: "Die Kunst"
+    gebiet: "Zwanzig Fälle und ihre Begründung"
+    seiten: 108
+    datei: pdf/Band_24_Die_Kunst.pdf

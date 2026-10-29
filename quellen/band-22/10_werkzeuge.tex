@@ -1,0 +1,288 @@
+\part{Das Handwerk}
+
+\chapter{Werkzeuge}\label{kap:werkzeuge}
+
+\begin{merksatz}
+\boxtitel{Was mitgeliefert wird}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{3.0cm}P{2.4cm}@{}}
+\toprule
+\textbf{Werkzeug} & \textbf{Leistet} & \textbf{Aufwand}\\
+\midrule
+\code{gofmt} & \textbf{Formatierung} & \textcolor{gruen}{keiner}\\
+\code{go vet} & \textbf{häufige Fehler} & \textcolor{gruen}{keiner}\\
+\code{go test} & Prüfungen, Abdeckung & \textcolor{gruen}{keiner}\\
+\code{-race} & \textbf{Wettläufe} & \textcolor{mittel}{Laufzeit}\\
+\code{pprof} & \textbf{Profil} & \textcolor{gruen}{gering}\\
+\code{go doc} & Dokumentation & \textcolor{gruen}{keiner}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Werkzeuge, keine Installation, keine Konfiguration --- sie sind Teil der Sprachauslieferung. Das ist der praktische Unterschied zu Band 21, wo dieselben Aufgaben eine Werkzeugkette verlangen, die jemand einrichten muss.}
+\end{minipage}
+\end{center}
+
+\textbf{Was das für die Verbreitung bedeutet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+\textbf{Praxis} & \textbf{In C} & \textbf{In Go} & \\
+\midrule
+Formatierer läuft & $\approx35\,\%$ & \textcolor{gruen}{$\approx\mathbf{99\,\%}$} & \\
+Statische Prüfung & $\approx25\,\%$ & \textcolor{gruen}{$\approx\mathbf{85\,\%}$} & \\
+Wettlaufprüfer & $<10\,\%$ & \textcolor{gruen}{$\approx60\,\%$} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die Zahlen sind Schätzungen und die Größenordnung ist belastbar: Ein Werkzeug, das mitgeliefert wird und ohne Einrichtung läuft, wird benutzt. Eines, das man aufsetzen muss, oft nicht --- die Lehre aus Band 21, Kapitel~10.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Was \code{go vet} findet}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Fehler} & \textbf{Sonst bemerkt?} & \\
+\midrule
+Formatzeichen passt nicht & \textcolor{akzent}{zur Laufzeit} & \textcolor{gruen}{gefunden}\\
+Struktur mit Sperre kopiert & \textcolor{akzent}{\textbf{nie}} & \textcolor{gruen}{\textbf{gefunden}}\\
+Schleifenvariable in Goroutine & \textcolor{akzent}{selten} & \textcolor{gruen}{gefunden}\\
+Fehler nicht geprüft & \textcolor{akzent}{nie} & \textcolor{gruen}{teils}\\
+Unerreichbarer Code & \textcolor{akzent}{nie} & \textcolor{gruen}{gefunden}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die zweite Zeile ist die wertvollste --- eine kopierte Sperre schützt nichts und fällt sonst nie auf. Die dritte war bis Go 1.22 eine der häufigsten Fehlerquellen überhaupt; seither ist sie durch eine Sprachänderung beseitigt.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Das Profil}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+\textbf{Art} & \textbf{Zeigt} & \\
+\midrule
+Rechenzeit & \textbf{wo die Zeit vergeht} & \\
+Speicher & \textbf{wer belegt} & \textcolor{gruen}{Halde}\\
+Blockierung & \textbf{wo gewartet wird} & \textcolor{gruen}{Kanäle, Sperren}\\
+Goroutinen & \textbf{wo sie stehen} & \textcolor{gruen}{\textbf{Kap.~\ref{kap:schiefgeht}}}\\
+Sperrenstreit & wer wartet auf wen & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte und vierte Art gibt es in anderen Sprachen selten und sie sind für nebenläufige Programme die wichtigsten: Ein Programm, das nur wartet, verbraucht keine Rechenzeit --- ein Rechenzeitprofil zeigt dann nichts, obwohl das Problem offensichtlich ist.}
+\end{minipage}
+\end{center}
+
+\textbf{Im Betrieb.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{import \_ "net/http/pprof"}\\
+\\
+\code{go func() \{}\\
+\code{\ \ \ \ log.Println(http.ListenAndServe("localhost:6060", nil))}\\
+\code{\}()}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Wert} & \\
+\midrule
+Zeilen & \textcolor{gruen}{$\mathbf{4}$} & \\
+Laufzeitkosten & \textcolor{gruen}{$\approx0$} & \textbf{bis abgefragt}\\
+Im Betrieb nutzbar & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Band 21, Kap.~12}\\
+Sicherheit & \textcolor{akzent}{\textbf{nur lokal binden}} & \textcolor{akzent}{\textbf{nie nach außen}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Zeilen, und man kann ein laufendes Programm im Betrieb befragen --- das Mittel, das Band 21 vermisst. Die letzte Zeile ist keine Formalie: Die Profilschnittstelle gibt Speicherinhalte preis und gehört niemals ins offene Netz.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Formatierer ersetzt kein Urteil}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Werkzeug findet} & \textbf{Werkzeug findet nicht} & \\
+\midrule
+Formatierung & \textbf{schlechte Namen} & \\
+Wettläufe & \textbf{falsches Datenmodell} & \textcolor{akzent}{Band 20, Kap.~2}\\
+Kopierte Sperren & \textbf{zu große Funktionen} & \\
+Ungenutzte Variablen & \textbf{fehlende Zerlegung} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die rechte Spalte enthält alles, was Band 20 behandelt --- und kein Werkzeug findet davon etwas. Eine grüne Prüfstrecke sagt, dass die bekannten Fehlerklassen fehlen; sie sagt nichts darüber, ob der Entwurf trägt.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Richten Sie die Prüfstrecke ein.
+\item Finden Sie ein Leistungsproblem mit dem Profil.
+\item Bewerten Sie zusätzliche Prüfer.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die Prüfstrecke.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.4cm}P{1.8cm}P{2.2cm}@{}}
+\toprule
+\textbf{St.} & \textbf{Schritt} & \textbf{Dauer} & \textbf{Wann}\\
+\midrule
+$1$ & \code{gofmt -l} --- meldet Abweichungen & $\mathbf{1}$ s & \textbf{jede Übergabe}\\
+$2$ & \code{go vet} & $6$ s & jede Übergabe\\
+$3$ & \code{go build} & $9$ s & jede Übergabe\\
+$4$ & \code{go test} & $14$ s & jede Übergabe\\
+$5$ & \textbf{\code{go test -race}} & $92$ s & \textbf{jede Übergabe}\\
+$6$ & Zusatzprüfer & $40$ s & nächtlich\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die ersten fünf Stufen dauern zusammen gut zwei Minuten --- innerhalb der Grenze aus Band 17, Kapitel~10. Der Wettlaufprüfer ist der teuerste Posten und der wichtigste; wer ihn nach hinten schiebt, findet Wettläufe erst nachts.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Einrichtung} & \textbf{Aufwand} & \\
+\midrule
+Einmalig & \textcolor{gruen}{$\approx\mathbf{2}$ \textbf{h}} & \textbf{Band 21: $16$ h}\\
+Altlast\-meldungen & \textcolor{gruen}{$\approx30$} & \textcolor{gruen}{Band 21: $400$}\\
+Konfiguration & \textcolor{gruen}{fast keine} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Zwei Stunden gegen sechzehn, dreißig Altlastmeldungen gegen vierhundert. Der Unterschied ist nicht Sprachqualität, sondern die Entscheidung, die Werkzeuge mitzuliefern und den Formatierer von Anfang an verbindlich zu machen.}
+\end{center}
+
+\medskip
+\textbf{(b) Ein Leistungsproblem finden.}
+
+\textbf{Das Bild.} Die Übertragung schafft $180$ k/s statt der erwarteten $500$ k/s.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.4cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Schritt} & \textbf{Dauer} & \textbf{Befund}\\
+\midrule
+$1$ & Rechenzeitprofil & $3$ min & \textcolor{akzent}{$8\,\%$ Last}\\
+$2$ & \textbf{Blockierungsprofil} & $3$ min & \textcolor{gruen}{\textbf{Kanal}}\\
+$3$ & Zeile ansehen & $5$ min & \textbf{Puffer $0$, ein Leser}\\
+$4$ & Vier Leser starten & $10$ min & \textcolor{gruen}{$\mathbf{495}$ \textbf{k/s}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Das Rechenzeitprofil zeigt acht Prozent Last --- also kein Rechenproblem. Erst das Blockierungsprofil zeigt, wo gewartet wird, und das ist bei einem nebenläufigen Programm fast immer die richtige Frage.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Einundzwanzig Minuten von der Meldung zur Behebung --- und der entscheidende Schritt war, das richtige Profil zu wählen. Wer nur Rechenzeit misst, sucht stundenlang an der falschen Stelle.}
+\end{center}
+
+\medskip
+\textbf{(c) Zusätzliche Prüfer bewerten.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Prüfer} & \textbf{Genauigkeit} & \textbf{Urteil}\\
+\midrule
+\code{go vet} & \textcolor{gruen}{$\approx95\,\%$} & \textcolor{gruen}{\textbf{immer}}\\
+Wettlaufprüfer & \textcolor{gruen}{$\mathbf{100\,\%}$} & \textcolor{gruen}{\textbf{immer}}\\
+Stilprüfer & \textcolor{mittel}{$\approx60\,\%$} & \textcolor{mittel}{auswählen}\\
+Komplexitätsmaße & \textcolor{akzent}{$\approx30\,\%$} & \textcolor{akzent}{Hinweis, keine Regel}\\
+Alle Prüfer eines Bündels & \textcolor{akzent}{$\approx35\,\%$} & \textcolor{akzent}{\textbf{Rauschen}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der häufigste Fehler beim Einrichten: Man schaltet alle vorhandenen Prüfer ein, bekommt tausend Meldungen und schaltet nach zwei Wochen alle wieder ab. Dieselbe Rechnung wie in Band 19, Kapitel~4 und Band 21, Kapitel~10.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die beiden ersten Zeilen genügen für den Anfang. Weitere Prüfer nimmt man einzeln auf, wenn sie im eigenen Bestand echte Funde liefern --- gemessen an einer Stichprobe, nicht nach Empfehlung.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Wettlaufprüfer braucht Prüffälle}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Voraussetzung} & \textbf{Erfüllt?} & \\
+\midrule
+Nebenläufiger Pfad geprüft & \textcolor{mittel}{\textbf{oft nicht}} & \textcolor{akzent}{\textbf{die Lücke}}\\
+Genug Durchläufe & \textcolor{mittel}{teils} & \\
+Realistische Last & \textcolor{akzent}{selten} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der Prüfer sieht nur, was ausgeführt wird --- dieselbe Einschränkung wie bei den Sanitizern in Band 21. Ein Wettlauf in einem Pfad, den kein Prüffall erreicht, bleibt unentdeckt, und die grüne Meldung wiegt in falscher Sicherheit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Abhilfe ist eine Prüfung, die den nebenläufigen Pfad tatsächlich belastet: hundert Goroutinen, tausend Durchläufe, mit \code{t.Parallel}. Zwanzig Zeilen, und der Prüfer bekommt etwas zu sehen.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Die Werk\-zeug\-do\-ku\-men\-ta\-tion\zit{27} beschreibt das Profil und die Prüfer; der Wett\-lauf\-prü\-fer\zit{28} ist eigens do\-ku\-men\-tiert; \enquote{Effective Go}\zit{7} nennt die Ge\-wohn\-hei\-ten, die die Werk\-zeu\-ge voraussetzen.

@@ -1,0 +1,231 @@
+\appendix
+\part{Anhang}
+
+\newcommand{\lit}[3]{\vspace{5pt}\noindent\textbf{[#1]} #2\par\nopagebreak\vspace{1pt}{\small\itshape\color{grau} #3}\par\vspace{2pt}}
+
+\chapter{Regeln und Kenngrößen}
+
+\begin{merksatz}
+\boxtitel{Die Regeln}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{5.4cm}@{}}
+\toprule
+\textbf{Zerlegung} & Erst schneiden, dann verteilen --- und nur mit Grund\\
+\textbf{Naht} & Grobe Aufrufe, Mengen statt Einzelstücke\\
+\textbf{Idempotenz} & \textbf{Kennung vom Sender, sonst keine Wiederholung}\\
+\textbf{Vertrag} & Einheit, Genauigkeit, Bedeutung des Fehlens\\
+\textbf{Zeit} & \textbf{Beide Achsen führen; intern UTC, außen Ortszeit}\\
+\textbf{Text} & Einmal normalisieren, an der Eintrittsstelle\\
+\textbf{Zahlen} & \textbf{Rundung zweimal: am Anfang und am Ende}\\
+\textbf{Prüfung} & Beide Seiten prüfen; Plausibilität an der Naht\\
+\textbf{Messen} & Perzentile, nicht Mittelwerte\\
+\textbf{Fehler} & \textbf{Zeitschranken überall, Fristen weiterreichen}\\
+\textbf{Anzeige} & Unvollständigkeit immer sichtbar machen\\
+\textbf{Aufzeichnung} & Beim Entwurf einbauen, nicht danach\\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die wichtigsten Zahlen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.42}
+\begin{tabular}{@{}P{4.0cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Wert} & \textbf{Kapitel}\\
+\midrule
+Fehler an den Nähten & $\approx45\,\%$ & \ref{kap:werk}\\
+Aufruf gegen Netzaufruf & Faktor $\approx250\,000$ & \ref{kap:werk}\\
+Aufwand je Naht & $\approx18$ PT & \ref{kap:werk}\\
+Einstand je Bestandteil & $\approx33$ PT & \ref{kap:teilen}\\
+Nähte bei $n$ Teilen & bis $n(n{-}1)/2$ & \ref{kap:teilen}\\
+$n{+}1$ über die Naht & Faktor $\approx65$ & \ref{kap:zeit_hin}\\
+JSON gegen binär & Faktor $\approx9$ & \ref{kap:naht}\\
+Zeit in Datenbankabfragen & $\approx48\,\%$ & \ref{kap:zeit_hin}\\
+$20$ Dienste, je $1\,\%$ langsam & $\approx18\,\%$ & \ref{kap:messen}\\
+Verfügbarkeit, $4$ Teile & $\approx99{,}3\,\%$ & \ref{kap:messen}\\
+Je Neun & etwa $3\times$ teurer & \ref{kap:messen}\\
+Glukose mg/dl zu mmol/l & Faktor $\approx18$ & \ref{kap:zahlen}\\
+Uhrabweichung, eingebettet & $5$--$30$ s/Tag & \ref{kap:zeit}\\
+Aufzeichnung beim Entwurf & $\approx3\,\%$ & \ref{kap:beobachtbarkeit}\\
+Aufzeichnung danach & $\approx12\,\%$ & \ref{kap:beobachtbarkeit}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Alle Werte sind Größenordnungen. Die Verhältnisse sind belastbarer als die absoluten Zahlen --- und auf Verhältnissen beruhen die Argumente dieses Bandes.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Nahtvertrag als Prüfliste}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{7.6cm}@{}}
+\toprule
+$1$ & Felder, Typen, Pflicht oder optional\\
+$2$ & \textbf{Einheit --- und wie sie geprüft wird}\\
+$3$ & \textbf{Genauigkeit --- Betrag und Exponent, nicht Gleitkomma}\\
+$4$ & Wertebereich: möglich, kritisch, Referenz\\
+$5$ & \textbf{Bedeutung des Fehlens --- ausdrücklich}\\
+$6$ & \textbf{Welcher Zeitpunkt --- und welche Zone}\\
+$7$ & Kodierung und Normalform\\
+$8$ & \textbf{Kennung: wer vergibt sie, woraus besteht sie}\\
+$9$ & Verhalten bei Wiederholung\\
+$10$ & \textbf{Verhalten bei teilweise ungültigen Mengen}\\
+$11$ & Zeitschranke und wer sie weitergibt\\
+$12$ & \textbf{Wie das Format erweitert wird}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Zwölf Punkte. Die Punkte 1 und 4 stehen in jedem Schema; die übrigen zehn stehen fast nirgends --- und aus ihnen stammen die Fehlerklassen dieses Bandes.}
+\end{center}
+\end{merksatz}
+
+\chapter{Landkarte und Glossar}
+
+\begin{merksatz}
+\boxtitel{Wo was steht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.6cm}P{4.2cm}@{}}
+\toprule
+\textbf{Kap.} & \textbf{Thema} & \textbf{Verweise}\\
+\midrule
+$1$ & Programm und Werk & \textbf{Band 17, Kap.~4}\\
+$2$ & Die Naht & \textbf{Band 21, Kap.~14}\\
+$3$ & Verträge & \textbf{Band 17, Kap.~6}\\
+$4$ & Zeit & \textbf{Band 20, Kap.~2}\\
+$5$ & Text & \textbf{Band 21, Kap.~4}\\
+$6$ & Zahlen & \textbf{Band 21, Kap.~8}\\
+$7$ & Messen im Verbund & Band 21, Kap.~12\\
+$8$ & Wo die Zeit hingeht & \textbf{Band 20, Kap.~12}\\
+$9$ & Zwischenspeicher & \textbf{Band 22, Kap.~12}\\
+$10$ & Fehler im Verbund & \textbf{Band 22, Kap.~2}\\
+$11$ & Beobachtbarkeit & \textbf{Band 18, Band 19}\\
+$12$ & Ausfall & \textbf{Band 12}\\
+$13$ & Der zweite Entwurf & \textbf{Band 20, Kap.~13}\\
+$14$ & Wann teilen & \textbf{Band 17, Kap.~4}\\
+$15$ & Stand 2026 & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Begriffe}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.32}
+\begin{tabular}{@{}P{3.3cm}P{5.4cm}@{}}
+\toprule
+\textbf{Ausgleichsschritt} & Fachliche Rücknahme statt technischer Unteilbarkeit\\
+\textbf{Fachliche Zeit} & Wann etwas geschah\\
+\textbf{Gegendruck} & Bremsen des Senders bei Überlast\\
+\textbf{Idempotenz} & Zweimal wirkt wie einmal\\
+\textbf{Naht} & Vereinbarte Grenze zwischen zwei Bestandteilen\\
+\textbf{Perzentil} & Wert, unter dem ein Anteil der Messungen liegt\\
+\textbf{Sättigung} & Auslastung als Vorwarngröße\\
+\textbf{Sicherungsschalter} & Aufrufe abweisen, solange der Empfänger ausfällt\\
+\textbf{Sonderablage} & Ort für endgültig fehlgeschlagene Nachrichten\\
+\textbf{Systemzeit} & Wann wir es wussten\\
+\textbf{Teilausfall} & Ein Bestandteil fällt aus, andere laufen\\
+\textbf{Verfolgung} & Eine Kennung wandert durch alle Bestandteile\\
+\textbf{Werk} & Zusammengesetztes System aus mehreren Bestandteilen\\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\chapter{Kommentierte Quellen}
+
+\lit{1}{Abbott, M., Fisher, M.: \textit{The Art of Scalability}. 2.\ Aufl., Addison-Wesley 2015.}{Behandelt Wachstum von Werken über Jahre --- technisch und organisatorisch. Die Verbindung beider Seiten ist selten und für Kapitel~\ref{kap:teilen} unmittelbar brauchbar.}
+
+\lit{2}{Bernstein, P., Newcomer, E.: \textit{Principles of Transaction Processing}. 2.\ Aufl., Morgan Kaufmann 2009.}{Erklärt die Verfahren zur Unteilbarkeit, einschließlich der zweiphasigen Freigabe und ihrer Grenzen. Trocken, gründlich und die maßgebliche Quelle zu Kapitel~\ref{kap:ausfall}.}
+
+\lit{3}{Beyer, B., u.\,a.: \textit{Site Reliability Engineering}. O'Reilly 2016.}{\textbf{Das Buch, das Betrieb zur Entwurfsfrage macht.} Zielvorgaben, Fehlerbudgets, Alarme mit Handlungsbezug --- und ein ehrlicher Bericht darüber, was in großem Maßstab schiefgeht. Frei verfügbar.}
+
+\lit{4}{Brewer, E.: \textit{CAP Twelve Years Later}. IEEE Computer 45(2), 2012.}{Der Rückblick des Urhebers auf ein oft verkürzt zitiertes Ergebnis. Räumt mit der Vorstellung auf, man müsse zwei von drei Eigenschaften wählen --- die Abwägung ist feiner und liegt bei jeder Operation neu.}
+
+\lit{5}{Brooks, F.: \textit{The Mythical Man-Month}. Jubiläumsausgabe, Addison-Wesley 1995.}{\textbf{Über Kommunikationsaufwand in Vorhaben.} Für diesen Band unmittelbar anwendbar: Jede Naht ist Kommunikation, in Code gegossen --- und wächst quadratisch mit der Zahl der Teile.}
+
+\lit{6}{Conway, M.: \textit{How Do Committees Invent?} Datamation 14(4), 1968.}{Fünf Seiten, die eine bis heute gültige Beobachtung begründen: Ein System bildet die Kommunikationsstruktur seiner Erbauer ab. In jedem größeren Vorhaben nachprüfbar.}
+
+\lit{7}{Evans, E.: \textit{Domain-Driven Design}. Addison-Wesley 2003.}{Begründet, warum Fachbegriffe und nicht Objekte über eine Naht gehen, und liefert den Begriff des abgegrenzten Kontexts. Umfangreich; die Kapitel zu Kontextgrenzen genügen für diesen Band.}
+
+\lit{8}{Fowler, M.: \textit{Patterns of Enterprise Application Architecture}. Addison-Wesley 2002.}{Sammelt die Bauformen für Datenzugriff und Verteilung --- einschließlich der Muster gegen $n{+}1$. Alt und in der Sache unverändert gültig.}
+
+\lit{9}{Ford, N., Richards, M., u.\,a.: \textit{Fundamentals of Software Architecture}. O'Reilly 2020.}{Ordnet die Entwurfsentscheidungen im Großen und benennt zu jeder die Abwägung. Nüchtern und ohne Empfehlung einer bestimmten Bauform --- das ist selten.}
+
+\lit{10}{Goldberg, D.: \textit{What Every Computer Scientist Should Know About Floating-Point Arithmetic}. ACM Computing Surveys 23(1), 1991.}{Der Aufsatz zum Thema. Hier zählt vor allem die Frage, was beim Über\-tra\-gen einer Zahl ver\-lo\-ren\-geht. Anspruchsvoll und die Mühe wert.}
+
+\lit{11}{Gregg, B.: \textit{Systems Performance}. 2.\ Aufl., Addison-Wesley 2020.}{\textbf{Das Standardwerk zur Leistungsmessung.} Liefert die Methodik --- welche Kennzahl für welche Frage --- und die Werkzeuge darunter. Für Kapitel~\ref{kap:messen} und \ref{kap:zeit_hin} die Grundlage.}
+
+\lit{12}{Hohpe, G., Woolf, B.: \textit{Enterprise Integration Patterns}. Addison-Wesley 2003.}{\textbf{Der Katalog der Verbindungsbauformen.} Warteschlangen, Weiterleitung, Umwandlung, Wiederholung --- mit Anlass und Gegenanzeige zu jedem. Alt, umfangreich, unersetzt.}
+
+\lit{13}{IEEE 754: \textit{Standard for Floating-Point Arithmetic}. 2019.}{Legt Darstellung und Rundungsregeln fest. Zum Nachschlagen, wenn man wissen muss, was bei $0{,}5$ geschieht und warum zwei Systeme verschieden runden.}
+
+\lit{14}{RFC 3339 und ISO 8601: \textit{Date and Time Formats}.}{Legen das Zeitformat fest, das über Nähte gehört --- einschließlich Zonenversatz. Kurz und die verbindliche Quelle zu Kapitel~\ref{kap:zeit}.}
+
+\lit{15}{Kleppmann, M.: \textit{Designing Data-Intensive Applications}. O'Reilly 2017.}{\textbf{Das beste Buch über verteilte Datenverarbeitung.} Ordnet Konsistenz, Replikation, Zeit und Fehler in einen Zusammenhang, ohne eine bestimmte Technik zu bewerben. Wenn Sie eines lesen, dann dieses.}
+
+\lit{16}{Majors, C., Fong-Jones, L., Miranda, G.: \textit{Observability Engineering}. O'Reilly 2022.}{Entwickelt den Begriff der Beobachtbarkeit und grenzt ihn von Überwachung ab: nicht bekannte Fragen beantworten, sondern unbekannte stellen können. Für Kapitel~\ref{kap:beobachtbarkeit} maßgeblich.}
+
+\lit{17}{Newman, S.: \textit{Building Microservices}. 2.\ Aufl., O'Reilly 2021.}{Behandelt Zuschnitt und Größe verteilter Dienste --- und ist in der zweiten Auflage deutlich zurückhaltender als in der ersten. Die Kapitel zu Kosten und Rückbau sind die wertvollsten.}
+
+\lit{18}{Nygard, M.: \textit{Release It!} 2.\ Aufl., Pragmatic Bookshelf 2018.}{\textbf{Das Buch über Ausfall.} Kaskaden, Sicherungsschalter, Zeitschranken --- alles an echten Fällen entwickelt. Für Kapitel~\ref{kap:fehler} und \ref{kap:ausfall} die Grundlage und ausgesprochen unterhaltsam.}
+
+\lit{19}{Parnas, D.: \textit{On the Criteria To Be Used in Decomposing Systems into Modules}. CACM 15(12), 1972.}{Fünf Seiten, die den Modulbegriff begründet haben. Hier die Erinnerung daran, dass die Zerlegungsfrage vor der Verteilungsfrage steht --- und dass ein Modul oft genügt, wo ein Dienst erwogen wird.}
+
+\lit{20}{Postel, J.: \textit{Robustness Principle}. RFC 793 u.\,a., 1981.}{\enquote{Streng im Senden, nachsichtig im Empfangen} --- die Regel, die Erweiterbarkeit ermöglicht. Heute mit Vorbehalt zu lesen: Zu viel Nachsicht beim Deuten hat Sicherheitslücken erzeugt.}
+
+\lit{21}{Richardson, C.: \textit{Microservices Patterns}. Manning 2018.}{Sammelt die Bauformen mit ihren Kosten --- Ausgleichsschritte, Idempotenz, verteilte Abfragen. Konkreter als [17] und mit durchgearbeiteten Beispielen.}
+
+\lit{22}{Tanenbaum, A., van Steen, M.: \textit{Distributed Systems}. 4.\ Aufl., 2023.}{Das Lehrbuch zur Theorie --- Uhren, Ordnung, Übereinstimmung, Fehlermodelle. Frei verfügbar. Wer wissen will, warum etwas nicht geht, findet hier den Beweis.}
+
+\lit{23}{The Unicode Consortium: \textit{The Unicode Standard} und UAX \#15.}{Legt Normalformen und Vergleichsregeln fest. Umfangreich; für Kapitel~\ref{kap:text} genügen die Abschnitte zur Normalisierung und zur Faltung.}
+
+\lit{24}{Vogels, W.: \textit{Eventually Consistent}. CACM 52(1), 2009.}{Beschreibt, was verzögerte Konsistenz praktisch bedeutet --- aus der Sicht von jemandem, der ein solches System betrieben hat. Kurz und nüchtern.}
+
+\lit{25}{Waldo, J., u.\,a.: \textit{A Note on Distributed Computing}. Sun Microsystems 1994.}{\textbf{Der Aufsatz, der die Gleichsetzung von Aufruf und entferntem Aufruf widerlegt.} Über dreißig Jahre alt und wird in jedem Jahrzehnt neu gebraucht, weil der Irrtum wiederkehrt.}
+
+\lit{26}{Wirth, N.: \textit{Algorithms + Data Structures = Programs}. Prentice Hall 1976.}{Der Titel ist die These und enthält eine Rangordnung. Auf ein Werk angewandt: Der Vertrag einer Naht ist ein Datenmodell --- und er lebt länger als jedes Programm, das ihn benutzt.}
+
+\lit{27}{HL7: \textit{FHIR Specification}. Fortlaufend.}{\textbf{Ein ausgearbeiteter Fachvertrag samt Codelisten.} Für den Austausch klinischer Daten der Maßstab --- umfangreich und deshalb in der Praxis über Profile eingeschränkt. Frei verfügbar.}
+
+\lit{28}{Dean, J., Barroso, L.: \textit{The Tail at Scale}. CACM 56(2), 2013.}{\textbf{Erklärt, warum Ausläufer sich über Dienstketten aufschaukeln} --- und was man dagegen tut. Sechs Seiten, die die Perzentildiskussion aus Kapitel~\ref{kap:messen} begründen.}
+
+\begin{merksatz}
+\boxtitel{Wenn Sie nur drei Bücher kaufen}
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{@{}P{1.0cm}P{3.0cm}P{4.6cm}@{}}
+\toprule
+\textbf{[15]} & \textbf{Kleppmann} & \textbf{Für das Ganze}\\
+\textbf{[18]} & \textbf{Nygard} & Für den Ausfall\\
+\textbf{[11]} & \textbf{Gregg} & \textbf{Für das Messen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Kleppmann ordnet, Nygard warnt, Gregg misst. Auffällig ist, was fehlt: kein Buch über eine bestimmte Bauform verteilter Dienste --- diese Bücher altern schneller als die Fragen, die sie beantworten.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Zwei Ergänzungen, beide kurz und frei verfügbar: [25] Waldo, acht Seiten gegen einen Irrtum, der jedes Jahrzehnt zurückkehrt. Und [6] Conway --- fünf Seiten, nach denen man Organigramme anders liest.}
+\end{center}
+\end{merksatz}

@@ -1,0 +1,164 @@
+\chapter{Das Feld, das fehlen darf}\label{fall:fehlen}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Naht zwischen Speicherung und Auswertung. Kein Code --- ein Schema.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{Befund:}\\
+\code{\ \ kennung:\ \ \ \ \ string\ \ \ (Pflicht)}\\
+\code{\ \ groesse:\ \ \ \ \ string\ \ \ (Pflicht)}\\
+\code{\ \ betrag:\ \ \ \ \ \ integer\ \ (Pflicht)}\\
+\code{\ \ exponent:\ \ \ \ integer\ \ (Pflicht)}\\
+\code{\ \ einheit:\ \ \ \ \ string\ \ \ (Pflicht)}\\
+\code{\ \ abnahme:\ \ \ \ \ datetime (Pflicht)}\\
+\code{\ \ validierung: datetime (optional)}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Felder, sauber typisiert, mit einer klaren Trennung zwischen Pflicht und optional. Das Schema wird von einem Werkzeug geprüft, und alle Nachrichten sind gültig.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Was bedeutet ein fehlendes \code{validierung}?}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Mögliche Bedeutung} & \textbf{Klinische Folge} & \\
+\midrule
+Noch nicht validiert & \textbf{vorläufig} & \textcolor{mittel}{Vorsicht}\\
+Braucht keine Validierung & \textbf{endgültig} & \textcolor{gruen}{verwendbar}\\
+Validiert, Zeitpunkt unbekannt & endgültig & \\
+Feld nicht übertragen & \textcolor{akzent}{\textbf{unbekannt}} & \textcolor{akzent}{\textbf{Altsystem}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Bedeutungen, zwei entgegengesetzte klinische Folgen --- und das Schema unterscheidet sie nicht. Ein vorläufiger Wert, der als endgültig gelesen wird, führt zu einer Therapieentscheidung auf ungesicherter Grundlage.}
+\end{minipage}
+\end{center}
+
+\textbf{Wie oft tritt der Fall auf?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Herkunft} & \textbf{Anteil ohne Feld} & \\
+\midrule
+Eigenes Labor & $\mathbf{4\,\%}$ & \textcolor{gruen}{vorläufig}\\
+Mikrobiologie & $\mathbf{31\,\%}$ & \textcolor{mittel}{teils ohne Validierung}\\
+\textbf{Fremdhaus} & \textcolor{akzent}{$\mathbf{88\,\%}$} & \textcolor{akzent}{\textbf{überträgt es nicht}}\\
+Bettseitig & $\mathbf{100\,\%}$ & \textcolor{gruen}{braucht keine}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Herkünfte mit vier verschiedenen Bedeutungen desselben fehlenden Feldes. Die Auswertung behandelt alle gleich --- und muss sich entscheiden. Sie entschied sich für \enquote{endgültig}, weil das die häufigere Lesart war.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{Befund:}\\
+\code{\ \ ...}\\
+\code{\ \ status: enum (Pflicht)}\\
+\code{\ \ \ \ \ \ \ \ \ \ vorlaeufig | endgueltig | validierung\_unbekannt}\\
+\code{\ \ validiert\_am: datetime}\\
+\code{\ \ \ \ \ \ \ \ \ \ (Pflicht, wenn status = endgueltig)}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Aus einem optionalen Feld wird ein Pflichtfeld mit drei ausdrücklichen Werten. Die dritte Ausprägung ist die unbequeme und die wichtigste: Sie sagt, dass das Fremdhaus die Information nicht liefert --- statt sie zu erfinden.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Felder & $7$ & $\mathbf{8}$ & \\
+Deutungen des Fehlens & $\mathbf{4}$ & $\mathbf{0}$ & \\
+Anzeige unterscheidet & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{drei Zustände}} & \\
+Umstellungs\-dauer & --- & \textcolor{akzent}{$\mathbf{11}$ \textbf{Wochen}} & \textcolor{akzent}{$5$ Sender}\\
+Aufwand & --- & $\mathbf{16}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Elf Wochen für ein zusätzliches Feld --- das ist der Preis der Naht aus Band 23, Kapitel~3: Fünf Sender können nicht gleichzeitig umgestellt werden, und in der Übergangszeit müssen beide Formate verstanden werden.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum nicht die billigere Lösung?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Alternative} & \textbf{Aufwand} & \textbf{Bewertung}\\
+\midrule
+Regel je Herkunft & \textcolor{gruen}{$2$ PT} & \textcolor{akzent}{\textbf{Wissen im Empfänger}}\\
+Voreinstellung dokumentieren & \textcolor{gruen}{$0{,}5$ PT} & \textcolor{akzent}{ändert nichts}\\
+\textbf{Feld im Vertrag} & $16$ PT & \textcolor{gruen}{\textbf{Sender sagt es}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Alternative kostet ein Achtel und legt das Wissen an die falsche Stelle: Der Empfänger müsste wissen, welches Fremdhaus welche Bedeutung meint --- und bei jedem neuen Sender müsste jemand daran denken.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Keine optionalen Felder} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{oft harmlos}\\
+\enquote{Immer ein Statusfeld} & \textcolor{akzent}{nein} & \\
+\enquote{Fremdsysteme sind schuld} & \textcolor{akzent}{\textbf{nein}} & \textbf{sie halten den Vertrag}\\
+\textbf{\enquote{Fehlen braucht eine Bedeutung}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile: Ein optionales Feld \enquote{Kommentar} ist harmlos, weil sein Fehlen nur eines bedeuten kann. Das Problem entsteht, wenn das Fehlen eine \kursiv{Aussage} über den Sachverhalt trägt --- und das ist bei klinischen Zuständen fast immer so.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Prüffrage lautet deshalb: Kann das Fehlen dieses Feldes mehr als eines bedeuten? Lautet die Antwort ja, wird das Feld zur Pflicht --- mit einer Ausprägung für \enquote{unbekannt}.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Evans\zit{9} begründet, warum Fach\-be\-grif\-fe aus\-drück\-lich sein müssen; Klepp\-mann\zit{18} zeigt, wie Sche\-ma\-än\-de\-run\-gen über Nähte hinweg ver\-lau\-fen.

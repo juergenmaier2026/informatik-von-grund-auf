@@ -1,0 +1,172 @@
+\chapter{Der Dienst, der bleibt}\label{fall:dienst}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Der Benachrichtigungsdienst --- ein eigener Prozess, der Warnungen an Station, Piepser und Mobilgerät zustellt.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Wert} & \\
+\midrule
+Zeilen & $\mathbf{1900}$ & \textcolor{mittel}{klein}\\
+Aufrufer & $\mathbf{1}$ & \textcolor{akzent}{nur die Auswertung}\\
+Eigene Datenhaltung & \textcolor{akzent}{\textbf{nein}} & \\
+Gemeinsame Bereitstellung & \textcolor{akzent}{\textbf{meist}} & \textcolor{akzent}{$11$ von $14$ mal}\\
+Naht & $1$ & $\approx18$ PT Einstand\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf Anzeichen für einen überflüssigen Dienst: klein, ein einziger Aufrufer, keine eigenen Daten, fast immer gemeinsam bereitgestellt. Nach Band 23, Kapitel~14 ist die Prüffrage klar zu beantworten --- und der Vorschlag lautet: zusammenlegen.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Die vier Gründe aus Band 23 im Einzelnen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Grund} & \textbf{Erfüllt?} & \\
+\midrule
+Eigene Sprache & \textcolor{akzent}{nein} & \textbf{beide Python}\\
+Eigenes Team & \textcolor{akzent}{nein} & \\
+Eigenständig erneuerbar & \textcolor{akzent}{\textbf{selten genutzt}} & $3$ von $14$\\
+\textbf{Andere Betriebsanforderung} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{siehe unten}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei von vier Gründen tragen nicht. Der vierte trägt --- und er allein genügt, weil er sich nicht durch Sorgfalt ersetzen lässt.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Betriebsanforderung.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Aus\-wertung} & \textbf{Benach\-richtigung} & \\
+\midrule
+Verfügbarkeit & $99{,}5\,\%$ & \textcolor{gruen}{$\mathbf{99{,}99\,\%}$} & \\
+Wartungs\-fenster & \textcolor{gruen}{nachts} & \textcolor{akzent}{\textbf{keines}} & \\
+Speicherbedarf & $\mathbf{6}$ GB & $\mathbf{180}$ MB & \\
+Neustart dauert & $\mathbf{40}$ s & $\mathbf{1{,}2}$ s & \\
+Darf ausfallen & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{\textbf{nein}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die klinische Anforderung: Eine kritische Warnung muss zugestellt werden, auch wenn die Verlaufsansicht gerade nicht verfügbar ist. Zwei Größenordnungen Unterschied in der geforderten Verfügbarkeit.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: so gelassen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bei Zusammenlegung} & \textbf{Folge} & \\
+\midrule
+Verfügbarkeit & \textcolor{akzent}{\textbf{$99{,}5\,\%$ für beide}} & \textcolor{akzent}{$44$ h/Jahr}\\
+Neustart & \textcolor{akzent}{$40$ s ohne Warnungen} & \\
+Speicher & \textcolor{akzent}{$6$ GB je Instanz} & \textcolor{akzent}{teurer}\\
+Nachtwartung & \textcolor{akzent}{\textbf{Warnungen aus}} & \textcolor{akzent}{\textbf{unzulässig}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Vierundvierzig Stunden im Jahr ohne Warnungszustellung --- das ist die Folge der Zusammenlegung, und sie ist klinisch nicht vertretbar. Die Naht kostet achtzehn Personentage und kauft eine Verfügbarkeit, die anders nicht zu haben ist.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Getrennt} & \textbf{Zusammen} & \\
+\midrule
+Bestandteile & $2$ & $\mathbf{1}$ & \\
+Nähte & $1$ & $\mathbf{0}$ & \\
+Aufwand gespart & --- & \textcolor{gruen}{$\approx8$ PT} & \\
+\textbf{Warnungen verfügbar} & \textcolor{gruen}{$\mathbf{99{,}99\,\%}$} & \textcolor{akzent}{$\mathbf{99{,}5\,\%}$} & \\
+\textbf{Ausfall je Jahr} & \textcolor{gruen}{$\mathbf{53}$ min} & \textcolor{akzent}{$\mathbf{44}$ \textbf{h}} & $50\times$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Acht Personentage Ersparnis gegen Faktor fünfzig bei der Ausfallzeit für kritische Warnungen. Das ist keine knappe Abwägung --- und sie beruht auf einer Größe, die in keiner Codedurchsicht sichtbar wird.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum die anderen Anzeichen täuschen.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.2cm}@{}}
+\toprule
+\textbf{Anzeichen} & \textbf{Erklärung} & \\
+\midrule
+Nur ein Aufrufer & \textbf{Zweck, nicht Größe} & \\
+Klein & \textcolor{gruen}{Zustellung ist einfach} & \\
+Meist gemeinsam bereitgestellt & \textbf{Bequem\-lichkeit} & \textcolor{gruen}{\textbf{$3$ mal getrennt}}\\
+Keine eigenen Daten & \textcolor{gruen}{muss er nicht} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die aufschlussreichste: Elf von vierzehn gemeinsamen Bereitstellungen sind Bequemlichkeit --- und die drei getrennten waren genau die Fälle, in denen es darauf ankam. Die Häufigkeit misst die Gewohnheit, nicht die Notwendigkeit.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Kleine Dienste sind in Ordnung} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{dieser ist es}}\\
+\enquote{Ein Grund genügt immer} & \textcolor{akzent}{nein} & \textbf{dieser genügt}\\
+\enquote{Verfügbarkeit rechtfertigt jede Naht} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{nur wo gefordert}\\
+\textbf{\enquote{Betriebsanforderungen stehen nicht im Code}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der Ertrag dieses Falls und gilt weit über ihn hinaus: Fünf von fünf Anzeichen sprachen für eine Zusammenlegung, und alle fünf waren im Code sichtbar. Die Größe, die dagegen sprach, war es nicht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt eine Verfahrensregel: Bevor man zwei Bestandteile zusammenlegt, fragt man den Betrieb nach ihren Verfügbarkeitszielen. Fünf Minuten, die in diesem Fall achtzehn Personentage Fehlentscheidung verhindert haben.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Conway\zit{6} erklärt, warum Schnit\-te den Zu\-stän\-dig\-kei\-ten folgen; Waldo und Mit\-au\-to\-ren\zit{27} erinnern daran, dass eine Naht Ei\-gen\-schaf\-ten hat, die im Pro\-gramm nicht vorkommen.

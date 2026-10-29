@@ -1,0 +1,175 @@
+\chapter{Die Goroutine, die nie endet}\label{fall:goroutine}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Übertragung, Go. Holt Stammdaten von drei Quellen und nimmt die erste Antwort. Wird bei jedem Verbindungsaufbau aufgerufen --- etwa $4000$ mal am Tag.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func stammdaten(p PatientID, quellen []Quelle) (Daten, error) \{}\\
+\code{\ \ \ \ aus := make(chan Daten)}\\
+\code{\ \ \ \ for \_, q := range quellen \{}\\
+\code{\ \ \ \ \ \ \ \ go func(q Quelle) \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ if d, err := q.Hole(p); err == nil \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ aus <- d}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ \}(q)}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ select \{}\\
+\code{\ \ \ \ case d := <-aus:\ \ \ \ \ \ \ \ \ \ \ return d, nil}\\
+\code{\ \ \ \ case <-time.After(2 * time.Second): return Daten\{\}, ErrZeit}\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vierzehn Zeilen mit Zeitschranke und Fehlerbehandlung --- der Verfasser hat an das Wesentliche gedacht. Die Funktion liefert richtige Ergebnisse und hat nie einen Fehler gemeldet.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Je Aufruf} & \textbf{Anzahl} & \\
+\midrule
+Goroutinen gestartet & $3$ & \\
+Ergebnis gelesen & $1$ & \\
+\textbf{Blockiert für immer} & $\mathbf{2}$ & \textcolor{akzent}{\textbf{Kanal ohne Puffer}}\\
+Nach einem Tag & \textcolor{akzent}{$\mathbf{8000}$} & \textcolor{akzent}{$\approx32$ MB}\\
+Nach einem Monat & \textcolor{akzent}{$\mathbf{240\,000}$} & \textcolor{akzent}{\textbf{$\approx1$ GB}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Das Leck aus Band 22, Kapitel~6, in seiner klassischen Form: Der Kanal hat keinen Puffer, nur eine Antwort wird gelesen, und die beiden anderen Goroutinen warten auf einen Abnehmer, den es nicht mehr gibt.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum es fünf Monate unbemerkt blieb.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Werkzeug} & \textbf{Meldet?} & \\
+\midrule
+Übersetzer, \code{go vet} & \textcolor{akzent}{\textbf{nein}} & \\
+Wettlaufprüfer & \textcolor{akzent}{nein} & \textcolor{akzent}{kein Wettlauf}\\
+Verklemmungs\-melder & \textcolor{akzent}{nein} & \textcolor{akzent}{andere laufen}\\
+Speicherprofil & \textcolor{mittel}{\textbf{indirekt}} & \textbf{Wachstum}\\
+\textbf{Goroutinenprofil} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{eindeutig}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Werkzeuge schweigen, eines nennt die Zeile. Der Dienst wurde alle zwei Wochen neu bereitgestellt --- damit blieb der Speicherverbrauch unter der Warnschwelle, und das Leck war unsichtbar.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{ctx, ab := context.WithTimeout(ctx, 2*time.Second)}\\
+\code{defer ab()}\\
+\code{aus := make(chan Daten, len(quellen))\ \ // Puffer!}\\
+\code{for \_, q := range quellen \{}\\
+\code{\ \ \ \ go func(q Quelle) \{}\\
+\code{\ \ \ \ \ \ \ \ if d, err := q.Hole(ctx, p); err == nil \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ aus <- d\ \ \ \ \ \ \ \ \ \ \ \ // blockiert nie}\\
+\code{\ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \}(q)}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Zwei Änderungen. Die entscheidende steht in Zeile drei und besteht aus einem Argument: Mit einem Puffer der Größe drei kann jede Goroutine senden und enden, auch wenn niemand liest. Die zweite reicht den Abbruch weiter, damit die Quellen ihre Arbeit einstellen.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen & $14$ & $\mathbf{15}$ & \\
+Leckende Goroutinen & $\mathbf{2}$ je Aufruf & $\mathbf{0}$ & \\
+Speicher nach $30$ d & \textcolor{akzent}{$\approx1$ GB} & \textcolor{gruen}{$\approx\mathbf{0}$} & \\
+Netzarbeit bei Abbruch & \textcolor{akzent}{läuft weiter} & \textcolor{gruen}{\textbf{eingestellt}} & \\
+Aufwand & --- & $\mathbf{0{,}5}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein halber Personentag, eine Zeile mit einem zusätzlichen Argument, ein Gigabyte Speicher im Monat. Das ist das beste Verhältnis von Aufwand zu Wirkung in diesem ganzen Band.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum nicht der Kontext allein?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Nur Kontext} & \textbf{Wirkung} & \\
+\midrule
+Quelle beachtet ihn & \textcolor{gruen}{Goroutine endet} & \\
+Quelle beachtet ihn nicht & \textcolor{akzent}{\textbf{Leck bleibt}} & \textcolor{akzent}{\textbf{fremder Code}}\\
+\textbf{Puffer allein} & \textcolor{gruen}{\textbf{Leck fort}} & \textcolor{akzent}{Arbeit läuft weiter}\\
+Beides & \textcolor{gruen}{\textbf{richtig}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist der Grund für beide Maßnahmen: Eine der drei Quellen ist eine fremde Bibliothek, die den Abbruch ignoriert. Der Puffer wirkt unabhängig davon --- er ist die Maßnahme, die man selbst in der Hand hat.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Immer gepufferte Kanäle} & \textcolor{akzent}{\textbf{nein}} & \textbf{Fall 9}\\
+\enquote{Goroutinen sind gefährlich} & \textcolor{akzent}{nein} & \\
+\enquote{Regelmäßig neu starten hilft} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{verdeckt es}}\\
+\textbf{\enquote{Jede Goroutine braucht einen Endweg}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der eigentliche Befund dieses Falls: Die zweiwöchige Bereitstellung hat das Leck fünf Monate lang verborgen. Ein Neustart ist keine Behebung, sondern eine Maßnahme, die verhindert, dass man den Fehler bemerkt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt eine Betriebsregel: Die Zahl der Goroutinen gehört überwacht, und zwar über die Bereitstellungen hinweg. Eine Kurve, die zwischen zwei Neustarts stetig steigt, ist ein Befund --- auch wenn sie nie eine Schwelle erreicht.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Donovan und Ker\-nig\-han\zit{8} führen die Ne\-ben\-läu\-fig\-keits\-mus\-ter mit ihren Fall\-stri\-cken vor; Pikes Merk\-sät\-ze\zit{25} halten fest, dass der Start einer Go\-rou\-ti\-ne ihr Ende mit\-be\-den\-ken muss.

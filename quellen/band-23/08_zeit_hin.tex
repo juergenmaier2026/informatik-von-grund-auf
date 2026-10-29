@@ -1,0 +1,290 @@
+\chapter{Wo die Zeit hingeht}\label{kap:zeit_hin}
+
+\begin{merksatz}
+\boxtitel{Die Aufteilung einer Anfrage}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Abschnitt} & \textbf{Anteil} & \\
+\midrule
+\textbf{Datenbank\-abfragen} & $\approx\mathbf{48\,\%}$ & \textcolor{akzent}{\textbf{davon $n{+}1$: $32\,\%$}}\\
+Netz zwischen Diensten & $\approx18\,\%$ & \\
+Serialisierung & $\approx12\,\%$ & \textcolor{akzent}{oft übersehen}\\
+Eigene Rechnung & $\approx11\,\%$ & \\
+Warten auf Sperren & $\approx7\,\%$ & \\
+Protokollierung & $\approx4\,\%$ & \textbf{Band 22, Kap.~12}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Elf Prozent der Zeit vergehen dort, wo die meisten Optimierungsversuche ansetzen. Fast die Hälfte in der Datenbank, und zwei Drittel davon durch ein einziges Muster --- dasselbe $n{+}1$-Problem wie in Band 20, Kapitel~12 und Band 23, Kapitel~\ref{kap:naht}.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Serialisierung, die niemand rechnet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.4cm}P{2.0cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{je $1000$} & \textbf{Bei $5$ Nähten} & \\
+\midrule
+JSON erzeugen & $4{,}8$ ms & $\mathbf{24}$ ms & \\
+JSON lesen & $6{,}1$ ms & $\mathbf{31}$ ms & \\
+Binär erzeugen & $\mathbf{0{,}2}$ ms & $1$ ms & $24\times$\\
+Binär lesen & $0{,}3$ ms & $1{,}5$ ms & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Fünfundfünfzig Millisekunden für das Umwandeln derselben tausend Befunde, wenn sie durch fünf Nähte gehen. Das ist mehr, als die Fachlogik braucht --- und es steht in keinem Profil eines einzelnen Dienstes.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die Ablaufverfolgung über Nähte}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.0cm}@{}}
+\toprule
+\textbf{Das Mittel} & Eine Kennung wandert mit der Anfrage durch alle Bestandteile\\
+\textbf{Was man sieht} & \textbf{Wo die Zeit vergeht --- über Dienstgrenzen hinweg}\\
+\textbf{Der Aufwand} & Kennung durchreichen, Abschnitte melden\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Ohne dieses Mittel misst jeder Dienst sich selbst, und niemand sieht das Ganze. Mit ihm bekommt man ein Bild einer einzelnen Anfrage über alle Nähte --- und die Frage \enquote{warum hat das zwei Sekunden gedauert} wird beantwortbar.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Aufwand ist gering und die Disziplin hoch: Die Kennung muss durch jede Naht weitergereicht werden, auch durch Warteschlangen und asynchrone Verarbeitung. Wo sie verlorengeht, endet die Verfolgung.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Das $n{+}1$-Problem über Nähte}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{// Auswertung fragt die Speicherung}\\
+\code{faelle = hole\_faelle(patient)\ \ \ \ \ \ \ // 1 Aufruf}\\
+\code{for fall in faelle:}\\
+\code{\ \ \ \ befunde = hole\_befunde(fall.id)\ // n Aufrufe ueber die Naht}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.2cm}P{2.2cm}P{2.2cm}P{2.2cm}@{}}
+\toprule
+\textbf{Fälle} & \textbf{Im Prozess} & \textbf{Über Naht} & \textbf{Faktor}\\
+\midrule
+$12$ & $52$ ms & $\mathbf{190}$ ms & $3{,}7$\\
+$80$ & $324$ ms & $1{,}2$ s & \\
+$340$ & $1{,}4$ s & \textcolor{akzent}{$\mathbf{5{,}1}$ \textbf{s}} & \textcolor{akzent}{\textbf{Langzeit\-patient}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Dasselbe Muster wie in Band 20, mit vierfachem Faktor --- weil jeder Aufruf jetzt Netz, Serialisierung und Warteschlange durchläuft. Fünf Sekunden für den Aufbau einer Patientenansicht, und das bei dem Patienten, bei dem es am meisten zählt.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Behebung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Weg} & \textbf{Dauer} & \\
+\midrule
+Einzeln & $\mathbf{5{,}1}$ s & \\
+Alle Fallnummern auf einmal & $\mathbf{78}$ ms & $65\times$\\
+Ein Aufruf für alles & $\mathbf{61}$ ms & \textcolor{gruen}{\textbf{fachlicher Zuschnitt}}\\
+Nebenläufig einzeln & $340$ ms & \textcolor{mittel}{hilft, löst nicht}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die Versuchung: Nebenläufigkeit bringt Faktor fünfzehn und die Bündelung Faktor fünfundsechzig. Wer nebenläufig einzeln abfragt, hat das Problem verschleiert statt behoben --- und die Last auf der Gegenseite verzehnfacht.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Zuschnitt der Naht entscheidet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Technisch geschnitten} & \textbf{Fachlich geschnitten}\\
+\midrule
+Aufrufe je Ansicht & \textcolor{akzent}{$\mathbf{n{+}1}$} & \textcolor{gruen}{$\mathbf{1}$}\\
+Wiederver\-wendbar & \textcolor{gruen}{ja} & \textcolor{mittel}{weniger}\\
+Übertragene Menge & \textcolor{gruen}{genau} & \textcolor{mittel}{etwas mehr}\\
+Passt zur Aufgabe & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{\textbf{ja}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine Naht, die \code{holeBefund(id)} anbietet, ist allgemein und erzwingt $n{+}1$. Eine, die \code{holeVerlauf(patient, groesse, zeitraum)} anbietet, ist enger und beantwortet die tatsächliche Frage in einem Aufruf --- Ousterhouts tiefe Schnittstelle aus Band 20, hier über das Netz.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Preis steht in der zweiten Zeile und ist geringer, als er wirkt: Eine Naht mit acht fachlichen Operationen deckt fast alles ab, was gebraucht wird. Wer hundert allgemeine Operationen anbietet, hat keine Schnittstelle, sondern eine Datenbank über das Netz.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Verfolgen Sie eine langsame Anfrage.
+\item Rechnen Sie die Wirkung der Bündelung aus.
+\item Bestimmen Sie, wo man zuerst ansetzt.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine langsame Anfrage verfolgen.}
+
+\textbf{Die Meldung.} Der Aufbau der Verlaufsansicht dauert bei manchen Patienten über fünf Sekunden.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.2cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Abschnitt} & \textbf{Dauer} & \textbf{Anteil}\\
+\midrule
+$1$ & Oberfläche & $40$ ms & $1\,\%$\\
+$2$ & Auswertung, Rechnung & $180$ ms & $4\,\%$\\
+$3$ & \textbf{Aufrufe an Speicherung} & \textcolor{akzent}{$\mathbf{4{,}6}$ \textbf{s}} & \textcolor{akzent}{$\mathbf{90\,\%}$}\\
+$4$ & davon Netz & $1{,}1$ s & \\
+$5$ & davon Serialisierung & $\mathbf{0{,}9}$ s & \\
+$6$ & davon Datenbank & $2{,}6$ s & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Neunzig Prozent in einem Abschnitt, und die Aufteilung darunter zeigt: Selbst wenn die Datenbank unendlich schnell wäre, blieben zwei Sekunden. Das ist der Befund, den ein Datenbankprofil allein nie liefert.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die fünfte Zeile ist der überraschende Posten: Neunhundert Millisekunden nur für das Umwandeln in JSON und zurück --- bei dreihundertvierzig Einzelaufrufen mit je einem kleinen Ergebnis.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Wirkung der Bündelung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{1.8cm}P{1.8cm}P{2.2cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Netz} & \textbf{Serial.} & \textbf{Datenbank}\\
+\midrule
+Vorher & $1{,}1$ s & $0{,}9$ s & $2{,}6$ s\\
+Gebündelt & $\mathbf{4}$ ms & $\mathbf{31}$ ms & $\mathbf{43}$ ms\\
+Faktor & $\mathbf{275}$ & $29$ & $\mathbf{60}$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine Änderung, drei Posten behoben. Der größte Faktor liegt beim Netz, weil dort die Verzögerung je Aufruf anfällt und nicht die übertragene Menge --- dreihundertvierzig mal drei Millisekunden gegen einmal vier.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Vorher} & \textbf{Nachher} & \\
+\midrule
+Gesamt & $\mathbf{5{,}1}$ s & $\mathbf{298}$ ms & $17\times$\\
+Übertragene Menge & $1{,}2$ MB & $\mathbf{1{,}4}$ MB & \textcolor{mittel}{$+17\,\%$}\\
+Zeilen geändert & --- & $\mathbf{24}$ & \\
+Aufwand & --- & $\mathbf{4}$ h & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Stunden Arbeit, vierundzwanzig geänderte Zeilen, Faktor siebzehn. Die zweite Zeile ist der Preis: siebzehn Prozent mehr Daten, weil der gebündelte Aufruf etwas mitliefert, was nicht jeder braucht.}
+\end{center}
+
+\medskip
+\textbf{(c) Wo man zuerst ansetzt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.2cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Schritt} & \textbf{Aufwand} & \textbf{Gewinn}\\
+\midrule
+$1$ & \textbf{Verfolgen, nicht raten} & \textcolor{gruen}{$2$ h} & --- \\
+$2$ & \textbf{Aufrufe über Nähte bündeln} & \textcolor{gruen}{$1$ d} & \textcolor{gruen}{\textbf{$5$--$60\times$}}\\
+$3$ & Datenbankindizes & $1$ d & $2$--$50\times$\\
+$4$ & Zwischenspeicher & $2$ d & $2$--$20\times$\\
+$5$ & Format wechseln & $3$ d & $2$--$5\times$\\
+$6$ & Mehr Rechner & \textcolor{akzent}{laufend} & \textcolor{akzent}{$1$--$2\times$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Reihenfolge ist nach dem Verhältnis von Gewinn zu Aufwand geordnet, und sie wird regelmäßig von unten begonnen. Schritt sechs ist der teuerste und der schwächste --- doppelte Rechnerzahl bringt bei einem $n{+}1$-Problem gar nichts, weil die Verzögerung nicht von der Rechenleistung abhängt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Schritt zwei steht vorn, weil er in einem verteilten Werk fast immer trägt --- und weil er die einzige Maßnahme ist, die drei Kostenposten zugleich senkt: Netz, Serialisierung und Datenbank.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Verzögerung addiert sich, die Bandbreite nicht}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Verzögerung} & \textbf{Bandbreite}\\
+\midrule
+Bei mehr Aufrufen & \textcolor{akzent}{\textbf{addiert sich}} & \textcolor{gruen}{unverändert}\\
+Bei mehr Daten & \textcolor{gruen}{fast unverändert} & \textcolor{akzent}{steigt}\\
+Durch schnellere Leitung & \textcolor{gruen}{kaum besser} & \textcolor{gruen}{\textbf{besser}}\\
+Durch kürzere Strecke & \textcolor{gruen}{\textbf{besser}} & unverändert\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile überrascht regelmäßig: Eine zehnmal schnellere Leitung verkürzt die Verzögerung fast nicht, weil sie von der Laufzeit des Signals und der Zahl der Zwischenstationen bestimmt wird. Bandbreite kauft man, Verzögerung nicht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt die praktische Regel: Wenige große Aufrufe schlagen viele kleine, auch wenn dabei mehr Daten übertragen werden. Siebzehn Prozent mehr Menge gegen Faktor siebzehn Zeit --- das ist der Handel aus Aufgabe (b).}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Gregg\zit{11} zeigt, wie man Ab\-schnit\-te einer An\-fra\-ge trennt; Fowler\zit{8} sammelt die Bau\-for\-men, die $n{+}1$ ver\-mei\-den; Klepp\-mann\zit{15} ordnet die Ab\-wä\-gun\-gen zwischen Menge und Ver\-zö\-ge\-rung ein.

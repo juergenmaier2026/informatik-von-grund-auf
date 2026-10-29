@@ -1,0 +1,163 @@
+\chapter{Der Zwischenspeicher ohne Ablaufzeit}\label{fall:cache}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Referenzbereiche werden aus der Datenbank geholt und im Prozess gehalten.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{@lru\_cache(maxsize=None)}\\
+\code{def bereich(groesse: GroessenCode, alter: int,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ geschlecht: Geschlecht) -> Referenz:}\\
+\code{\ \ \ \ return db.hole\_bereich(groesse, alter, geschlecht)}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Zeilen, eine Anmerkung. Der Aufruf war vorher der teuerste Posten der Verlaufsansicht; seit dem Zwischenspeicher ist er nicht mehr messbar. Faktor vierhundert für ein Wort.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Befund} & \textbf{Schwere} & \\
+\midrule
+Keine Ablaufzeit & \textcolor{akzent}{\textbf{hoch}} & \textbf{bis Neustart}\\
+Keine Größenbegrenzung & \textcolor{mittel}{mittel} & $\approx9000$ Einträge\\
+\textbf{Nicht kohärent} & \textcolor{akzent}{\textbf{hoch}} & \textcolor{akzent}{\textbf{$6$ Prozesse}}\\
+Nicht abschaltbar & \textcolor{mittel}{mittel} & \textcolor{akzent}{Fehlersuche}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der erste Befund ist der klinisch bedeutsame: Ändert das Labor einen Referenzbereich, bewertet die Auswertung weiter nach dem alten --- bis jemand den Dienst neu startet. Das kann Wochen dauern.}
+\end{minipage}
+\end{center}
+
+\textbf{Was tatsächlich geschah.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ereignis} & \textbf{Zeitpunkt} & \\
+\midrule
+Labor senkt obere Kaliumgrenze & \textbf{Mo, 8:00} & $5{,}1 \to 5{,}0$\\
+Zwei Prozesse neu gestartet & Mo, 14:00 & \textcolor{akzent}{\textbf{übernehmen}}\\
+Vier Prozesse alt & --- & \textcolor{akzent}{\textbf{bewerten anders}}\\
+\textbf{Auffällig geworden} & \textcolor{akzent}{\textbf{Do}} & \textcolor{akzent}{\textbf{Nachfrage Station}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Drei Tage lang bewerteten sechs Prozesse denselben Wert verschieden --- je nachdem, welcher die Anfrage bearbeitete. Ein Kaliumwert von $5{,}05$ war auf einem Bildschirm auffällig und auf dem nächsten nicht.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{\_bereiche = TTLCache(maxsize=20\_000, ttl=300)}\\
+\code{\_sperre\ \ \ = threading.Lock()}\\
+\\
+\code{def bereich(g: GroessenCode, alter: int,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ gs: Geschlecht) -> Referenz:}\\
+\code{\ \ \ \ if not EINSTELLUNG.zwischenspeicher:}\\
+\code{\ \ \ \ \ \ \ \ return db.hole\_bereich(g, alter, gs)}\\
+\code{\ \ \ \ with \_sperre:}\\
+\code{\ \ \ \ \ \ \ \ ...}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Drei Ergänzungen: eine Ablaufzeit von fünf Minuten, eine Größengrenze und ein Schalter. Der Zwischenspeicher bleibt im Prozess --- die Kohärenzfrage wird durch die Frist gelöst, nicht durch einen gemeinsamen Speicher.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen & $4$ & $\mathbf{16}$ & \\
+Trefferquote & $99{,}9\,\%$ & $\mathbf{99{,}5\,\%}$ & \\
+Datenbanklast & $+0$ & \textcolor{mittel}{$+0{,}4\,\%$} & \\
+\textbf{Veralterung} & \textcolor{akzent}{\textbf{unbegrenzt}} & \textcolor{gruen}{$\mathbf{\le 5}$ \textbf{min}} & \\
+Prozesse uneins & \textcolor{akzent}{\textbf{tagelang}} & \textcolor{gruen}{$\le 5$ min} & \\
+Abschaltbar & \textcolor{akzent}{nein} & \textcolor{gruen}{ja} & \\
+Aufwand & --- & $1$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Zehntel Prozent mehr Datenbanklast --- praktisch nichts --- gegen eine Veralterung von unbegrenzt auf fünf Minuten. Das ist der billigste Handel im ganzen Band.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum fünf Minuten?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.2cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+\textbf{Frist} & \textbf{Treffer} & \textbf{Last} & \textbf{Veraltet}\\
+\midrule
+$30$ s & $94\,\%$ & \textcolor{akzent}{$+4{,}8\,\%$} & \textcolor{gruen}{$30$ s}\\
+$\mathbf{5}$ \textbf{min} & $\mathbf{99{,}5\,\%}$ & \textcolor{gruen}{$+0{,}4\,\%$} & \textcolor{gruen}{$5$ min}\\
+$1$ h & $99{,}9\,\%$ & \textcolor{gruen}{$+0{,}03\,\%$} & \textcolor{akzent}{$1$ h}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die Kurve knickt bei etwa fünf Minuten: Darunter steigt die Last stark, darüber gewinnt man kaum noch. Die Zahl ist gemessen, nicht gewählt --- und das ist die eigentliche Arbeit an diesem Fall.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Prozesseigene Speicher sind falsch} & \textcolor{akzent}{\textbf{nein}} & \textbf{mit Frist gut}\\
+\enquote{Gemeinsamer Speicher wäre besser} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{$2000\times$ langsamer}}\\
+\enquote{Bei Änderung ungültig machen} & \textcolor{mittel}{möglich} & \textcolor{akzent}{Meldung kann fehlen}\\
+\textbf{\enquote{Jeder Zwischenspeicher braucht eine Frist}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die teure Übertreibung: Ein gemeinsamer Speicher löst die Kohärenz und kostet zweihundert Mikrosekunden statt einer Zehntelmikrosekunde. Für einen Wert, der sich alle paar Monate ändert, ist die Frist die richtige Antwort.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die technisch reizvollere und praktisch schwächere Lösung: Sie hängt daran, dass jede Änderungsmeldung ankommt --- die Annahme aus Band 23, Kapitel~2, die über eine Naht nicht zutrifft. Eine verlorene Meldung erzeugt einen dauerhaft falschen Speicher.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Klepp\-mann\zit{18} ordnet Ko\-hä\-renz und Ver\-al\-te\-rung ein; Gregg\zit{13} liefert das Vor\-ge\-hen, mit dem man die Frist misst statt sie zu wählen.

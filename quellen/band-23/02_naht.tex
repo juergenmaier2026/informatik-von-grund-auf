@@ -1,0 +1,304 @@
+\chapter{Die Naht}\label{kap:naht}
+
+\begin{merksatz}
+\boxtitel{Acht Trugschlüsse}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Angenommen wird} & \textbf{Tatsächlich} & \\
+\midrule
+Das Netz ist zuverlässig & \textcolor{akzent}{\textbf{nein}} & \textbf{Kap.~\ref{kap:fehler}}\\
+Latenz ist null & \textcolor{akzent}{$\approx0{,}5$--$80$ ms} & \\
+Bandbreite ist unbegrenzt & \textcolor{akzent}{nein} & \\
+Das Netz ist sicher & \textcolor{akzent}{\textbf{nein}} & \textbf{Band 19}\\
+Die Struktur ändert sich nicht & \textcolor{akzent}{nein} & \\
+Es gibt einen Zuständigen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Kap.~\ref{kap:werk}}}\\
+Übertragungskosten sind null & \textcolor{akzent}{nein} & \\
+Das Netz ist einheitlich & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Liste stammt aus den frühen Neunzigern und ist unverändert gültig. Ihr Wert liegt nicht in der Neuigkeit, sondern darin, dass jeder Punkt eine Entwurfsentscheidung verlangt --- und dass ein Entwurf, der einen davon übersieht, an genau dieser Stelle bricht.}
+\end{minipage}
+\end{center}
+
+\textbf{Was daraus folgt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Trugschluss} & \textbf{Verlangt} & \\
+\midrule
+Zuverlässig & \textbf{Wieder\-holung} & \textcolor{akzent}{und Idempotenz}\\
+Latenz null & \textbf{grobe Aufrufe} & \textcolor{akzent}{keine Schleifen}\\
+Zuständiger & \textbf{Zeitschranken} & \textcolor{akzent}{überall}\\
+Struktur fest & Namens\-auflösung & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile enthält den Kern des Kapitels: Wiederholung ist die Antwort auf Unzuverlässigkeit --- und sie ist nur zulässig, wenn eine zweimal ausgeführte Anfrage dasselbe bewirkt wie eine einmal ausgeführte.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Grobe statt feiner Aufrufe}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bauform} & \textbf{Aufrufe} & \textbf{Dauer}\\
+\midrule
+Je Befund einer & $\mathbf{500}$ & \textcolor{akzent}{$\mathbf{260}$ \textbf{ms}}\\
+In Blöcken zu $50$ & $10$ & $9$ ms\\
+\textbf{Ein Aufruf} & $\mathbf{1}$ & \textcolor{gruen}{$\mathbf{3}$ \textbf{ms}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Dasselbe $n{+}1$-Problem wie in Band 20, Kapitel~12 --- hier mit Faktor achtzig statt vierzig, weil die Naht teurer ist als eine Datenbankabfrage. Die Regel lautet: An einer Naht überträgt man Mengen, nicht Einzelstücke.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile hat eine Grenze: Ein einziger Aufruf mit hunderttausend Befunden scheitert an Speicher und Zeitschranken. Zwischen den beiden Fehlern liegt die richtige Blockgröße --- und die findet man durch Messen, nicht durch Nachdenken.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Idempotenz}
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.8cm}P{6.0cm}@{}}
+\toprule
+\textbf{Die Eigenschaft} & Zweimal ausgeführt wirkt wie einmal ausgeführt\\
+\textbf{Warum nötig} & \textbf{Der Sender weiß nach einem Zeitablauf nicht, ob es ankam}\\
+\textbf{Die Alternative} & Es gibt keine --- ohne sie ist Wiederholung unzulässig\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Das ist der zentrale Begriff dieses Kapitels. Ohne Idempotenz steht der Sender nach einem Zeitablauf vor einer unlösbaren Wahl: Wiederholen kann einen Wert verdoppeln, nicht wiederholen kann ihn verlieren --- und beides ist in der Klinik ein Schaden.}
+\end{minipage}
+\end{center}
+
+\textbf{Wie man sie herstellt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Mittel} & \textbf{Aufwand} & \\
+\midrule
+\textbf{Kennung vom Sender} & \textcolor{gruen}{gering} & \textcolor{gruen}{\textbf{das übliche Mittel}}\\
+Zustand statt Änderung & \textcolor{gruen}{gering} & \textbf{setzen statt erhöhen}\\
+Bedingtes Schreiben & mittel & \enquote{nur wenn Fassung $n$}\\
+Empfänger merkt sich Kennungen & \textcolor{akzent}{Speicher} & \textcolor{akzent}{mit Verfallszeit}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die eleganteste: \enquote{Setze den Kaliumwert für Probe 4711 auf 5,1} ist idempotent; \enquote{füge einen Kaliumwert hinzu} ist es nicht. Die Umformulierung kostet nichts und beseitigt die Fehlerklasse.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Kennung muss vom Sender kommen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Empfänger vergibt} & \textbf{Sender vergibt}\\
+\midrule
+Bei Wiederholung & \textcolor{akzent}{\textbf{zwei Einträge}} & \textcolor{gruen}{\textbf{einer}}\\
+Erkennbar & \textcolor{akzent}{nein} & \textcolor{gruen}{ja}\\
+Sender kann nachfragen & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Wenn der Empfänger die Kennung vergibt, kann er eine Wiederholung nicht von einem neuen Wert unterscheiden --- der Sender hat nichts, worauf er sich beziehen könnte. Die Kennung gehört deshalb zur Nachricht, nicht zur Antwort.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Beim Messdatenerfasser ist die natürliche Kennung ohnehin vorhanden: Gerät, Probe, Messgröße und Zeitpunkt bestimmen einen Wert eindeutig. Man muss sie nur mitschicken.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Entwerfen Sie die Naht zwischen Erfassung und Übertragung.
+\item Bestimmen Sie die Blockgröße.
+\item Untersuchen Sie, wann eine Warteschlange dazwischen gehört.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die Naht entwerfen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Entscheidung} & \textbf{Gewählt} & \textbf{Warum}\\
+\midrule
+Richtung & \textbf{Erfassung sendet} & \textbf{kennt den Takt}\\
+Form & Blöcke & \textcolor{gruen}{Kap.\ oben}\\
+Kennung & \textbf{Gerät, Probe, Zeit} & \textcolor{gruen}{\textbf{idempotent}}\\
+Bestätigung & je Block & \textcolor{gruen}{Wiederholung möglich}\\
+Bei Ausfall & \textbf{Erfassung puffert} & \textcolor{gruen}{Band 21, Kap.~13}\\
+Format & \textbf{fest, binär} & \textbf{$64$ KB Speicher}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile folgt aus der Umgebung: Ein Messdatenerfasser mit vierundsechzig Kilobyte kann kein JSON erzeugen. Das Format der Naht wird von der schwächsten Seite bestimmt --- eine Regel, die man beim Entwurf oft übergeht.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Vergleich der Formate.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{1.8cm}P{1.8cm}P{2.0cm}@{}}
+\toprule
+\textbf{Format} & \textbf{Byte/Wert} & \textbf{Erzeugen} & \textbf{Lesbar}\\
+\midrule
+Fest, binär & $\mathbf{16}$ & \textcolor{gruen}{$\mathbf{0{,}2}$ µs} & \textcolor{akzent}{nein}\\
+Selbst\-beschreibend & $34$ & $1{,}1$ µs & \textcolor{mittel}{mit Werkzeug}\\
+JSON & $\mathbf{142}$ & \textcolor{akzent}{$\mathbf{4{,}8}$ µs} & \textcolor{gruen}{\textbf{ja}}\\
+XML & $310$ & $9{,}2$ µs & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor neun im Umfang und vierundzwanzig beim Erzeugen zwischen der ersten und der dritten Zeile. An der ersten Naht entscheidet das; an der Naht zur Auswertung, wo Menschen mitlesen, entscheidet die letzte Spalte.}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Daraus folgt eine Erkenntnis, die viele überrascht: Ein Werk hat nicht \kursiv{ein} Format, sondern eines je Naht. Die Umwandlung geschieht an der Übertragungsschicht --- das ist eine ihrer Aufgaben.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{(b) Die Blockgröße.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.2cm}P{2.0cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+\textbf{Block} & \textbf{Durchsatz} & \textbf{Verzögerung} & \textbf{Verlust bei Ausfall}\\
+\midrule
+$1$ & $3{,}8$ k/s & \textcolor{gruen}{$\mathbf{0{,}5}$ ms} & \textcolor{gruen}{$1$ Wert}\\
+$50$ & $185$ k/s & $\mathbf{28}$ ms & $50$\\
+$\mathbf{500}$ & $\mathbf{495}$ \textbf{k/s} & $\mathbf{95}$ ms & $500$\\
+$5000$ & $510$ k/s & \textcolor{akzent}{$\mathbf{940}$ ms} & \textcolor{akzent}{$5000$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist das Optimum: Der Durchsatz ist fast erreicht, die Verzögerung liegt unter der weichen Schranke von einer Sekunde, und der Verlust bei einem Ausfall bleibt überschaubar. Die vierte Zeile bringt drei Prozent Durchsatz und verzehnfacht beides.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Spalte wird beim Entwurf oft vergessen und ist klinisch die wichtigste: Ein Block ist die Einheit, die bei einem Absturz verlorengeht --- wenn die Erfassung nicht dauerhaft puffert.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann eine Warteschlange dazwischen gehört.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.2cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Warte\-schlange?} & \\
+\midrule
+Empfänger langsamer & \textcolor{gruen}{\textbf{ja}} & \textbf{Lastspitzen}\\
+Empfänger fällt aus & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Werte bleiben}\\
+Mehrere Empfänger & \textcolor{gruen}{ja} & \\
+Antwort wird gebraucht & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{direkt aufrufen}\\
+Zwei Bestandteile, fest & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{Aufwand ohne Ertrag}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der stärkste Grund: Eine Warteschlange entkoppelt die Verfügbarkeit. Der Sender kann weiterarbeiten, wenn der Empfänger steht --- und in einem Klinikbetrieb, in dem Wartungsfenster vorkommen, ist das keine Kleinigkeit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{1.8cm}P{2.6cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Direkt} & \textbf{Warte\-schlange} & \\
+\midrule
+Bestandteile & $2$ & $\mathbf{3}$ & \\
+Verzöge\-rung & $\mathbf{3}$ ms & $12$ ms & \\
+Bei Empfängerausfall & \textcolor{akzent}{Verlust} & \textcolor{gruen}{\textbf{Puffer}} & \\
+Betriebs\-aufwand & \textcolor{gruen}{gering} & \textcolor{akzent}{eigenes System} & \\
+Reihenfolge & \textcolor{gruen}{sicher} & \textcolor{mittel}{je nach System} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine unangenehme Überraschung: Viele Warteschlangensysteme sichern die Reihenfolge nur innerhalb eines Abschnitts zu. Wer Verläufe überträgt, muss das wissen --- oder die Reihenfolge selbst aus den Zeitpunkten wiederherstellen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Naht ist keine Funktion}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Versuchung} & \textbf{Folge} & \\
+\midrule
+Aufrufe wie im Code & \textcolor{akzent}{\textbf{$n{+}1$ über das Netz}} & \\
+Ausnahmen durchreichen & \textcolor{akzent}{geht nicht} & \textbf{Band 21, Kap.~14}\\
+Objekte übertragen & \textcolor{akzent}{\textbf{Kopplung}} & \textcolor{akzent}{\textbf{beide Seiten hängen}}\\
+Zeiger übertragen & \textcolor{akzent}{sinnlos} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die folgenreichste: Wer die inneren Datenstrukturen eines Bestandteils überträgt, koppelt beide Seiten an eine Umsetzung. Jede Änderung der einen erzwingt eine Änderung der anderen --- genau das, was die Naht verhindern sollte.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Naht überträgt Fachbegriffe, keine Objekte: einen Befund mit Wert, Einheit, Zeitpunkt und Kennung --- nicht die Klasse, mit der ein Bestandteil ihn zufällig darstellt.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Waldo und Mit\-au\-to\-ren\zit{25} beschrieben 1994, warum ein ent\-fern\-ter Aufruf kein Auf\-ruf ist; Hohpe und Woolf\zit{12} sammeln die Bau\-for\-men der Ver\-bin\-dung; Parnas\zit{19} liefert den Maß\-stab, wonach ge\-schnit\-ten wird.

@@ -1,0 +1,173 @@
+\chapter{Die Zeit, die falsch gewählt war}\label{fall:zeit}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Naht zwischen Speicherung und Auswertung. Kein Code --- eine Feldbelegung, die seit acht Jahren gilt.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{Befund.zeitpunkt}\ \ \ \ \ \code{-- gefuellt mit: Zeitpunkt}\\
+\code{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{\ \ \ des Datenbankschreibens}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Bewertung} & \\
+\midrule
+Immer vorhanden & \textcolor{gruen}{\textbf{ja}} & \\
+Immer aufsteigend & \textcolor{gruen}{ja} & \textcolor{gruen}{sortierbar}\\
+Kostenlos & \textcolor{gruen}{ja} & \textbf{Datenbank setzt ihn}\\
+Nie leer & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier gute Eigenschaften --- und alle vier sind technisch. Der Schreibzeitpunkt ist der zuverlässigste Wert im ganzen System und beantwortet die Frage nicht, die man ihm stellt.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Abstand zwischen Abnahme und Speicherung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+\textbf{Herkunft} & \textbf{Median} & \textbf{$95.$ Perz.} & \textbf{Anteil}\\
+\midrule
+Bettseitig & $\mathbf{40}$ s & $3$ min & $31\,\%$\\
+Zentrallabor & $52$ min & $2{,}1$ h & $54\,\%$\\
+Mikrobiologie & $\mathbf{2{,}3}$ \textbf{d} & $6$ d & $9\,\%$\\
+\textbf{Fremdhaus} & \textcolor{akzent}{$\mathbf{4}$ \textbf{d}} & \textcolor{akzent}{$\mathbf{31}$ \textbf{d}} & $6\,\%$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Bei einem Drittel der Befunde beträgt der Abstand unter drei Minuten --- dort ist der Schreibzeitpunkt eine brauchbare Näherung. Bei fünfzehn Prozent liegt er bei Tagen, und dort ist der Verlauf falsch.}
+\end{minipage}
+\end{center}
+
+\textbf{Wie sich das auswirkt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Auswirkung} & \textbf{Häufigkeit} & \\
+\midrule
+Verlauf falsch sortiert & $\approx\mathbf{4\,\%}$ & \textbf{der Ansichten}\\
+Steigungs\-warnung falsch & $\approx\mathbf{1{,}2\,\%}$ & \textcolor{akzent}{\textbf{je Nacherfassung}}\\
+Verlauf am Stichtag & \textcolor{akzent}{nicht rekonstruierbar} & \textcolor{akzent}{\textbf{regulatorisch}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile wiegt am schwersten und fiel erst bei einer Prüfung auf: Die Frage \enquote{welche Werte lagen der Ärztin am Dienstag vor} lässt sich nicht beantworten, weil es nur eine Zeitachse gibt --- Band 23, Kapitel~4.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{Befund.abnahme\ \ \ \ \ \ \ Pflicht\ \ fachliche Zeit}\\
+\code{Befund.eingang\ \ \ \ \ \ \ Pflicht}\\
+\code{Befund.validiert\_am\ \ optional}\\
+\code{Befund.geschrieben\ \ \ Pflicht\ \ Systemzeit, unveraenderlich}\\
+\code{Befund.zeit\_unsicher bool\ \ \ \ \ Abnahme geschaetzt?}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Vier Zeitpunkte statt einem, und ein Kennzeichen. Das letzte Feld ist die ehrliche Antwort auf den Altbestand: Wo die Abnahmezeit nicht bekannt ist, wird sie nicht geschätzt, sondern als unsicher gekennzeichnet.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeitfelder & $1$ & $\mathbf{4}$ & \\
+Byte je Befund & $8$ & $\mathbf{33}$ & \\
+Bei $10^9$ Befunden & --- & \textcolor{mittel}{$+25$ GB} & \textcolor{gruen}{tragbar}\\
+Verlauf richtig & $\approx96\,\%$ & \textcolor{gruen}{$\approx\mathbf{100\,\%}$} & \\
+Stichtag rekonstruierbar & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{\textbf{ja}} & \\
+Umstellung & --- & \textcolor{akzent}{$\mathbf{9}$ \textbf{Wochen}} & \\
+Aufwand & --- & $\mathbf{22}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zweiundzwanzig Personentage und neun Wochen Umstellung für vier Zeitfelder --- der teuerste Fall dieses Bandes. Er ist es wert, weil die vorletzte Zeile eine regulatorische Pflicht betrifft, die sich nachträglich nicht herstellen lässt.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Altbestand.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Umgang} & \textbf{Gewählt?} & \\
+\midrule
+Abnahme aus Schreibzeit ableiten & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{erfundene Daten}}\\
+Alte Werte löschen & \textcolor{akzent}{nein} & \\
+\textbf{Als unsicher kennzeichnen} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{$412$ Mio.\ Werte}\\
+Stichtag nennen & \textcolor{gruen}{ja} & \textbf{ab da verlässlich}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile war der naheliegende Vorschlag und wurde verworfen: Aus dem Schreibzeitpunkt eine Abnahmezeit zu berechnen erzeugt Werte, die richtig aussehen und es nicht sind. Vierhundertzwölf Millionen Befunde tragen jetzt ein Kennzeichen --- unbequem und ehrlich.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Immer alle Zeitpunkte speichern} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{was gebraucht wird}\\
+\enquote{Der Schreibzeitpunkt ist wertlos} & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{\textbf{er bleibt}}\\
+\enquote{$96\,\%$ richtig ist gut genug} & \textcolor{akzent}{nein} & \textbf{die $4\,\%$ sind sortiert}\\
+\textbf{\enquote{Ein Feld ist keine Bedeutung}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist wichtig: Der Schreibzeitpunkt wird nicht ersetzt, sondern ergänzt --- er ist die Systemzeit und beantwortet die Nachvollzugsfrage. Falsch war nicht das Feld, sondern dass es als fachliche Zeit gelesen wurde.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die statistische Falle: Die vier Prozent falsch sortierter Verläufe sind nicht zufällig verteilt --- sie häufen sich bei Mikrobiologie und Fremdbefunden, also genau dort, wo eine Nacherfassung stattfindet und ein Verlauf klinisch etwas bedeutet.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Klepp\-mann\zit{18} unterscheidet die beiden Zeit\-ach\-sen und ihre Ver\-wen\-dung; Evans\zit{9} begründet, warum ein Feld\-na\-me eine fach\-li\-che Aus\-sa\-ge trägt.

@@ -1,0 +1,288 @@
+\part{Leistung im Großen}
+
+\chapter{Messen im Verbund}\label{kap:messen}
+
+\begin{merksatz}
+\boxtitel{Der Mittelwert lügt}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{3.2cm}@{}}
+\toprule
+\textbf{Kennzahl} & \textbf{Wert} & \textbf{Sagt}\\
+\midrule
+Mittelwert & $\mathbf{42}$ ms & \textcolor{akzent}{\textbf{fast nichts}}\\
+Median & $31$ ms & \textbf{die Hälfte ist schneller}\\
+$95.$ Perzentil & $180$ ms & \\
+$99.$ Perzentil & $\mathbf{940}$ ms & \textcolor{akzent}{\textbf{jeder Hundertste}}\\
+Maximum & $\mathbf{8{,}2}$ \textbf{s} & \textcolor{akzent}{einer}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Dieselbe Messreihe, fünf Zahlen. Der Mittelwert von zweiundvierzig Millisekunden verdeckt, dass jede hundertste Anfrage fast eine Sekunde braucht --- und in einer Klinik ist das die Anfrage, bei der jemand vor dem Bildschirm wartet.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum die Verteilung schief ist.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ursache} & \textbf{Wirkung} & \\
+\midrule
+Zwischenspeicher verfehlt & $\times10$ & \textbf{Kap.~\ref{kap:zwischenspeicher}}\\
+Speicher\-bereinigung & $\times20$ & \textbf{Band 22, Kap.~12}\\
+Netzwiederholung & \textcolor{akzent}{$\times\mathbf{200}$} & \textcolor{akzent}{\textbf{Zeitablauf}}\\
+Wartung, Neustart & \textcolor{akzent}{$\times\infty$} & \\
+Ungewöhnlich große Anfrage & $\times50$ & \textbf{Langzeitpatient}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Fünf Ursachen, die alle selten sind und alle Faktoren im zweistelligen Bereich erzeugen. Deshalb ist die Antwortzeitverteilung nie glockenförmig, und deshalb ist der Mittelwert die falsche Kennzahl.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Warum sich Ausreißer aufschaukeln}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.4cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+\textbf{Dienste in Kette} & \textbf{$99.$ je Dienst} & \textbf{Anteil langsam} & \\
+\midrule
+$1$ & $940$ ms & $\mathbf{1\,\%}$ & \\
+$5$ & $940$ ms & $\mathbf{4{,}9\,\%}$ & \\
+$20$ & $940$ ms & \textcolor{akzent}{$\mathbf{18\,\%}$} & \\
+$100$ & $940$ ms & \textcolor{akzent}{$\mathbf{63\,\%}$} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Wenn eine Anfrage zwanzig Dienste durchläuft und jeder in einem Prozent der Fälle langsam ist, ist fast jede fünfte Anfrage langsam. Das ist reine Wahrscheinlichkeitsrechnung --- und der stärkste Einwand gegen viele kleine Bestandteile.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt: Je mehr Nähte eine Anfrage durchläuft, desto strenger muss das Perzentil jedes einzelnen Dienstes sein. Bei zwanzig Diensten und einer Zielvorgabe von einem Prozent braucht jeder Dienst $99{,}95$ Prozent.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Wo gemessen wird}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Messpunkt} & \textbf{Sieht} & \\
+\midrule
+Im Dienst & \textbf{eigene Arbeit} & \textcolor{akzent}{\textbf{nicht das Warten}}\\
+Am Eingang des Dienstes & \textbf{plus Warteschlange} & \textcolor{gruen}{besser}\\
+Beim Aufrufer & \textbf{plus Netz} & \textcolor{gruen}{\textbf{ehrlicher}}\\
+Beim Benutzer & \textbf{alles} & \textcolor{gruen}{\textbf{die einzige, die zählt}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vier Messpunkte liefern verschiedene Zahlen, und die erste ist immer die schönste. Ein Dienst, der \enquote{drei Millisekunden} meldet, während der Benutzer zwei Sekunden wartet, hat recht und misst das Falsche.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Differenz zeigt, wo es klemmt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Messpunkt} & \textbf{$95.$ Perz.} & \textbf{Differenz} & \\
+\midrule
+Im Dienst & $\mathbf{18}$ ms & --- & \\
+Am Eingang & $47$ ms & $\mathbf{29}$ ms & \textcolor{akzent}{\textbf{Warte\-schlange}}\\
+Beim Aufrufer & $63$ ms & $16$ ms & \textbf{Netz}\\
+Beim Benutzer & $\mathbf{410}$ ms & \textcolor{akzent}{$\mathbf{347}$ \textbf{ms}} & \textcolor{akzent}{\textbf{andere Aufrufe}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist der Befund: Dreihundertsiebenundvierzig Millisekunden entstehen zwischen dem Aufrufer und dem Benutzer --- also in anderen Aufrufen derselben Seite. Der untersuchte Dienst war nie das Problem.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Perzentile lassen sich nicht mitteln}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Vorgehen} & \textbf{Zulässig?} & \\
+\midrule
+Perzentile addieren & \textcolor{akzent}{\textbf{nein}} & \\
+Perzentile mitteln & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{häufiger Fehler}}\\
+Über Zeiträume mitteln & \textcolor{akzent}{nein} & \\
+Verteilungen zusammenfassen & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Histogramme}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Das $95.$ Perzentil von zehn Minuten ist nicht der Mittelwert der zehn Minutenwerte. Wer so rechnet, bekommt eine Zahl, die keiner Größe entspricht --- und die systematisch zu niedrig ist.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die richtige Bauform speichert Histogramme statt Perzentile: Zählwerte je Zeitklasse lassen sich addieren, und das Perzentil wird beim Auswerten daraus berechnet. Der Aufwand ist derselbe, das Ergebnis richtig.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Legen Sie die Kennzahlen fest.
+\item Bestimmen Sie Ziele je Bestandteil.
+\item Untersuchen Sie, was eine Last aussagt.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die Kennzahlen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.8cm}P{2.6cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Was sie beantwortet} & \\
+\midrule
+\textbf{Durchsatz} & wie viel geht durch & \\
+\textbf{Antwortzeit} & \textbf{wie lange wartet man} & \textcolor{gruen}{Verteilung}\\
+\textbf{Fehlerquote} & wie viel schlägt fehl & \textcolor{gruen}{je Ursache}\\
+\textbf{Sättigung} & \textbf{wie nah an der Grenze} & \textcolor{gruen}{\textbf{Frühwarnung}}\\
+Rückstand & wie viel liegt an & \textcolor{gruen}{Warteschlangen}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist die einzige, die vorwärts schaut: Durchsatz, Antwortzeit und Fehler melden, dass etwas geschehen ist. Die Sättigung --- wie viele Verbindungen belegt, wie voll die Warteschlange, wie viel Speicher --- meldet, dass etwas geschehen wird.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Bei einem Klinikbetrieb heißt das konkret: Wenn der Übertragungspuffer regelmäßig zu achtzig Prozent gefüllt ist, weiß man drei Wochen vor dem ersten Datenverlust, dass er kommt.}
+\end{center}
+
+\medskip
+\textbf{(b) Ziele je Bestandteil.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.0cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{$95.$ Perz.} & \textbf{$99.$ Perz.} & \textbf{Verfügbar}\\
+\midrule
+Erfassung & $\mathbf{2}$ ms & $\mathbf{2}$ ms & $99{,}99\,\%$\\
+Übertragung & $50$ ms & $200$ ms & $99{,}9\,\%$\\
+Speicherung & $20$ ms & $100$ ms & $\mathbf{99{,}95\,\%}$\\
+Auswertung & $300$ ms & $\mathbf{1}$ s & $99{,}5\,\%$\\
+\textbf{Ganze Kette} & $\mathbf{400}$ ms & $\mathbf{1{,}3}$ s & $\mathbf{99{,}3\,\%}$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die harte Schranke aus Band 21 --- dort steht bei beiden Perzentilen dieselbe Zahl, weil eine harte Schranke keine Ausreißer kennt. Bei allen anderen unterscheiden sich die Werte um Faktor drei bis vier.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine Rechnung, keine Wahl: Die Verfügbarkeit der Kette ist das Produkt der einzelnen. Vier Bestandteile mit je $99{,}5$ bis $99{,}99$ Prozent ergeben $99{,}3$ --- etwa zweieinhalb Tage Ausfall im Jahr.}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}P{1.2cm}@{}}
+\toprule
+\textbf{Verfügbarkeit} & \textbf{Ausfall je Jahr} & \textbf{Ausfall je Monat} & \\
+\midrule
+$99\,\%$ & $3{,}7$ d & $7{,}3$ h & \\
+$99{,}9\,\%$ & $8{,}8$ h & $44$ min & \\
+$99{,}99\,\%$ & $\mathbf{53}$ min & $4{,}4$ min & \\
+$99{,}999\,\%$ & $5{,}3$ min & $26$ s & \textcolor{akzent}{teuer}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Jede Neun kostet etwa das Dreifache der vorigen. Für eine Übertragungsschicht mit Puffer sind drei Neunen richtig; für die Erfassung am Patientenbett vier --- und fünf braucht in einer Klinik fast nichts.}
+\end{center}
+
+\medskip
+\textbf{(c) Was eine Last aussagt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Versuchsaufbau} & \textbf{Aussage\-kräftig?} & \\
+\midrule
+Ein Wert, wiederholt & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{alles zwischen\-gespeichert}}\\
+Zufällige Werte & \textcolor{mittel}{teils} & \textcolor{akzent}{Zwischen\-speicher wirkungslos}\\
+Verteilung wie im Betrieb & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{aufgezeichnete Last}}\\
+Nur der Regelfall & \textcolor{akzent}{nein} & \textbf{Langzeit\-patient fehlt}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die ersten beiden Zeilen sind die beiden Extreme, und beide liefern falsche Zahlen --- die eine zu gut, die andere zu schlecht. Nur eine Last, deren Verteilung dem Betrieb entspricht, misst, was im Betrieb geschieht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die billigste Antwort ist eine aufgezeichnete Last: Man protokolliert einen Tag im Betrieb mit und spielt ihn ab. Der Aufwand liegt bei einem Tag Arbeit und ersetzt jede Diskussion über realistische Annahmen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Messen im Betrieb, nicht im Versuch}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Unterschied} & \textbf{Versuch} & \textbf{Betrieb}\\
+\midrule
+Daten & \textcolor{akzent}{klein} & \textcolor{gruen}{gewachsen}\\
+Nebenlast & \textcolor{akzent}{keine} & \textcolor{gruen}{Sicherung, Wartung}\\
+Netz & \textcolor{akzent}{lokal} & \textcolor{gruen}{Haus}\\
+Ausreißer & \textcolor{akzent}{\textbf{fehlen}} & \textcolor{gruen}{\textbf{da}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der Grund, warum Versuchsmessungen die Perzentile systematisch zu gut anzeigen: Genau die seltenen Störungen, die den Ausläufer erzeugen, kommen im Versuch nicht vor. Ein Versuchsaufbau misst den Median gut und das $99.$ Perzentil gar nicht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb gehört die Messung dauerhaft in den Betrieb --- nicht als einmalige Untersuchung. Kapitel~\ref{kap:beobachtbarkeit} behandelt, wie man das einrichtet.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Gregg\zit{11} liefert das Vor\-ge\-hen zur Mes\-sung der Leis\-tung im Sys\-tem\-ver\-bund; Dean und Barroso\zit{28} erklären, warum Aus\-läu\-fer sich über Dienst\-ket\-ten auf\-schau\-keln; das Be\-triebs\-hand\-buch\zit{3} verbindet Kenn\-zah\-len mit Ziel\-vor\-ga\-ben.

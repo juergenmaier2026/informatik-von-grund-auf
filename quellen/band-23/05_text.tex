@@ -1,0 +1,253 @@
+\chapter{Text}\label{kap:text}
+
+\begin{merksatz}
+\boxtitel{Drei Bedeutungen von \enquote{Länge}}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Gezählt wird} & \enquote{Müller} & \textbf{Wofür}\\
+\midrule
+Bytes (UTF-8) & $\mathbf{7}$ & \textbf{Speicher, Puffer}\\
+Zeichen & $6$ & \textcolor{mittel}{Feldgrenzen}\\
+Sichtbare Einheiten & $6$ & \textcolor{gruen}{\textbf{Anzeige}}\\
+Darstellungsbreite & $6$ & Tabellen\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Bei einem deutschen Namen fallen drei der vier Zahlen zusammen und nur die Bytezahl weicht ab. Bei einem Namen mit kombinierenden Zeichen oder außerhalb der lateinischen Schrift weichen alle vier voneinander ab --- und ein Feld mit \enquote{höchstens 40 Zeichen} ist mehrdeutig.}
+\end{minipage}
+\end{center}
+
+\textbf{Was an der Naht schiefgeht.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Fehler} & \textbf{Ursache} & \textbf{Folge}\\
+\midrule
+Abschneiden mitten im Zeichen & \textbf{Bytegrenze} & \textcolor{akzent}{\textbf{ungültiger Text}}\\
+Feld zu kurz & Zeichen gegen Bytes & \textcolor{akzent}{Name gekürzt}\\
+Kodierung geraten & \textbf{keine Angabe} & \textcolor{akzent}{\textbf{Umlaute zerstört}}\\
+Vergleich schlägt fehl & \textbf{Normalform} & \textcolor{akzent}{\textbf{derselbe Name, ungleich}}\\
+Sortierung falsch & Bytefolge & \textcolor{akzent}{Ö nach Z}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist die tückischste, weil sie unsichtbar ist: \enquote{Müller} kann als ein Zeichen \code{ü} oder als \code{u} plus kombinierendes Trema kodiert sein. Beide sehen gleich aus, beide sind gültig, und der Bytevergleich sagt \enquote{ungleich}.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Normalisieren an der Naht}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.2cm}P{3.0cm}P{2.8cm}@{}}
+\toprule
+\textbf{Form} & \textbf{Tut} & \\
+\midrule
+\textbf{NFC} & \textbf{zusammensetzen} & \textcolor{gruen}{\textbf{die übliche Wahl}}\\
+NFD & zerlegen & macOS-Dateinamen\\
+NFKC & \textcolor{akzent}{Verträglichkeit} & \textcolor{akzent}{ändert Bedeutung}\\
+Keine & \textcolor{akzent}{beides möglich} & \textcolor{akzent}{Vergleiche brechen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die Regel: Beim Eintritt in das Werk wird in NFC normalisiert, danach nie wieder. Wer an mehreren Stellen normalisiert, hat dieselbe Wirkung; wer es nirgends tut, bekommt Namen, die sich nicht wiederfinden lassen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist eine Warnung: Die Verträglichkeitsformen wandeln auch \enquote{ﬁ} in \enquote{fi} und römische Ziffern in Buchstaben. Für die Suche brauchbar, für die Speicherung eines Namens nicht.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Namensvergleich}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Zweck} & \textbf{Verfahren} & \\
+\midrule
+Gleichheit prüfen & \textbf{NFC, dann Bytes} & \textcolor{gruen}{exakt}\\
+Suchen & \textbf{Faltung, Akzente weg} & \textcolor{gruen}{\enquote{Muller} findet \enquote{Müller}}\\
+Sortieren & \textbf{Sortierregeln} & \textcolor{akzent}{\textbf{sprachabhängig}}\\
+Patienten zusammenführen & \textcolor{akzent}{\textbf{nie über Namen}} & \textcolor{akzent}{\textbf{nur über Kennung}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile überrascht: Die richtige Sortierung von \enquote{ä} hängt von der Sprache ab --- im Deutschen wie \enquote{a} oder wie \enquote{ae}, im Schwedischen nach \enquote{z}. Es gibt keine sprachneutrale richtige Sortierung, nur eine gewählte.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die klinisch wichtigste Regel des Kapitels: Zwei Patienten mit gleichem Namen und Geburtsdatum sind nicht derselbe Patient. Eine Zusammenführung über Namensähnlichkeit ist ein Behandlungsrisiko, keine Bequemlichkeit.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Was in einen Namen alles passt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Annahme} & \textbf{Zutreffend?} & \\
+\midrule
+Hat Vor- und Nachnamen & \textcolor{akzent}{\textbf{nein}} & \textbf{einteilige Namen}\\
+Ändert sich nicht & \textcolor{akzent}{nein} & \textcolor{akzent}{Heirat, Geschlecht}\\
+Passt in $40$ Zeichen & \textcolor{akzent}{\textbf{nein}} & \\
+Nur lateinische Buchstaben & \textcolor{akzent}{nein} & \\
+Groß- und Kleinschreibung eindeutig & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{türkisches i}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist ein Lehrstück: Im Türkischen wird \enquote{i} zu \enquote{İ} und \enquote{I} zu \enquote{ı}. Eine Umwandlung in Großbuchstaben nach Systemsprache liefert je nach Einstellung verschiedene Ergebnisse --- und ein Vergleich schlägt fehl, je nachdem, wo der Rechner steht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb wird für technische Vergleiche nie die Systemsprache verwendet, sondern eine festgelegte --- oder man vergleicht ohne Umwandlung.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Legen Sie die Textbehandlung je Naht fest.
+\item Rechnen Sie die Kosten der Umwandlung aus.
+\item Bestimmen Sie, wie Freitext behandelt wird.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Textbehandlung je Naht.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.4cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+\textbf{Naht} & \textbf{Kodierung} & \textbf{Normalform} & \textbf{Grenze}\\
+\midrule
+Erfassung & \textbf{ASCII} & --- & \textbf{Bytes}\\
+Übertragung & \textbf{UTF-8} & \textbf{NFC} & Bytes\\
+Speicher & UTF-8 & NFC & Zeichen\\
+Auswertung & UTF-8 & \textcolor{gruen}{schon NFC} & --- \\
+Anzeige & UTF-8 & --- & \textcolor{gruen}{Breite}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist eine bewusste Einschränkung: Der Messdatenerfasser überträgt nur Kennungen und Codes, keine Namen --- damit braucht er keine Kodierungsbehandlung. Wer ihm Freitext zumutet, handelt sich das ganze Kapitel ein.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile enthält die einzige Normalisierung im ganzen Werk. Sie geschieht an der Eintrittsstelle, und danach kann sich jeder darauf verlassen --- die Voraussetzung dafür, dass die vierte Zeile leer bleibt.}
+\end{center}
+
+\medskip
+\textbf{(b) Kosten der Umwandlung.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{je Name} & \textbf{bei $10^6$} & \\
+\midrule
+Prüfen auf gültiges UTF-8 & $\mathbf{40}$ ns & $40$ ms & \\
+Prüfen auf NFC & $\mathbf{90}$ ns & $90$ ms & \textcolor{gruen}{meist schon}\\
+Normalisieren & $\mathbf{620}$ ns & $\mathbf{620}$ ms & \textcolor{akzent}{nur wenn nötig}\\
+Faltung für Suche & $310$ ns & $310$ ms & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der Kunstgriff steht in der zweiten Zeile: Die Prüfung, ob ein Text bereits in NFC vorliegt, ist siebenmal billiger als die Normalisierung --- und sie fällt bei fast allen Eingaben positiv aus. Man normalisiert nur, wenn die Prüfung fehlschlägt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Damit kostet die Behandlung im Regelfall hundertdreißig statt sechshundertzwanzig Nanosekunden --- und bei einer Million Namen eine Zehntelsekunde statt einer halben.}
+\end{center}
+
+\medskip
+\textbf{(c) Freitext.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Regel} & \\
+\midrule
+Länge begrenzen & \textcolor{gruen}{\textbf{ja}} & \textbf{in Bytes und Zeichen}\\
+Steuerzeichen & \textcolor{akzent}{\textbf{verwerfen}} & \textcolor{akzent}{außer Zeilenumbruch}\\
+Auszeichnung erlaubt & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{Band 19}}\\
+Beim Abschneiden & \textbf{an Zeichengrenze} & \textcolor{gruen}{und markieren}\\
+Richtungswechsel & \textcolor{akzent}{\textbf{gefährlich}} & \textcolor{akzent}{\textbf{Anzeige täuschbar}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist eine Sicherheitsfrage aus Band 19: Es gibt unsichtbare Zeichen, die die Leserichtung umkehren --- damit lässt sich ein Text so anzeigen, dass er etwas anderes bedeutet, als er enthält. In einem Befundkommentar ist das ein ernsthaftes Risiko.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Abhilfe ist eine Positivliste: Erlaubt sind Buchstaben, Ziffern, übliche Satzzeichen und Zeilenumbrüche. Alles andere wird an der Naht entfernt --- und dass etwas entfernt wurde, wird gemeldet.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Codes statt Text}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Freitext} & \textbf{Code}\\
+\midrule
+Auswertbar & \textcolor{akzent}{\textbf{kaum}} & \textcolor{gruen}{\textbf{ja}}\\
+Sprachabhängig & \textcolor{akzent}{ja} & \textcolor{gruen}{nein}\\
+Vergleichbar & \textcolor{akzent}{nein} & \textcolor{gruen}{ja}\\
+Kodierungs\-fragen & \textcolor{akzent}{\textbf{alle}} & \textcolor{gruen}{\textbf{keine}}\\
+Für den Menschen & \textcolor{gruen}{ja} & \textcolor{akzent}{Übersetzung nötig}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist der stille Gewinn: Ein Code aus einer festgelegten Liste hat keine Kodierungs-, keine Normalisierungs- und keine Sortierfrage. Das ganze Kapitel entfällt für alles, was sich kodieren lässt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb lautet die Entwurfsregel: An der Naht so viel wie möglich kodiert, so wenig wie nötig als Text. Freitext bleibt für das, was man wirklich nicht kodieren kann --- und das ist weniger, als man zunächst annimmt.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Der Uni\-code-Stan\-dard\zit{23} legt Nor\-mal\-for\-men und Ver\-gleichs\-re\-geln fest; Goldberg\zit{10} zeigt am Gleit\-kom\-ma, wie Fragen der Dar\-stel\-lung zu Re\-chen\-feh\-lern werden; die FHIR-Spe\-zi\-fi\-ka\-tion\zit{27} liefert die Code\-lis\-ten, die Frei\-text ersparen.

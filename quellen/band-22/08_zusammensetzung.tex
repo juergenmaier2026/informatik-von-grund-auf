@@ -1,0 +1,293 @@
+\chapter{Zusammensetzung}\label{kap:zusammensetzung}
+
+\begin{merksatz}
+\boxtitel{Einbetten statt erben}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{type Basis struct \{ id ID; erzeugt time.Time \}}\\
+\code{func (b Basis) ID() ID \{ return b.id \}}\\
+\\
+\code{type Laborbefund struct \{}\\
+\code{\ \ \ \ Basis\ \ \ \ \ \ \ \ \ \ \ \ // eingebettet, ohne Feldnamen}\\
+\code{\ \ \ \ Wert Ergebnis}\\
+\code{\}}\\
+\\
+\code{b := Laborbefund\{...\}}\\
+\code{b.ID()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ // Methode von Basis, hochgereicht}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Vererbung} & \textbf{Einbettung}\\
+\midrule
+Beziehung & \textbf{ist ein} & \textbf{hat ein}\\
+Methode überschreiben & \textcolor{gruen}{ja, dynamisch} & \textcolor{akzent}{\textbf{nur verdecken}}\\
+Basis ruft abgeleitet & \textcolor{gruen}{ja} & \textcolor{akzent}{\textbf{nein}}\\
+Mehrfach & \textcolor{akzent}{schwierig} & \textcolor{gruen}{\textbf{beliebig}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der entscheidende Unterschied und der häufigste Stolperstein für Umsteiger: Eine eingebettete Basis weiß nichts von dem Typ, der sie enthält. Es gibt keine Schablonenmethode, kein Aufrufen nach unten --- und damit auch keine der Überraschungen, die daraus entstehen.}
+\end{minipage}
+\end{center}
+
+\textbf{Was das Verdecken bedeutet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{4.2cm}P{1.8cm}P{2.0cm}@{}}
+\toprule
+\textbf{Aufruf} & \textbf{Ruft} & \\
+\midrule
+\code{b.Beschreibung()} & \textbf{die äußere} & \textcolor{gruen}{verdeckt}\\
+\code{b.Basis.} \code{Beschreibung()} & die innere & \textcolor{gruen}{aus\-drück\-lich}\\
+Aus \code{Basis} heraus & \textcolor{akzent}{\textbf{immer die innere}} & \textcolor{akzent}{\textbf{nie die äußere}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist der Punkt, an dem Rahmenwerksmuster scheitern. Wer aus einer Basismethode heraus eine überschriebene Methode aufrufen will, kann das nicht --- er muss die Abhängigkeit ausdrücklich übergeben, meist als Schnittstelle.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die Umkehrung, die daraus folgt}
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\code{// statt: Basis ruft ueberschriebene Methode}\\
+\code{type Formatierer interface \{ Beschreibe(Basis) string \}}\\
+\\
+\code{func (b Basis) Text(f Formatierer) string \{}\\
+\code{\ \ \ \ return f.Beschreibe(b)}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Was in einer Klassenhierarchie implizit über die Vererbung liefe, wird hier ein Argument. Das ist mehr Schreibarbeit und beantwortet beim Lesen eine Frage, die man sonst suchen muss: Welche Umsetzung wird aufgerufen? Die, die dasteht.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Wo die Einbettung nützt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Zweck} & \textbf{Passend?} & \\
+\midrule
+Gemeinsame Felder & \textcolor{gruen}{\textbf{ja}} & \textbf{Kennung, Zeitstempel}\\
+Schnittstelle weiterreichen & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Verhalten ergänzen}}\\
+Sperre in eine Struktur & \textcolor{mittel}{umstritten} & \textcolor{akzent}{macht sie öffentlich}\\
+Hierarchie nachbauen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{funktioniert nicht}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die eleganteste Anwendung: Man bettet eine Schnittstelle ein, überschreibt eine Methode und reicht den Rest durch. Damit ergänzt man fremdes Verhalten, ohne den fremden Typ zu kennen --- in fünf Zeilen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{type ZaehlenderSchreiber struct \{}\\
+\code{\ \ \ \ io.Writer\ \ \ \ \ \ \ \ \ \ \ // Schnittstelle eingebettet}\\
+\code{\ \ \ \ N int64}\\
+\code{\}}\\
+\\
+\code{func (z *ZaehlenderSchreiber) Write(p []byte) (int, error) \{}\\
+\code{\ \ \ \ n, err := z.Writer.Write(p)}\\
+\code{\ \ \ \ z.N += int64(n)}\\
+\code{\ \ \ \ return n, err}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Zehn Zeilen, und jeder Empfänger von Bytes bekommt einen Zähler --- Datei, Netzverbindung, Komprimierer. Das ist das Dekorierermuster aus Band 17 ohne jedes Gerüst.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Falle der eingebetteten Sperre}
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\code{type Zwischenspeicher struct \{}\\
+\code{\ \ \ \ sync.Mutex\ \ \ \ \ \ \ \ \ \ // eingebettet: Lock() ist oeffentlich!}\\
+\code{\ \ \ \ daten map[ID]Messwert}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Folge} & \textbf{Bewertung} & \\
+\midrule
+\code{Lock} von außen aufrufbar & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{\textbf{Teil der Schnittstelle}}\\
+Sperrstrategie änderbar & \textcolor{akzent}{nein} & \textbf{Aufrufer hängen daran}\\
+Als Feld benannt & \textcolor{gruen}{\textbf{besser}} & \code{mu sync.Mutex}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Einbettung macht \code{Lock} und \code{Unlock} zu öffentlichen Methoden des Zwischenspeichers --- also zu einem Versprechen, das man nicht zurücknehmen kann. Ein benanntes Feld \code{mu} ist ein Zeichen mehr und hält die Sperrstrategie im Paket.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Bauen Sie eine Hierarchie um.
+\item Messen Sie den Unterschied beim Lesen.
+\item Bestimmen Sie, wo Wiederholung besser ist.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine Hierarchie umbauen.}
+
+\textbf{Der Ausgangszustand.} Fünf Befundarten, drei Ebenen, vier Schablonenmethoden.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Element} & \textbf{Vorher} & \textbf{Nachher}\\
+\midrule
+Typen & $8$ & $\mathbf{5}$\\
+Ebenen & $3$ & $\mathbf{1}$\\
+Schnittstellen & $1$ groß & $\mathbf{3}$ klein\\
+Zeilen & $520$ & $610$\\
+Doppelter Code & $0$ & \textcolor{akzent}{$\approx70$ Zeilen}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Neunzig Zeilen mehr, davon siebzig Wiederholung --- das ist der Preis, ehrlich beziffert. Wer nur diese Tabelle sieht, hält den Umbau für eine Verschlechterung.}
+\end{minipage}
+\end{center}
+
+\textbf{Was sich dafür ändert.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{Vorher} & \textbf{Nachher} & \\
+\midrule
+Neue Befundart & \textcolor{akzent}{Hierarchie prüfen} & \textcolor{gruen}{\textbf{neuer Typ}} & \\
+Zwei Eigenschaften & \textcolor{akzent}{\textbf{unmöglich}} & \textcolor{gruen}{ja} & \\
+Eine Art einzeln prüfen & \textcolor{akzent}{Basis nötig} & \textcolor{gruen}{\textbf{allein}} & \\
+Verstehenszeit & $195$ s & $\mathbf{62}$ s & $3{,}1\times$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor drei bei der Verstehenszeit, gemessen wie in Band 20. Die zweite Zeile war der Anlass des Umbaus --- ein Befund mit Bild und Zahlen ließ sich in der Hierarchie nicht darstellen, und alle Umgehungen waren schlechter als die Wiederholung.}
+\end{center}
+
+\medskip
+\textbf{(b) Der Unterschied beim Lesen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Hierarchie} & \textbf{Zusammen\-setzung}\\
+\midrule
+Welche Methode läuft? & $\mathbf{84}$ s & \textcolor{gruen}{$\mathbf{9}$ s}\\
+Was tut die Basis? & $41$ s & $12$ s\\
+Wo wird der Wert gesetzt? & $52$ s & $18$ s\\
+Was ändert sich bei X? & $\mathbf{118}$ s & \textcolor{gruen}{$\mathbf{31}$ s}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile trägt den Unterschied: In einer Hierarchie mit drei Ebenen muss man alle drei ansehen, um zu wissen, welche Umsetzung läuft. Bei Zusammensetzung steht sie beim Typ --- neun Sekunden statt vierundachtzig.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist die Rechnung, die den Preis rechtfertigt: siebzig Zeilen Wiederholung gegen dreiviertel weniger Verstehenszeit --- bei einer Tätigkeit, die dreißig Prozent der Arbeitszeit ausmacht.}
+\end{center}
+
+\medskip
+\textbf{(c) Wo Wiederholung besser ist.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.6cm}P{2.2cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Zusammen\-fassen?} & \\
+\midrule
+Zufällig gleich & \textcolor{akzent}{\textbf{nein}} & \textbf{Band 20, Kap.~14}\\
+Ändert sich aus demselben Grund & \textcolor{gruen}{\textbf{ja}} & \\
+Drei oder mehr Fälle & \textcolor{gruen}{ja} & \textcolor{gruen}{Regel der drei}\\
+Zwei Fälle & \textcolor{akzent}{noch nicht} & \\
+Fachlich verschieden & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{trotz gleichem Code}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die wichtigste und in Go besonders sichtbar: Zwei Prüffunktionen, die heute gleich aussehen --- eine für Laborwerte, eine für Abrechnungsbeträge --- werden sich auseinanderentwickeln. Wer sie zusammenlegt, muss sie später mühsam trennen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Go begünstigt diese Zurückhaltung, weil es das Zusammenlegen umständlicher macht. Ob das eine Tugend oder ein Mangel ist, hängt davon ab, wie oft man die Trennung später gebraucht hätte.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Umstellung kostet Wochen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.4cm}@{}}
+\toprule
+\textbf{Herkunft} & \textbf{Umge\-wöhnung} & \\
+\midrule
+Java, C\# & \textcolor{akzent}{\textbf{schwer}} & \textbf{Hierarchien fehlen}\\
+C++ & \textcolor{akzent}{schwer} & \\
+Python & \textcolor{mittel}{mittel} & \\
+C & \textcolor{gruen}{\textbf{leicht}} & \textcolor{gruen}{gab es dort auch nicht}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der typische Verlauf: In den ersten Wochen baut man Hierarchien mit Einbettung nach, es funktioniert nicht richtig, und man ärgert sich über die Sprache. Nach ein bis zwei Monaten hört man auf, es zu versuchen --- und findet die Lösungen einfacher.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist keine Aussage darüber, welcher Ansatz besser ist. Es ist eine Warnung an den, der Go beurteilen will: Das Urteil aus den ersten Wochen misst die Umgewöhnung, nicht die Sprache.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Ousterhout\zit{16} begründet, warum tiefe Schnitt\-stel\-len wichtiger sind als Hier\-ar\-chien; Donovan und Ker\-nig\-han\zit{6} zeigen Ein\-bet\-tung mit ihren Grenzen; Bodner\zit{1} behandelt die Um\-ge\-wöh\-nung aus\-drück\-lich.

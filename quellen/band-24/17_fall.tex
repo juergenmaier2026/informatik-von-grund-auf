@@ -1,0 +1,178 @@
+\chapter{Der doppelte Code, der bleibt}\label{fall:doppelt}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Zwei Prüffunktionen in verschiedenen Paketen, seit vier Jahren fast identisch.
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{\# paket labor}\\
+\code{def pruefe\_bereich(wert, unten, oben):}\\
+\code{\ \ \ \ if wert < unten: return Lage.UNTER}\\
+\code{\ \ \ \ if wert > oben:\ return Lage.UEBER}\\
+\code{\ \ \ \ return Lage.INNERHALB}\\
+\\
+\code{\# paket abrechnung}\\
+\code{def pruefe\_spanne(betrag, min\_, max\_):}\\
+\code{\ \ \ \ if betrag < min\_: return Spanne.UNTER}\\
+\code{\ \ \ \ if betrag > max\_:\ return Spanne.UEBER}\\
+\code{\ \ \ \ return Spanne.INNERHALB}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei Funktionen, fünf Zeilen, Zeile für Zeile dieselbe Struktur. Ein Werkzeug zur Doppelungserkennung meldet sie zuverlässig, und in jeder Durchsicht kommt der Vorschlag, sie zusammenzulegen.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Die Prüffrage} & Ändern sich beide aus demselben Grund?\\
+\textbf{Die Antwort} & \textbf{Nein}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Änderungsgrund} & \textbf{Labor} & \textbf{Abrechnung}\\
+\midrule
+Neue Referenzlogik & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein}\\
+Altersabhängige Grenzen & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein}\\
+Steuerliche Rundung & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}}\\
+Währungswechsel & \textcolor{akzent}{nein} & \textcolor{gruen}{ja}\\
+Nachweisgrenzen & \textcolor{gruen}{ja} & \textcolor{akzent}{nein}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf absehbare Änderungsgründe, kein einziger gemeinsamer. Die beiden Funktionen sehen gleich aus und haben nichts miteinander zu tun --- Band 20, Kapitel~14: gleiches Aussehen ist kein gemeinsamer Grund.}
+\end{minipage}
+\end{center}
+
+\textbf{Was in vier Jahren geschah.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Änderungen} & \\
+\midrule
+Nur Labor & $\mathbf{3}$ & \textbf{Grenzwert\-arten}\\
+Nur Abrechnung & $\mathbf{2}$ & \\
+\textbf{Beide gemeinsam} & $\mathbf{0}$ & \textcolor{gruen}{\textbf{in vier Jahren}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Fünf Änderungen, keine gemeinsame. Hätte man die Funktionen vor vier Jahren zusammengelegt, wären es fünf Änderungen an einer gemeinsamen Funktion gewesen --- jede mit einem Schalter, der nur eine Seite betrifft.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: so gelassen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Gewählt?} & \\
+\midrule
+Zusammenlegen & \textcolor{akzent}{\textbf{nein}} & \textbf{kein gemeinsamer Grund}\\
+Gemeinsame Basisklasse & \textcolor{akzent}{nein} & \textcolor{akzent}{schlimmer}\\
+Werkzeug\-meldung abschalten & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{mit Begründung}}\\
+Code geändert & \textcolor{gruen}{$\mathbf{0}$ Zeilen} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die dritte Zeile ist der einzige Eingriff: Die Doppelungsmeldung wird für diese Stelle abgeschaltet, mit einem Verweis auf diesen Fall. Sonst kommt der Vorschlag bei jeder Durchsicht neu --- und irgendwann setzt ihn jemand um.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{1.8cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Getrennt} & \textbf{Zusammen\-gelegt} & \\
+\midrule
+Zeilen heute & $\mathbf{10}$ & $\mathbf{6}$ & \textcolor{gruen}{kürzer}\\
+Zeilen nach $5$ Änderungen & $\mathbf{19}$ & \textcolor{akzent}{$\mathbf{31}$} & \\
+Schalter & $\mathbf{0}$ & \textcolor{akzent}{$\mathbf{5}$} & \\
+Pakete gekoppelt & \textcolor{gruen}{nein} & \textcolor{akzent}{\textbf{ja}} & \\
+Änderung trifft & $1$ Paket & \textcolor{akzent}{\textbf{$2$ Pakete}} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Heute wären vier Zeilen gespart; nach fünf Änderungen sind es zwölf Zeilen mehr und fünf Schalter. Die zweite Zeile ist keine Vermutung --- die fünf Änderungen sind bereits eingetreten, und man kann beide Verläufe nachrechnen.}
+\end{minipage}
+\end{center}
+
+\textbf{Die schwerwiegendere Folge.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bei Zusammenlegung} & \textbf{Folge} & \\
+\midrule
+Gemeinsames Paket nötig & \textcolor{akzent}{\textbf{ja}} & \code{util}?\\
+Labor hängt an Abrechnung & \textcolor{akzent}{mittelbar} & \\
+\textbf{Änderung braucht beide Freigaben} & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{\textbf{zwei Bereiche}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist der eigentliche Preis und hat nichts mit Code zu tun: Eine gemeinsame Funktion bedeutet, dass jede Änderung an der Grenzwertlogik des Labors die Zustimmung der Abrechnung braucht. Vier Zeilen gegen eine organisatorische Kopplung.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Doppelter Code ist in Ordnung} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{dieser ist es}}\\
+\enquote{Doppelungswerkzeuge taugen nichts} & \textcolor{akzent}{nein} & \textbf{sie fragen}\\
+\enquote{Fünf Zeilen sind zu wenig zum Teilen} & \textcolor{akzent}{nein} & \textcolor{akzent}{Länge entscheidet nicht}\\
+\textbf{\enquote{Gleiches Aussehen ist kein gemeinsamer Grund}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die Falle: Bei fünf Zeilen wirkt die Doppelung harmlos und die Entscheidung beliebig. Sie ist es nicht --- dieselbe Prüfung bei zweihundert doppelten Zeilen würde genauso ausgehen, wenn die Änderungsgründe verschieden sind.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Umgekehrt: Zwei Funktionen, die \kursiv{verschieden} aussehen und sich aus demselben Grund ändern, gehören zusammengelegt --- und die findet kein Werkzeug. Das Werkzeug sieht Zeichen, die Prüffrage betrifft Gründe.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Fowler\zit{10} nennt die Be\-din\-gun\-gen für das Zu\-sam\-men\-le\-gen; Beck\zit{1} behandelt die kleinen Ent\-schei\-dun\-gen, in denen sich solche Fragen stellen.

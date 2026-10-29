@@ -1,0 +1,277 @@
+\appendix
+\part{Anhang}
+
+\newcommand{\lit}[3]{\vspace{5pt}\noindent\textbf{[#1]} #2\par\nopagebreak\vspace{1pt}{\small\itshape\color{grau} #3}\par\vspace{2pt}}
+
+\chapter{Die zwanzig Fälle}
+
+\begin{merksatz}
+\boxtitel{Übersicht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.38}
+\begin{tabular}{@{}P{0.7cm}P{3.4cm}P{2.1cm}P{2.4cm}@{}}
+\toprule
+\textbf{Nr.} & \textbf{Fall} & \textbf{Urteil} & \textbf{Die Prüffrage}\\
+\midrule
+$1$ & Wert ohne Einheit & \textcolor{tief}{\textbf{überarbeitet}} & Mehr als eine Darstellung möglich?\\
+$2$ & Acht Argumente & \textcolor{tief}{überarbeitet} & Wandern Argumente gemeinsam?\\
+$3$ & Verfrühte Abstraktion & \textcolor{akzent}{\textbf{umgebaut}} & Ist der dritte Fall gekommen?\\
+$4$ & Feld, das fehlen darf & \textcolor{tief}{überarbeitet} & Bedeutet Fehlen mehr als eines?\\
+$5$ & Schleife, die fragt & \textcolor{tief}{überarbeitet} & Aufruf über eine Naht?\\
+$6$ & Prüfung verschwindet & \textcolor{akzent}{\textbf{umgebaut}} & Wie geprüft, wie ausgeliefert?\\
+$7$ & Puffer ohne Grenze & \textcolor{tief}{überarbeitet} & Steht die Größe in der Signatur?\\
+$8$ & Goroutine ohne Ende & \textcolor{tief}{überarbeitet} & Wie endet sie?\\
+$9$ & Kanal, der puffert & \textcolor{akzent}{\textbf{umgebaut}} & Verlust oder Verzögerung?\\
+$10$ & Hierarchie & \textcolor{akzent}{\textbf{umgebaut}} & Wie viele Notlösungen?\\
+$11$ & Ohne Ablaufzeit & \textcolor{tief}{überarbeitet} & Wie lange darf es veralten?\\
+$12$ & Falsche Zeit & \textcolor{tief}{\textbf{überarbeitet}} & Welcher Zeitpunkt ist gemeint?\\
+$13$ & Ohne Kennung & \textcolor{tief}{überarbeitet} & Ist es idempotent?\\
+$14$ & Meldung ohne Bezug & \textcolor{tief}{überarbeitet} & Weiß ich etwas, das tiefer fehlt?\\
+\midrule
+$15$ & Code, schon gut & \textcolor{grau}{\textbf{so gelassen}} & Eine Zuständigkeit?\\
+$16$ & Optimierung & \textcolor{grau}{\textbf{so gelassen}} & Was kostet der Rückbau?\\
+$17$ & Doppelter Code & \textcolor{grau}{\textbf{so gelassen}} & Derselbe Änderungsgrund?\\
+$18$ & Doppelte Prüfung & \textcolor{grau}{\textbf{so gelassen}} & Liegt eine Grenze dazwischen?\\
+$19$ & Dienst bleibt & \textcolor{grau}{\textbf{so gelassen}} & Andere Betriebsanforderung?\\
+$20$ & Werkzeug bleibt & \textcolor{grau}{\textbf{so gelassen}} & Ist der Umstellungsaufwand drin?\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Spalte ist der eigentliche Ertrag dieses Bandes. Zwanzig Fragen, die man an eine Vorlage stellt --- keine davon beantwortet sich aus dem Code allein, und keine davon ist eine Regel.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die zwanzig Fehlschlüsse}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.32}
+\begin{tabular}{@{}P{0.7cm}P{7.9cm}@{}}
+\toprule
+$1$ & Nicht: jeder Wert braucht einen eigenen Typ\\
+$2$ & Nicht: höchstens drei Argumente\\
+$3$ & Nicht: Abstraktion ist schlecht\\
+$4$ & Nicht: keine optionalen Felder\\
+$5$ & Nicht: keine geschachtelten Schleifen\\
+$6$ & Nicht: der Übersetzer ist schuld\\
+$7$ & Nicht: den Puffer größer machen\\
+$8$ & Nicht: immer gepufferte Kanäle\\
+$9$ & \textbf{Nicht: kein Verlust ist immer besser}\\
+$10$ & Nicht: Vererbung ist schlecht\\
+$11$ & Nicht: ein gemeinsamer Speicher wäre besser\\
+$12$ & Nicht: der Schreibzeitpunkt ist wertlos\\
+$13$ & Nicht: den Zeitstempel als Kennung nehmen\\
+$14$ & Nicht: jeden Fehler anreichern\\
+\midrule
+$15$ & \textbf{Nicht: lange Funktionen sind in Ordnung}\\
+$16$ & \textbf{Nicht: Optimierungen behält man}\\
+$17$ & \textbf{Nicht: doppelter Code ist in Ordnung}\\
+$18$ & \textbf{Nicht: doppelte Prüfung ist immer gut}\\
+$19$ & \textbf{Nicht: kleine Dienste sind in Ordnung}\\
+$20$ & \textbf{Nicht: das Bestehende ist gut}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die sechs unteren sind die gefährlichsten, weil sie bequem sind: Wer aus Teil IV mitnimmt, dass man nichts ändern muss, hat das Gegenteil gelernt. In jedem der sechs Fälle war die Zurückhaltung das Ergebnis einer Prüfung --- nicht ihr Ersatz.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Was die Fälle gekostet haben}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.42}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+\textbf{Urteil} & \textbf{Fälle} & \textbf{Aufwand} & \textbf{Je Fall}\\
+\midrule
+Überarbeitet & $9$ & $\mathbf{34{,}5}$ PT & $3{,}8$\\
+Umgebaut & $5$ & \textcolor{akzent}{$\mathbf{56}$ PT} & \textcolor{akzent}{$11{,}2$}\\
+So gelassen & $6$ & \textcolor{gruen}{$\mathbf{2{,}6}$ PT} & \textcolor{gruen}{$\mathbf{0{,}4}$}\\
+\midrule
+\textbf{Summe} & $\mathbf{20}$ & $\approx\mathbf{93}$ \textbf{PT} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die aufschlussreichste: Die sechs Fälle ohne Änderung haben zusammen zweieinhalb Personentage gekostet --- für Messung, Begründung und einen Vermerk. Nicht zu handeln ist billig, aber nicht umsonst.}
+\end{minipage}
+\end{center}
+
+\textbf{Der teuerste und der billigste Fall.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Aufwand} & \textbf{Ertrag}\\
+\midrule
+Fall $12$, Zeit & \textcolor{akzent}{$\mathbf{22}$ PT} & \textbf{Nachvollzug möglich}\\
+Fall $8$, Goroutine & \textcolor{gruen}{$\mathbf{0{,}5}$ PT} & \textcolor{gruen}{\textbf{$1$ GB je Monat}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor vierundvierzig zwischen dem teuersten und dem billigsten Eingriff. Wer die Reihenfolge nach diesem Verhältnis wählt, beginnt bei Fall 8 --- und das ist die richtige Reihenfolge.}
+\end{center}
+\end{merksatz}
+
+\chapter{Landkarte und Glossar}
+
+\begin{merksatz}
+\boxtitel{Woher die Regeln stammen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.42}
+\begin{tabular}{@{}P{1.0cm}P{3.6cm}P{4.0cm}@{}}
+\toprule
+\textbf{Fall} & \textbf{Regel geprüft} & \textbf{Band}\\
+\midrule
+$1$, $12$ & Daten vor Verfahren & \textbf{20, Kap.~2}\\
+$2$, $15$ & Zuständigkeit, nicht Länge & \textbf{20, Kap.~5}\\
+$3$, $17$ & Regel der drei & \textbf{20, Kap.~14}\\
+$4$ & Bedeutung des Fehlens & \textbf{23, Kap.~3}\\
+$5$ & Aufruf über die Naht & \textbf{23, Kap.~2}\\
+$6$, $7$ & Undefiniertes Verhalten & \textbf{21, Kap.~7}\\
+$8$, $9$ & Nebenläufigkeit & \textbf{22, Kap.~4--6}\\
+$10$ & Zusammensetzung & \textbf{22, Kap.~8}\\
+$11$ & Zwischenspeicher & \textbf{23, Kap.~9}\\
+$13$ & Idempotenz & \textbf{23, Kap.~2}\\
+$14$ & Fehlerkette & \textbf{22, Kap.~2}\\
+$16$ & Messen vor Optimieren & \textbf{21, Kap.~2}\\
+$18$ & Vertrauensgrenze & \textbf{19, Kap.~4}\\
+$19$, $20$ & Wann teilen & \textbf{23, Kap.~14}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Keine der zwanzig Prüfungen brauchte eine neue Regel. Alle standen in den Bänden 19 bis 23 --- was fehlte, war die Entscheidung, ob sie im jeweiligen Fall greifen.}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Begriffe}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}P{3.3cm}P{5.4cm}@{}}
+\toprule
+\textbf{Änderungsgrund} & Warum sich ein Stück Code ändert --- das Maß für Zusammenlegung\\
+\textbf{Fehlschluss} & Naheliegende Verallgemeinerung, die aus einem Fall nicht folgt\\
+\textbf{Notlösung} & Umgehung, die eine Struktur nicht vorsah\\
+\textbf{So gelassen} & Urteil nach Prüfung, nicht Unterlassung\\
+\textbf{Überarbeitet} & Derselbe Entwurf, besser ausgeführt\\
+\textbf{Umgebaut} & Der Entwurf selbst war falsch\\
+\textbf{Verstehenszeit} & Zeit bis zur richtigen Antwort auf fünf Fragen zum Code\\
+\textbf{Vorlage} & Der Code, wie er vorliegt, mit seinem Zusammenhang\\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\chapter{Kommentierte Quellen}
+
+\lit{1}{Beck, K.: \textit{Implementation Patterns}. Addison-Wesley 2007.}{Behandelt die kleinen Entscheidungen --- Benennung, Sichtbarkeit, Aufteilung --- und begründet sie einzeln. Dünn, unterschätzt und für die Fälle 15 und 17 unmittelbar brauchbar.}
+
+\lit{2}{Bentley, J.: \textit{Programming Pearls}. 2.\ Aufl., Addison-Wesley 1999.}{Zeigt an durchgearbeiteten Beispielen, wie man den Gewinn misst, bevor man ihn behauptet. Die Form dieses Bandes --- Fall, Diagnose, Begründung --- ist bei Bentley abgeschaut.}
+
+\lit{3}{Brooks, F.: \textit{No Silver Bullet}. IEEE Computer 20(4), 1987.}{\textbf{Trennt wesentliche von zufälliger Komplexität.} Für Fall 20 die Grundlage: Ein Werkzeug beseitigt zufällige Komplexität und lässt die wesentliche unberührt --- weshalb der versprochene Gewinn regelmäßig überschätzt wird.}
+
+\lit{4}{Bryant, R., O'Hallaron, D.: \textit{Computer Systems: A Programmer's Perspective}. 3.\ Aufl., Pearson 2015.}{Erklärt, was auf der Maschine tatsächlich geschieht --- Keller, Speicherlayout, Überlauf. Für Fall 7 die Antwort auf die Frage, was ein Kellerüberlauf anrichtet.}
+
+\lit{5}{Chisnall, D.: \textit{C Is Not a Low-Level Language}. ACM Queue 16(2), 2018.}{Zeigt, wie weit das C-Modell von heutigen Maschinen entfernt ist. Für Fall 6 die Erklärung, warum der Übersetzer Freiheiten hat, mit denen niemand rechnet.}
+
+\lit{6}{Conway, M.: \textit{How Do Committees Invent?} Datamation 14(4), 1968.}{Fünf Seiten über den Zusammenhang von Organisation und Systemstruktur. Für Fall 19 die Erinnerung, dass ein Schnitt auch organisatorische Gründe haben darf --- wenn man sie benennt.}
+
+\lit{7}{Dijkstra, E.: \textit{Notes on Structured Programming}. 1970.}{Mahnt früh, dass Allgemeinheit ohne Anlass die Einsicht verstellt. Für Fall 3 der älteste Beleg gegen die verfrühte Abstraktion.}
+
+\lit{8}{Donovan, A., Kernighan, B.: \textit{The Go Programming Language}. Addison-Wesley 2015.}{\textbf{Das Standardwerk zu Go.} Führt die Nebenläufigkeitsmuster mit ihren Fallstricken vor --- Fall 8 ist einer der dort beschriebenen, in freier Wildbahn angetroffen.}
+
+\lit{9}{Evans, E.: \textit{Domain-Driven Design}. Addison-Wesley 2003.}{Begründet, warum Fachbegriffe ausdrücklich sein müssen und ein Feldname eine Aussage trägt. Für die Fälle 4 und 12 die Grundlage.}
+
+\lit{10}{Fowler, M.: \textit{Refactoring}. 2.\ Aufl., Addison-Wesley 2018.}{\textbf{Der Katalog der Umgestaltungsschritte} --- und, wichtiger für diesen Band, der Bedingungen, unter denen sie angezeigt sind. Fall 17 wendet die Bedingung an und kommt zum Nein.}
+
+\lit{11}{Gamma, E., u.\,a.: \textit{Design Patterns}. Addison-Wesley 1994.}{Liefert das Vokabular für Zielformen. Heute weniger als Rezeptbuch zu lesen denn als Wörterbuch --- für Fall 10 genau in dieser Rolle verwendet.}
+
+\lit{12}{Goldberg, D.: \textit{What Every Computer Scientist Should Know About Floating-Point Arithmetic}. ACM Computing Surveys 23(1), 1991.}{Der Aufsatz zum Thema. Für Fall 1 die Antwort auf die Frage, welche Information ein \code{float} verliert --- und warum Betrag und Exponent sie behalten.}
+
+\lit{13}{Gregg, B.: \textit{Systems Performance}. 2.\ Aufl., Addison-Wesley 2020.}{Liefert das Vorgehen, mit dem man den teuren Posten findet, bevor man ihn behebt. Für die Fälle 5 und 11 --- die Frist in Fall 11 ist nach diesem Verfahren gemessen, nicht gewählt.}
+
+\lit{14}{Hanson, D.: \textit{C Interfaces and Implementations}. Addison-Wesley 1996.}{Zeigt an vollständigen Beispielen, wie Schnittstelle und Umsetzung getrennt werden. Für Fall 15 der Beleg, dass Verstehenszeit ein brauchbarer Maßstab ist.}
+
+\lit{15}{Hunt, A., Thomas, D.: \textit{The Pragmatic Programmer}. 20-Jahre-Ausgabe, Addison-Wesley 2019.}{Behandelt die Haltung zum eigenen Bestand --- und rät, Werkzeuge zu beherrschen statt sie zu wechseln. Für die Fälle 14 und 20.}
+
+\lit{16}{Kernighan, B., Pike, R.: \textit{The Practice of Programming}. Addison-Wesley 1999.}{\textbf{Das kürzeste gute Buch über das Handwerk.} Behandelt Fehlermeldungen, Fehlersuche und Stil als das, was sie sind: erlernbare Fertigkeiten. Für Fall 14.}
+
+\lit{17}{Kernighan, B., Ritchie, D.: \textit{The C Programming Language}. 2.\ Aufl., Prentice Hall 1988.}{Beschreibt die Zeichenkettenfunktionen und ihre Grenzen --- knapp und vollständig. Für Fall 7 die Quelle, in der schon steht, was dort falsch gemacht wurde.}
+
+\lit{18}{Kleppmann, M.: \textit{Designing Data-Intensive Applications}. O'Reilly 2017.}{\textbf{Ordnet Konsistenz, Zeit und Verzögerung in einen Zusammenhang.} Für die Fälle 4, 9, 11 und 12 --- insbesondere die Unterscheidung der beiden Zeitachsen.}
+
+\lit{19}{Knuth, D.: \textit{Structured Programming with go to Statements}. ACM Computing Surveys 6(4), 1974.}{Enthält den Satz über verfrühte Optimierung --- mit der Einschränkung, die beim Zitieren regelmäßig entfällt. Für Fall 16 in seiner vollständigen Fassung gelesen.}
+
+\lit{20}{Lattner, C.: \textit{What Every C Programmer Should Know About Undefined Behavior}. 2011.}{Erklärt aus der Sicht des Übersetzerbauers, wie aus undefiniertem Verhalten entfernter Code wird. Für Fall 6 die maßgebliche Darstellung.}
+
+\lit{21}{McConnell, S.: \textit{Code Complete}. 2.\ Aufl., Microsoft Press 2004.}{Sammelt die empirischen Belege zu defensiver Programmierung und ihren Grenzen. Umfangreich; für Fall 18 sind die Kapitel zu Vertrauensgrenzen einschlägig.}
+
+\lit{22}{Nygard, M.: \textit{Release It!} 2.\ Aufl., Pragmatic Bookshelf 2018.}{\textbf{Das Buch über Ausfall.} Behandelt Wiederholung mit ihren Voraussetzungen und zeigt, warum großzügige Puffer den Zusammenbruch nur verschieben. Für die Fälle 9 und 13.}
+
+\lit{23}{Ousterhout, J.: \textit{A Philosophy of Software Design}. 2.\ Aufl., Yaknyam Press 2021.}{Fordert tiefe Schnittstellen und misst Abstraktionen daran, wie viel sie verbergen. Für die Fälle 2, 3 und 10 --- eine Abstraktion, die nichts verbirgt, ist keine.}
+
+\lit{24}{Parnas, D.: \textit{On the Criteria To Be Used in Decomposing Systems into Modules}. CACM 15(12), 1972.}{\textbf{Fünf Seiten, die den Modulbegriff begründet haben.} Das Kriterium --- schneide nach Geheimnissen, nicht nach Arbeitsschritten --- entscheidet Fall 2.}
+
+\lit{25}{Pike, R.: \textit{Notes on Programming in C} und \textit{Go Proverbs}. 1989 und 2015.}{Zwei kurze Merksatzsammlungen im Abstand von sechsundzwanzig Jahren, erstaunlich konsistent. \enquote{Messen, bevor man ändert} steht in beiden --- für die Fälle 8 und 15.}
+
+\lit{26}{Ramalho, L.: \textit{Fluent Python}. 2.\ Aufl., O'Reilly 2022.}{Zeigt, was die Sprache selbst leistet und wo Prüfungen innerhalb eines Programms entbehrlich sind. Für Fall 18 die Gegenprobe zur defensiven Haltung.}
+
+\lit{27}{Waldo, J., u.\,a.: \textit{A Note on Distributed Computing}. Sun Microsystems 1994.}{\textbf{Erklärt, warum ein Zeitablauf drei Lagen nicht unterscheidet.} Für Fall 13 die Begründung, warum Wiederholung ohne Idempotenz unzulässig ist --- und für Fall 19, dass eine Naht Eigenschaften hat, die ein Aufruf nicht hat.}
+
+\lit{28}{Wirth, N.: \textit{Algorithms + Data Structures = Programs}. Prentice Hall 1976.}{Der Titel ist die These und enthält eine Rangordnung: Die Datenstruktur kommt zuerst. Fall 1 ist eine Anwendung dieses Satzes auf eine Funktionssignatur.}
+
+\begin{merksatz}
+\boxtitel{Wenn Sie nur drei Bücher kaufen}
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{@{}P{1.0cm}P{3.0cm}P{4.6cm}@{}}
+\toprule
+\textbf{[16]} & \textbf{Kernighan, Pike} & \textbf{Für das Handwerk}\\
+\textbf{[23]} & \textbf{Ousterhout} & Für das Urteil\\
+\textbf{[10]} & \textbf{Fowler} & \textbf{Für die Schritte}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Kernighan und Pike lehren das Handwerk, Ousterhout die Maßstäbe, Fowler die Griffe. Auffällig ist, wie kurz die ersten beiden sind: zusammen etwa vierhundert Seiten für das, worauf es ankommt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Zwei Ergänzungen, beide frei verfügbar und beide unter zehn Seiten: [24] Parnas, das Kriterium für jeden Schnitt. Und [27] Waldo --- acht Seiten gegen einen Irrtum, der in jedem Jahrzehnt zurückkehrt.}
+\end{center}
+\end{merksatz}
+
+\bigskip
+\begin{flushright}
+\itshape\color{grau}
+Zwanzig Fälle, vierzehn Änderungen,\\
+sechs Begründungen für Zurückhaltung.\\[10pt]
+\normalfont\color{grau}\upshape
+--- die Bilanz dieses Bandes\\
+\itshape und der Reihe:\\
+Die Regel sagt, wonach man fragt.\\
+Der Fall sagt, was die Antwort war.
+\end{flushright}

@@ -1,0 +1,321 @@
+\chapter{Schnittstellen}\label{kap:schnittstellen}
+
+\begin{merksatz}
+\boxtitel{Erfüllung ohne Erklärung}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.8cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Ausdrücklich} & \textbf{Nach Gestalt}\\
+\midrule
+Typ nennt sie & \textcolor{gruen}{ja} & \textcolor{akzent}{\textbf{nein}}\\
+Nachträglich möglich & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}}\\
+Fremde Typen & \textcolor{akzent}{nein} & \textcolor{gruen}{ja}\\
+Wer legt fest? & \textbf{der Anbieter} & \textcolor{gruen}{\textbf{der Benutzer}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die eigentliche Umkehrung. In Java oder C++ entscheidet der, der einen Typ schreibt, welche Schnittstellen er erfüllt. In Go entscheidet der, der ihn \kursiv{benutzt}, welche Schnittstelle er braucht --- und definiert sie dort, wo sie gebraucht wird.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Folge für den Entwurf.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{6.2cm}@{}}
+\toprule
+\textbf{Die Regel} & Schnittstellen gehören zum Benutzer, nicht zum Anbieter\\
+\textbf{Die Größe} & \textbf{Je kleiner, desto brauchbarer}\\
+\textbf{Der Maßstab} & Eine Methode ist oft genug\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist die Umkehrung dessen, was man aus anderen Sprachen kennt: Dort baut man große Schnittstellen im Voraus. Hier schreibt der Aufrufer eine Schnittstelle mit genau den zwei Methoden, die er braucht --- und jeder Typ, der sie hat, passt.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die kleinste nützliche Schnittstelle}
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\code{type Writer interface \{}\\
+\code{\ \ \ \ Write(p []byte) (n int, err error)}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Erfüllt von} & \textbf{Erwartet?} & \\
+\midrule
+Datei & \textcolor{gruen}{ja} & \\
+Netzverbindung & \textcolor{gruen}{ja} & \\
+Puffer im Speicher & \textcolor{gruen}{ja} & \textcolor{gruen}{\textbf{für Prüfungen}}\\
+Prüfsummen\-rechner & \textcolor{gruen}{ja} & \\
+Komprimierer & \textcolor{gruen}{\textbf{ja}} & \textbf{lässt sich stapeln}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Eine Methode, und jeder Empfänger von Bytes passt hinein. Die dritte Zeile ist der Prüfgewinn: Man ersetzt die Netzverbindung durch einen Speicherpuffer und prüft ohne Netz --- ohne Attrappe, ohne Rahmenwerk.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Schnittstelle beim Aufrufer}
+\textbf{Der übliche Fehler.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{// paket geraet -- so nicht}\\
+\code{type GeraetLeser interface \{}\\
+\code{\ \ \ \ Lies() (Messwert, error)}\\
+\code{\ \ \ \ Kalibriere() error}\\
+\code{\ \ \ \ Status() Status}\\
+\code{\ \ \ \ Zuruecksetzen() error}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Methoden, weil das Gerät sie hat. Wer nur lesen will, muss trotzdem alle vier bereitstellen --- und eine Prüfattrappe braucht vier Methoden, von denen drei leer sind.}
+\end{minipage}
+\end{center}
+
+\textbf{Beim Aufrufer, so klein wie nötig.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{// paket uebertragung}\\
+\code{type Quelle interface \{ Lies() (Messwert, error) \}}\\
+\\
+\code{func Uebertrage(q Quelle, z Ziel) error \{ ... \}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Beim Anbieter} & \textbf{Beim Aufrufer} & \\
+\midrule
+Methoden & $4$ & $\mathbf{1}$ & \\
+Attrappe & $22$ Zeilen & $\mathbf{4}$ Zeilen & \\
+Abhängigkeit & \textcolor{akzent}{auf \code{geraet}} & \textcolor{gruen}{\textbf{keine}} & \\
+Andere Quellen & \textcolor{akzent}{Umbau} & \textcolor{gruen}{passen} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist der Gewinn, den man erst nach Monaten bemerkt: Das Übertragungspaket kennt das Gerätepaket nicht. Damit lässt es sich einzeln prüfen, einzeln übersetzen und einzeln wiederverwenden --- Parnas' Kriterium aus Band 17 in seiner schärfsten Form.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Wo die Gestaltprüfung überrascht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Fall} & \textbf{Wirkung} & \\
+\midrule
+Gleicher Name, andere Bedeutung & \textcolor{akzent}{\textbf{erfüllt versehentlich}} & \textbf{\code{Close}, \code{Read}}\\
+Methode umbenannt & \textcolor{akzent}{Erfüllung fällt weg} & \textcolor{akzent}{Fehler erst beim Übersetzen}\\
+Kein Bezug im Code & \textcolor{akzent}{\textbf{schwer zu finden}} & \textbf{wer erfüllt sie?}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der Preis für die Umkehrung: Es steht nirgends, welche Typen eine Schnittstelle erfüllen. Man findet es nur mit Werkzeugen --- und beim Lesen fehlt der Hinweis, den ein ausdrückliches \code{implements} gäbe.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die übliche Abhilfe ist eine Zusicherung beim Übersetzen: \code{var \_ Quelle = (*Geraet)(nil)}. Sie kostet eine Zeile, erzeugt keinen Code und dokumentiert die Absicht dort, wo sie hingehört.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Schneiden Sie Schnittstellen zu.
+\item Untersuchen Sie die Nullwertfalle bei Schnittstellen.
+\item Bestimmen Sie die Kosten der Indirektion.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Schnittstellen zuschneiden.}
+
+\textbf{Die Übertragungsschicht, Bedarf je Bestandteil.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Braucht} & \textbf{Schnittstelle}\\
+\midrule
+Übertrager & \textbf{lesen} & $1$ Methode\\
+Überwachung & Status & $1$ Methode\\
+Wartungs\-werkzeug & \textbf{alles} & $4$ Methoden\\
+Prüfung & lesen & \textcolor{gruen}{$1$ Methode}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Bestandteile, vier verschiedene Bedürfnisse --- und nur eines braucht alle vier Methoden. Wer eine gemeinsame Schnittstelle für alle baut, zwingt drei Bestandteile zu einer Abhängigkeit, die sie nicht brauchen.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Wirkung auf die Abhängigkeiten.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Eine große} & \textbf{Vier kleine} & \\
+\midrule
+Pakete mit Abhängigkeit & $4$ & $\mathbf{1}$ & \\
+Übersetzung bei Änderung & \textcolor{akzent}{$4$ Pakete} & \textcolor{gruen}{$\mathbf{1}$} & \\
+Prüfattrappen gesamt & $88$ Zeilen & $\mathbf{16}$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile wirkt auf die Bauzeit und damit auf die Rückmeldedauer aus Band 17, Kapitel~10. Kleine Schnittstellen sind nicht nur eine Entwurfsfrage --- sie halten den Bauvorgang schnell.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Nullwertfalle.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{var q *Geraet = nil}\\
+\code{var s Quelle = q}\\
+\code{if s != nil \{ ... \}\ \ \ \ // wahr! -- die Falle}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Wert} & \\
+\midrule
+Typ & \code{*Geraet} & \textcolor{akzent}{\textbf{nicht null}}\\
+Wert & \code{nil} & \\
+Schnittstelle & \textcolor{akzent}{\textbf{nicht \code{nil}}} & \textcolor{akzent}{weil der Typ da ist}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine Schnittstelle besteht aus zwei Teilen: Typ und Wert. Sie ist nur dann \code{nil}, wenn \kursiv{beide} leer sind. Ein Nullzeiger eines konkreten Typs erzeugt eine Schnittstelle, die nicht \code{nil} ist und beim Methodenaufruf abstürzt.}
+\end{minipage}
+\end{center}
+
+\textbf{Wo das auftritt.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func hole() error \{}\\
+\code{\ \ \ \ var e *MeinFehler = nil}\\
+\code{\ \ \ \ if schiefgelaufen \{ e = \&MeinFehler\{\} \}}\\
+\code{\ \ \ \ return e\ \ \ \ \ \ \ \ \ \ \ \ // FALSCH: nie nil}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der häufigste Fall in der Praxis --- und er macht jede Fehlerprüfung beim Aufrufer wirkungslos, weil \code{err != nil} immer wahr ist. Die Abhilfe ist einfach: \code{error} als Typ der Variablen, nicht den konkreten Typ.}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Erkennbar durch} & \textbf{Findet es?} & \\
+\midrule
+Lesen & \textcolor{akzent}{selten} & \\
+Übersetzer & \textcolor{akzent}{\textbf{nein}} & \\
+\code{go vet} & \textcolor{gruen}{\textbf{ja}} & \textbf{seit Jahren}\\
+Prüfung & \textcolor{gruen}{ja} & wenn vorhanden\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{(c) Kosten der Indirektion.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Aufruf} & \textbf{Dauer} & \textbf{Einbettbar} & \\
+\midrule
+Direkt, konkret & $\mathbf{1{,}0}$ ns & \textcolor{gruen}{\textbf{ja}} & \\
+Über Schnittstelle & $2{,}4$ ns & \textcolor{mittel}{teils} & \\
+In enger Schleife & \textcolor{akzent}{$\mathbf{+140\,\%}$} & & \textcolor{akzent}{spürbar}\\
+Bei Netzarbeit & \textcolor{gruen}{$<0{,}01\,\%$} & & \textcolor{gruen}{belanglos}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzten beiden Zeilen sind dieselbe Zahl in zwei Zusammenhängen. In einer Schleife über Millionen Werte kostet die Indirektion die Hälfte der Laufzeit; bei einer Übertragung, die auf das Netz wartet, ist sie nicht messbar.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt die Regel: Schnittstellen an den Rändern, konkrete Typen im Inneren enger Schleifen. Das ist derselbe Gedanke wie in Band 21, Kapitel~14 --- die Grenze verläuft entlang grober Operationen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Schnittstellen im Voraus sind fast immer falsch}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Anlass} & \textbf{Berechtigt?} & \\
+\midrule
+Zwei Umsetzungen vorhanden & \textcolor{gruen}{\textbf{ja}} & \\
+Prüfung braucht Ersatz & \textcolor{gruen}{ja} & \\
+\enquote{Könnte später nützlich sein} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Band 20, Kap.~14}}\\
+\enquote{Guter Stil} & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine Schnittstelle mit genau einer Umsetzung ist eine zusätzliche Ebene ohne Gegenwert --- man muss beim Lesen einen Sprung mehr machen, um zu sehen, was geschieht. Weil Go Schnittstellen nachträglich zulässt, kostet das Warten nichts.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist der Vorteil der Gestaltprüfung, den man am leichtesten verschenkt: Man kann sie einführen, wenn man sie braucht --- und muss es deshalb nicht vorher tun.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Parnas\zit{17} be\-grün\-de\-te, warum die Schnitt\-stel\-le ver\-ber\-gen und nicht zeigen soll; Ouster\-hout\zit{16} fordert tiefe Schnitt\-stel\-len --- wenig nach außen, viel dahinter; Donovan und Ker\-nig\-han\zit{6} führen die Ge\-stalt\-prü\-fung mit ihren Fein\-hei\-ten vor.

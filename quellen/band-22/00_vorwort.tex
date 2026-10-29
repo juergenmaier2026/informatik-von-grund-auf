@@ -1,0 +1,233 @@
+\chapter*{Vorwort: Was nicht da ist}
+\addcontentsline{toc}{chapter}{Vorwort}
+\markboth{Vorwort}{Vorwort}
+
+\textbf{Die meisten Sprachen erklärt man über das, was sie können.} \kursiv{Go erklärt man über das, was es weglässt. Jede Auslassung war eine Entscheidung mit einer Begründung --- und über sie zu streiten ist lehrreicher als über jede vorhandene Eigenschaft.}
+
+\begin{merksatz}
+\boxtitel{Acht Auslassungen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{3.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Fehlt} & \textbf{Begründung} & \textbf{Ersatz}\\
+\midrule
+Ausnahmen & \textbf{Fehlerpfad sichtbar} & \textbf{Rückgabewert}\\
+Vererbung & \textcolor{akzent}{Hierarchien altern schlecht} & \textbf{Zusammen\-setzung}\\
+Klassen & Methoden reichen & Typ mit Methoden\\
+Konstruktoren & \textbf{Nullwert brauchbar} & \textcolor{gruen}{Kap.~\ref{kap:nullwert}}\\
+Makros & \textcolor{akzent}{Band 21, Kap.~9} & keiner\\
+Operator\-überladung & \textbf{Lesbarkeit} & keiner\\
+Implizite Um\-wandlung & \textcolor{akzent}{Band 21, Kap.~8} & ausdrücklich\\
+Generizität bis 2022 & \textcolor{akzent}{\textbf{Zeit gebraucht}} & \textcolor{gruen}{seither da}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei dieser Auslassungen sind unmittelbare Antworten auf Erfahrungen aus Band 21 --- Makros, implizite Umwandlung und die stillen Fehlerpfade. Die letzte Zeile zeigt, dass eine Auslassung auch zurückgenommen werden kann, wenn man zwölf Jahre über die richtige Form nachgedacht hat.}
+\end{minipage}
+\end{center}
+
+\textbf{Der gemeinsame Nenner.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.4cm}@{}}
+\toprule
+\textbf{Die Leitfrage} & Was kostet dieses Sprachmittel den \kursiv{Leser}?\\
+\textbf{Die Antwort} & \textbf{Wenn mehr, als es dem Schreiber nützt: weglassen}\\
+\textbf{Die Folge} & Eine kleine Sprache, die man in zwei Tagen kennt\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist eine ungewöhnliche Gewichtung, und sie folgt aus einer Beobachtung, die Band 20 beziffert hat: Man liest anderthalbmal so viel, wie man schreibt. Wer für den Leser entwirft, entwirft für die häufigere Tätigkeit.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Was das Weglassen kostet}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Auslassung} & \textbf{Preis} & \\
+\midrule
+Keine Ausnahmen & \textcolor{akzent}{\textbf{viel \code{if err != nil}}} & \textbf{Wiederholung}\\
+Keine Vererbung & Umstellung nötig & \textcolor{mittel}{Gewöhnung}\\
+Keine Überladung & \code{Add}, \code{AddInt}, \code{AddAll} & \textcolor{akzent}{Namenswucher}\\
+Lange ohne Generizität & \textcolor{akzent}{\textbf{Code verdoppelt}} & \textcolor{gruen}{behoben}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\medskip
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die meistgenannte Kritik an Go, und sie ist berechtigt: Der Fehlerpfad ist sichtbar, weil er ausgeschrieben wird --- und das sind viele Zeilen. Kapitel~\ref{kap:fehler} rechnet aus, wie viele, und stellt die Frage, ob der Handel sich lohnt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Dieser Band verteidigt Go nicht. Er nimmt jede Auslassung ernst, nennt den Preis und lässt den Leser urteilen --- so wie Band 21 die Kosten von C aufgeschrieben hat, ohne sie zu beschönigen.}
+\end{center}
+\end{warnung}
+
+\begin{merksatz}
+\boxtitel{Der dritte Pol}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.4cm}P{1.8cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Python} & \textbf{C} & \textbf{Go}\\
+\midrule
+Zeigt & \textbf{was man ausdrücken kann} & \textbf{was geschieht} & \textbf{was man weglässt}\\
+Speicher & \textcolor{gruen}{verwaltet} & \textcolor{akzent}{selbst} & \textcolor{gruen}{verwaltet}\\
+Zeitschranken & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}} & \textcolor{akzent}{nein}\\
+Nebenläufigkeit & \textcolor{akzent}{angeflanscht} & \textcolor{akzent}{Hand\-arbeit} & \textcolor{gruen}{\textbf{Entwurfs\-gegenstand}}\\
+Sprachumfang & groß & klein & \textcolor{gruen}{\textbf{sehr klein}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist der sachliche Grund für diesen Band: Nebenläufigkeit ist in Python angeflanscht und in C Handarbeit mit Fußangeln. In Go ist sie das, worum die Sprache herum entworfen wurde --- und deshalb lässt sie sich hier ohne schlechte Beispiele erklären.}
+\end{minipage}
+\end{center}
+
+\textbf{Das Vorhaben, fortgesetzt.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{6.2cm}@{}}
+\toprule
+\textbf{Der Bestandteil} & Die Übertragungsschicht zwischen Gerät und Klinik\\
+\textbf{Warum passt Go} & \textbf{Viele gleichzeitige Verbindungen, weiche Schranken}\\
+\textbf{Was hinzukommt} & Netz, Ausfälle, Gegendruck, Abbruch\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist der Bestandteil, den Band 21, Kapitel~14 an Go verwiesen hat. Tausend Geräte, die gleichzeitig Messwerte senden, ein Netz, das ausfällt, und ein Empfänger, der langsamer ist als die Sender --- die Aufgabe, für die Go gebaut wurde.}
+\end{center}
+\end{merksatz}
+
+\section*{Was dieses Buch will}
+
+\textbf{Erstens: die Auslassungen begründen und ihren Preis nennen.}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zu jeder fehlenden Eigenschaft gehört die Frage, was man dafür bekommt und was man dafür bezahlt. Wer nur den Gewinn nennt, betreibt Werbung; wer nur den Preis nennt, hat nicht verstanden, worum es ging.}
+\end{minipage}
+\end{center}
+
+\textbf{Zweitens: Nebenläufigkeit richtig lehren.}
+
+Goroutinen sind billig, und genau deshalb ist es leicht, Millionen davon falsch zu benutzen. Kapitel~\ref{kap:schiefgeht} behandelt die drei Fehlerklassen, die dabei entstehen --- und alle drei sind in Go leichter zu machen als in C.
+
+\textbf{Drittens: sagen, wann Go nicht passt.}
+
+\begin{center}
+\kursiv{Die Speicherbereinigung schließt harte Zeitschranken aus. Das ist keine Kleinigkeit, sondern eine Grenze --- und Kapitel~\ref{kap:wann} nennt sie zusammen mit den anderen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Drei Warnungen}
+\textbf{Erstens: Einfach ist nicht dasselbe wie leicht.}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Go hat wenige Sprachmittel, und daraus folgt nicht, dass Programme einfach werden. Die Komplexität der Aufgabe verschwindet nicht --- sie wandert aus der Sprache in den Code. Ob das besser ist, entscheidet sich am Einzelfall.}
+\end{minipage}
+\end{center}
+
+\textbf{Zweitens: Goroutinen sind nicht kostenlos.}
+
+Sie sind billig --- einige Kilobyte statt einiger Megabyte --- und billig ist nicht null. Eine Goroutine, die nie endet, ist ein Leck, und Lecks dieser Art sind schwerer zu finden als Speicherlecks in C.
+
+\textbf{Drittens: Der Formatierer beendet Stildiskussionen, nicht Entwurfsdiskussionen.}
+
+\begin{center}
+\kursiv{\code{gofmt} legt fest, wie Code aussieht, und sagt nichts darüber, ob er gut ist. Alles aus Band 20 --- Zerlegung, Benennung, Datenmodell --- bleibt zu tun.}
+\end{center}
+\end{warnung}
+
+\section*{Zum Aufbau}
+
+\begin{itemize}
+\item \textbf{Teil I} (Kap.\ 1--3): Die Auslassungen. Warum sie fehlen, \textbf{Fehler als Werte}, Schnittstellen.
+\item \textbf{Teil II} (Kap.\ 4--6): Nebenläufigkeit. Goroutinen, Kanäle, \textbf{wo es schiefgeht}.
+\item \textbf{Teil III} (Kap.\ 7--9): Der Entwurf. Pakete, Zusammensetzung, \textbf{der Nullwert}.
+\item \textbf{Teil IV} (Kap.\ 10--12): Das Handwerk. Werkzeuge, Prüfen, \textbf{Leistung}.
+\item \textbf{Teil V} (Kap.\ 13--15): Das Urteil. Der zweite Entwurf, \textbf{wann Go}, der Stand 2026.
+\end{itemize}
+
+\begin{geschichte}
+\boxtitel{Eine Sprache gegen einen Bauvorgang}
+Go entstand nicht aus einer Idee über Sprachen, sondern aus einem Ärgernis.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.4cm}@{}}
+\toprule
+\textbf{Der Anlass} & Ein Bauvorgang, der bei einem großen Anbieter \textbf{fünfundvierzig Minuten} dauerte\\
+\textbf{Die Ursache} & Kopfdateien, die einander einschließen --- Band 21, Kap.~11\\
+\textbf{Die Entscheidung} & \textbf{Eine Sprache, deren Abhängigkeiten ein Graph ohne Zyklen sind}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Aus dieser einen Anforderung folgen mehrere Sprachentscheidungen: keine Kopfdateien, keine zirkulären Einschlüsse, ein Übersetzer, der jede Datei genau einmal liest. Der Bauvorgang dauert seither Sekunden statt Minuten.}
+\end{minipage}
+\end{center}
+
+\textbf{Was daraus noch folgte.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Entscheidung} & \textbf{Folge} & \\
+\midrule
+Keine Kopfdateien & \textcolor{gruen}{\textbf{schneller Bau}} & \\
+Unbenutzte Einschlüsse sind Fehler & \textcolor{gruen}{sauber} & \textcolor{akzent}{\textbf{lästig beim Probieren}}\\
+Ein Formatierer & \textcolor{gruen}{keine Stildebatten} & \\
+Alles in einer Binärdatei & \textcolor{gruen}{\textbf{einfache Auslieferung}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die zweite Zeile ist die umstrittenste: Ein nicht benutzter Einschluss ist kein Hinweis, sondern ein Übersetzungsfehler. Beim Probieren ist das lästig; im Bestand hält es die Abhängigkeiten sauber. Man kann beides für richtig halten, und darüber lohnt der Streit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Bemerkenswert ist die Herkunft: Nicht eine Theorie über Sprachen, sondern die Erfahrung mit einem großen Bestand hat die Entscheidungen bestimmt. Das erklärt, warum Go dort überzeugt, wo es um viele Zeilen und viele Beteiligte geht --- und weniger dort, wo es um Ausdrucksstärke geht.}
+\end{center}
+\end{geschichte}
+
+\bigskip
+\begin{flushright}
+\itshape\color{grau}
+Eine Eigenschaft wegzulassen ist eine Entscheidung,\\
+die man begründen muss.\\
+Eine hinzuzufügen auch ---\\
+nur verlangt das niemand.\\[10pt]
+\normalfont\color{grau}\upshape
+--- der Leitgedanke dieses Bandes.\\
+\itshape Was fehlt, sieht man sofort.\\
+Was zu viel ist, merkt man erst nach Jahren.
+\end{flushright}

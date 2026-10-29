@@ -1,0 +1,179 @@
+\chapter{Die Meldung ohne Zusammenhang}\label{fall:meldung}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Übertragung, Go. Fehlerbehandlung entlang der Verarbeitungskette.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func verarbeite(b Block) error \{}\\
+\code{\ \ \ \ w, err := entpacke(b)}\\
+\code{\ \ \ \ if err != nil \{ return err \}}\\
+\code{\ \ \ \ if err := pruefe(w); err != nil \{ return err \}}\\
+\code{\ \ \ \ if err := speichere(w); err != nil \{ return err \}}\\
+\code{\ \ \ \ return nil}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Zeilen, jeder Fehler geprüft, keiner verschluckt. Nach den Maßstäben aus Band 22, Kapitel~2 ist das die korrekte Form --- der Fehlerpfad ist ausgeschrieben und vollständig.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Was im Protokoll ankommt.}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\code{ERROR uebertragung: unexpected EOF}
+\end{minipage}
+\end{center}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Beantwortet?} & \\
+\midrule
+Welches Gerät? & \textcolor{akzent}{\textbf{nein}} & \\
+Welcher Block? & \textcolor{akzent}{nein} & \\
+Welcher Schritt? & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{drei kommen infrage}\\
+Wie oft? & \textcolor{mittel}{zählbar} & \\
+Was tun? & \textcolor{akzent}{\textbf{nein}} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei blanke \code{return err} --- und am Ende steht eine Meldung, die nichts sagt. Der Fehler wurde korrekt behandelt und sein Zusammenhang unterwegs verloren. Band 22, Kapitel~2: Die Kette muss gepflegt werden, sonst gibt es keine.}
+\end{minipage}
+\end{center}
+
+\textbf{Was die Aufklärung kostete.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Schritt} & \textbf{Dauer} & \\
+\midrule
+Meldung gesichtet & $5$ min & \\
+Code gelesen & $40$ min & \textcolor{akzent}{drei Kandidaten}\\
+Zusatzausgaben eingebaut & $\mathbf{2}$ h & \\
+Bereitgestellt, gewartet & \textcolor{akzent}{$\mathbf{2}$ \textbf{Tage}} & \textcolor{akzent}{\textbf{Fehler ist selten}}\\
+Ursache gefunden & $20$ min & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Zwei Tage Wartezeit, weil der Fehler etwa einmal täglich auftritt und die zusätzlichen Ausgaben erst nach einer Bereitstellung wirkten. Mit Zusammenhang in der Meldung wäre die Aufklärung in fünf Minuten erledigt gewesen.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func verarbeite(b Block) error \{}\\
+\code{\ \ \ \ w, err := entpacke(b)}\\
+\code{\ \ \ \ if err != nil \{}\\
+\code{\ \ \ \ \ \ \ \ return fmt.Errorf("entpacken \%s/\%d: \%w",}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ b.Geraet, b.Folge, err)}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ if err := pruefe(w); err != nil \{}\\
+\code{\ \ \ \ \ \ \ \ return fmt.Errorf("pruefen \%s/\%d: \%w",}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ b.Geraet, b.Folge, err)}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ ...}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Ergebnis im Protokoll: \code{uebertragung: entpacken A17/48213: unexpected EOF}. Wo, für wen, welcher Schritt, welche Ursache --- in einer Zeile. Das \code{\%w} erhält den ursprünglichen Fehler, sodass \code{errors.Is} weiterhin greift.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{1.8cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen & $7$ & $\mathbf{19}$ & $+171\,\%$\\
+Aufklärungsdauer & \textcolor{akzent}{$\mathbf{2}$ \textbf{Tage}} & \textcolor{gruen}{$\approx\mathbf{5}$ \textbf{min}} & \\
+Fehler je Woche & $\approx7$ & $\approx7$ & \textcolor{gruen}{gleich}\\
+Nach Ursache filterbar & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}} & \\
+Aufwand & --- & $\mathbf{1}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwölf zusätzliche Zeilen --- fast dreimal so lang. Das ist der meistgenannte Vorwurf gegen die Fehlerbehandlung in Go, und er trifft zu. Die zweite Zeile ist die Gegenrechnung: zwei Tage gegen fünf Minuten, bei einem Fehler, der wöchentlich auftritt.}
+\end{minipage}
+\end{center}
+
+\textbf{Was in die Meldung gehört.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Angabe} & \textbf{Aufnehmen?} & \\
+\midrule
+Schritt & \textcolor{gruen}{\textbf{ja}} & \\
+Kennungen & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{Gerät, Folge}\\
+Ursprünglicher Fehler & \textcolor{gruen}{ja} & \code{\%w}\\
+\textbf{Messwerte} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Band 19, Kap.~6}}\\
+Patienten\-kennung & \textcolor{akzent}{nein} & \textcolor{akzent}{Protokolle wandern}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzten beiden Zeilen sind die Grenze: Kennungen ja, Inhalte nein. Ein Protokoll wandert in Auswertungssysteme mit anderen Zugriffsrechten, und ein Kaliumwert in einer Fehlerzeile ist eine Offenlegung.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Jeden Fehler anreichern} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Kette wird Roman}}\\
+\enquote{Hilfsfunktion dafür} & \textcolor{akzent}{nein} & \textbf{versteckt den Pfad}\\
+\enquote{Ausnahmen wären besser} & \textcolor{mittel}{\textbf{vertretbar}} & \textbf{andere Abwägung}\\
+\textbf{\enquote{Zusammenhang hinzufügen, wo er neu ist}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die Übertreibung: Wer auf jeder Ebene anreichert, bekommt Meldungen mit acht Gliedern, in denen dieselbe Kennung fünfmal steht. Die Regel lautet: Zusammenhang hinzufügen, wo man etwas weiß, das die tiefere Ebene nicht wusste.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die einzige Stelle in diesem Band, an der ich ein anderes Urteil ausdrücklich für vertretbar halte: Mit Ausnahmen und Ablaufverfolgung hätte man denselben Zusammenhang ohne zwölf Zeilen bekommen --- und dafür die Nachteile aus Band 22, Kapitel~1 eingehandelt.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Kernighan und Pike\zit{16} behandeln Mel\-dun\-gen als Teil des Hand\-werks; Hunt und Thomas\zit{15} verbinden sie mit der Hal\-tung zum eigenen Bestand.

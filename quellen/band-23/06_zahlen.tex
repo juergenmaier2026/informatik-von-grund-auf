@@ -1,0 +1,293 @@
+\chapter{Zahlen}\label{kap:zahlen}
+
+\begin{merksatz}
+\boxtitel{Was eine Zahl an der Naht braucht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Angabe} & \textbf{Ohne sie} & \\
+\midrule
+\textbf{Betrag} & --- & \\
+\textbf{Einheit} & \textcolor{akzent}{\textbf{mg/dl oder mmol/l?}} & \textcolor{akzent}{Faktor $\approx18$}\\
+\textbf{Genauigkeit} & \textcolor{akzent}{Stellen erfunden} & \textbf{Kap.~\ref{kap:vertraege}}\\
+Bezugsgröße & \textcolor{akzent}{\enquote{pro was}} & \\
+Nachweisgrenze & \textcolor{akzent}{\textbf{\enquote{$<0{,}1$} als $0{,}1$}} & \textcolor{akzent}{\textbf{Band 20, Kap.~2}}\\
+Messunsicherheit & \textcolor{mittel}{selten übertragen} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der klassische Fall: Glukose wird in Deutschland in mg/dl und in vielen Ländern in mmol/l angegeben --- der Umrechnungsfaktor ist etwa achtzehn. Ein Wert ohne Einheit ist in der Klinik keine Information, sondern eine Gefahr.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Einheit gehört zum Wert.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Bauform} & \textbf{Trennbar?} & \\
+\midrule
+Zwei Felder & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{eines geht verloren}\\
+Einheit implizit & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{\textbf{steht nirgends}}\\
+Ein Verbund & \textcolor{gruen}{\textbf{nein}} & \textcolor{gruen}{\textbf{Band 21, Kap.~5}}\\
+Eigener Typ je Größe & \textcolor{gruen}{nein} & \textcolor{gruen}{Übersetzer prüft}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte und vierte Zeile machen den Fehler unmöglich statt unwahrscheinlich --- derselbe Leitgedanke wie in Band 19 und 21. Ein Typ \code{Konzentration}, der nur mit Einheit erzeugt werden kann, lässt sich nicht versehentlich als bloße Zahl behandeln.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Der Fall aus dem Vorwort, aufgelöst}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.0cm}@{}}
+\toprule
+\textbf{Gesendet} & \code{\{betrag: 51, exponent: -1, einheit: "mmol/L"\}}\\
+\textbf{Bedeutet} & $5{,}1$ mmol/l\\
+\textbf{Prüfung 1} & \textbf{Einheit passt zur Messgröße?} --- ja\\
+\textbf{Prüfung 2} & \textbf{Wert im Bereich $0$ bis $20$?} --- ja\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Hätte der Empfänger den Exponenten ignoriert, wäre der Wert $51$ --- und Prüfung 2 hätte ihn zurückgewiesen. Zwei Prüfungen, von denen jede einzeln den Fall verhindert hätte, und keine davon war vorhanden.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist die Lehre des Kapitels: Plausibilitätsgrenzen an der Naht kosten wenige Zeilen und fangen genau die Fehler ab, die aus Missverständnissen über die Darstellung entstehen.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Gleitkomma über die Naht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Problem} & \textbf{Wirkung} & \\
+\midrule
+$0{,}1$ nicht darstellbar & \textcolor{akzent}{Rundung} & \textbf{Band 21, Kap.~8}\\
+JSON kennt nur \code{double} & \textcolor{akzent}{\textbf{$\mathbf{2^{53}}$ Grenze}} & \textcolor{akzent}{\textbf{große Kennungen}}\\
+Textausgabe rundet & \textcolor{akzent}{Stellen verloren} & \\
+Verschiedene Rundungsregeln & \textcolor{akzent}{\textbf{$0{,}5$ auf oder ab}} & \textcolor{akzent}{je Sprache}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile trifft häufiger, als man denkt: Eine Kennung mit neunzehn Stellen passt in ein \code{int64} und nicht in eine JSON-Zahl. Viele Umsetzungen wandeln sie stillschweigend in \code{double} --- und die letzten Stellen sind fort.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Abhilfe ist so einfach wie unbeliebt: Kennungen werden als Zeichenkette übertragen. Sie werden nie berechnet, also verliert man nichts --- und gewinnt Eindeutigkeit.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Rundung ist eine fachliche Entscheidung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Regel bei $0{,}5$} & \textbf{Ergebnis} & \\
+\midrule
+Kaufmännisch & $\mathbf{1}$ & \textbf{verbreitet}\\
+Zur geraden Zahl & $\mathbf{0}$ & \textcolor{gruen}{IEEE-Voreinstellung}\\
+Immer abwärts & $0$ & \\
+\midrule
+Nach $10^6$ Werten & \textcolor{akzent}{Abweichung} & \textcolor{akzent}{\textbf{systematisch}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die ersten drei Zeilen liefern verschiedene Ergebnisse, und alle drei sind zulässig. Kaufmännisches Runden verschiebt Mittelwerte systematisch nach oben; die IEEE-Regel tut das nicht. Bei einer Million Messwerten ist der Unterschied messbar.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb gehört die Rundungsregel in den Vertrag --- und die Rundung selbst an genau eine Stelle. Wer an drei Stellen rundet, rundet dreimal, und das Ergebnis hängt von der Reihenfolge ab.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Legen Sie Plausibilitätsgrenzen fest.
+\item Rechnen Sie Einheiten um.
+\item Bestimmen Sie, wo gerundet wird.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Plausibilitätsgrenzen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Referenz} & \textbf{Kritisch} & \textbf{Möglich}\\
+\midrule
+Kalium & $3{,}5$--$5{,}1$ & $<2{,}5$, $>6{,}5$ & $\mathbf{1}$--$\mathbf{10}$\\
+Natrium & $135$--$145$ & $<120$, $>160$ & $90$--$190$\\
+Glukose & $70$--$100$ & $<40$, $>400$ & $10$--$1500$\\
+Temperatur & $36$--$37{,}5$ & $<35$, $>40$ & $\mathbf{20}$--$\mathbf{45}$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei Stufen, drei Zwecke. Der Referenzbereich sagt \enquote{auffällig}, der kritische Bereich \enquote{sofort handeln}, und die letzte Spalte sagt \enquote{das kann kein Messwert sein}. Nur die letzte ist eine Prüfung an der Naht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.2cm}@{}}
+\toprule
+\textbf{Bei Über\-schreitung} & \textbf{Vorgehen} & \\
+\midrule
+Referenzbereich & \textbf{Warnung} & \textcolor{gruen}{fachlich}\\
+Kritisch & \textbf{Sofort\-meldung} & \\
+\textbf{Möglich} & \textcolor{akzent}{\textbf{zurückweisen}} & \textcolor{akzent}{\textbf{Fehler, kein Befund}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile beseitigt die Fehlerklasse aus dem Vorwort. Ein Kalium von $51$ liegt außerhalb des Möglichen --- der Wert wird nicht gespeichert, sondern gemeldet, und zwar als technischer Fehler an den Betrieb, nicht als Befund an die Station.}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Der Aufwand: eine Tabelle mit drei Spalten je Messgröße, gepflegt vom Labor. Etwa vierhundert Zeilen Daten für ein vollständiges Repertoire --- und keine Zeile Code über die Prüfung hinaus.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{(b) Einheiten umrechnen.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{Glukose: mg/dl -> mmol/l}\\
+\code{Faktor = 1 / (Molmasse / 10) = 1 / 18{,}016}\\
+\code{100 mg/dl = 5{,}55 mmol/l}
+\end{minipage}
+\end{center}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Folge} & \\
+\midrule
+Faktor stoffabhängig & \textbf{je Messgröße} & \textcolor{akzent}{keine allgemeine Regel}\\
+Nicht ganzzahlig & \textcolor{akzent}{\textbf{Rundung}} & \\
+Nicht umkehrbar & \textcolor{akzent}{\textbf{hin und zurück $\ne$ Original}} & \textcolor{akzent}{\textbf{Stellen verloren}}\\
+Genauigkeit ändert sich & \textbf{mitzuführen} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der Grund für die wichtigste Regel dieses Abschnitts: Der ursprüngliche Wert wird gespeichert, wie er gemessen wurde. Umgerechnet wird bei der Anzeige --- nie beim Speichern.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Wer beim Eintreffen umrechnet, hat den Originalwert verloren. Wenn sich später herausstellt, dass der Faktor falsch war oder eine andere Einheit gewünscht wird, ist der Bestand nicht mehr zu retten.}
+\end{center}
+
+\medskip
+\textbf{(c) Wo gerundet wird.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{3.0cm}@{}}
+\toprule
+\textbf{Stelle} & \textbf{Runden?} & \\
+\midrule
+Messgerät & \textcolor{gruen}{\textbf{ja}} & \textbf{Messgenauigkeit}\\
+Übertragung & \textcolor{akzent}{\textbf{nie}} & \textcolor{akzent}{nur durchreichen}\\
+Speicherung & \textcolor{akzent}{\textbf{nie}} & \textcolor{gruen}{wie gemessen}\\
+Rechnung & \textcolor{akzent}{nein} & \textcolor{gruen}{volle Genauigkeit}\\
+Anzeige & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{einmal, am Ende}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zweimal runden, am Anfang und am Ende --- dazwischen nie. Das ist eine der wenigen Regeln dieses Bandes, die ohne Ausnahme gilt, und sie wird in gewachsenen Systemen regelmäßig an vier Stellen verletzt.}
+\end{minipage}
+\end{center}
+
+\textbf{Was mehrfaches Runden anrichtet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Schritte} & \textbf{Ergebnis} & \textbf{Abweichung} & \\
+\midrule
+Einmal am Ende & $\mathbf{4{,}83}$ & --- & \\
+Nach jedem Schritt & $4{,}80$ & $0{,}6\,\%$ & \\
+Bei $10$ Schritten & $\mathbf{4{,}71}$ & \textcolor{akzent}{$\mathbf{2{,}5\,\%}$} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Zweieinhalb Prozent Abweichung durch nichts als Rundung an den falschen Stellen. Bei einem Kaliumwert nahe der Grenze entscheidet das darüber, ob eine Warnung erscheint --- und niemand kann es später nachvollziehen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Genauigkeit ist eine Aussage}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+\textbf{Angabe} & \textbf{Bedeutet} & \\
+\midrule
+$4{,}2$ & \textbf{eine Nachkommastelle} & \textcolor{gruen}{so gemessen}\\
+$4{,}20$ & \textbf{zwei} & \textcolor{gruen}{genauer gemessen}\\
+$4{,}2000$ & \textcolor{akzent}{vier} & \textcolor{akzent}{\textbf{Genauigkeit erfunden}}\\
+$4{,}2$ als \code{double} & \textcolor{akzent}{\textbf{unbekannt}} & \textcolor{akzent}{Information fort}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile entsteht, wenn ein Programm eine feste Formatierung anwendet: Aus $4{,}2$ wird $4{,}2000$, und der Leser hält den Wert für genauer, als er ist. Das ist keine Formatierungsfrage, sondern eine fachliche Falschaussage.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist der Grund für den Verbund aus Betrag und Exponent: Er trägt die Genauigkeit mit, ein \code{double} nicht. Band 21, Kapitel~8 hat das begründet; hier ist es eine Anforderung an die Naht.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Die Gleit\-kom\-ma\-norm\zit{13} legt Dar\-stel\-lung und Run\-dungs\-re\-geln fest; Goldberg\zit{10} erklärt ihre Folgen; Wirth\zit{26} erinnert daran, dass die Wahl der Dar\-stel\-lung vor der Rech\-nung kommt.

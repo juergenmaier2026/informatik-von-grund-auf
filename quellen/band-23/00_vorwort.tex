@@ -1,0 +1,236 @@
+\chapter*{Vorwort: Die Nähte}
+\addcontentsline{toc}{chapter}{Vorwort}
+\markboth{Vorwort}{Vorwort}
+
+\textbf{Drei Bände haben gezeigt, wie man in einer Sprache gut arbeitet.} \kursiv{Dieser handelt davon, was geschieht, wenn drei solche Teile zusammengefügt werden --- und warum die Fehler dann fast alle an den Nähten sitzen.}
+
+\begin{merksatz}
+\boxtitel{Was an der Naht schiefgeht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{3.0cm}P{2.4cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Wenn unbeantwortet} & \\
+\midrule
+Welcher Zeitpunkt? & \textcolor{akzent}{\textbf{Verläufe falsch}} & \textbf{Kap.~\ref{kap:zeit}}\\
+Welche Zeitzone? & \textcolor{akzent}{Stunden verschoben} & \\
+Welche Kodierung? & \textcolor{akzent}{\textbf{Namen zerstört}} & Kap.~\ref{kap:text}\\
+Welche Genauigkeit? & \textcolor{akzent}{Stellen erfunden} & Kap.~\ref{kap:zahlen}\\
+Wer wiederholt? & \textcolor{akzent}{\textbf{Werte doppelt}} & Kap.~\ref{kap:fehler}\\
+Was bei Ausfall? & \textcolor{akzent}{stiller Verlust} & Kap.~\ref{kap:ausfall}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Fragen, und keine davon ist eine Sprachfrage. Sie stellen sich zwischen einem C-Programm und einem Go-Programm genauso wie zwischen zwei Python-Modulen --- nur fallen sie dort seltener auf, weil beide Seiten dieselben Voreinstellungen mitbringen.}
+\end{minipage}
+\end{center}
+
+\textbf{Wo die Fehler tatsächlich sitzen.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Ort} & \textbf{Anteil} & \\
+\midrule
+Innerhalb eines Bestandteils & $\approx35\,\%$ & \textbf{Bände 20--22}\\
+\textbf{An den Nähten} & \textcolor{akzent}{$\approx\mathbf{45\,\%}$} & \textcolor{akzent}{\textbf{dieser Band}}\\
+Im Betrieb & $\approx20\,\%$ & Kap.~\ref{kap:ausfall}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Fast die Hälfte der Fehler eines zusammengesetzten Systems entsteht dort, wo niemand zuständig ist --- zwischen zwei Bestandteilen, für die je ein anderes Team die Verantwortung trägt. Das ist keine Nachlässigkeit, sondern eine Folge der Aufteilung.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Irrtum, der diesen Band nötig macht}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Annahme} & \textbf{Zutreffend?} & \\
+\midrule
+Ein Aufruf über die Naht ist wie ein Aufruf im Programm & \textcolor{akzent}{\textbf{nein}} & \textbf{Kap.~\ref{kap:naht}}\\
+Er kommt an & \textcolor{akzent}{nein} & \\
+Er kommt einmal an & \textcolor{akzent}{\textbf{nein}} & \\
+Er kommt in der Reihenfolge an & \textcolor{akzent}{nein} & \\
+Er dauert etwa gleich lange & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Kap.~\ref{kap:messen}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein Funktionsaufruf innerhalb eines Programms erfüllt alle fünf Annahmen. Ein Aufruf über eine Naht erfüllt keine einzige --- und der Entwurf, der so tut, als wäre es dasselbe, bricht bei der ersten Netzstörung.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Dieser Irrtum ist so alt wie die verteilte Programmierung und so verbreitet wie eh. Er hat einen Namen, eine Literatur und eine Liste von acht Trugschlüssen --- Kapitel~\ref{kap:naht} geht sie durch.}
+\end{center}
+\end{warnung}
+
+\begin{merksatz}
+\boxtitel{Was dieser Band voraussetzt}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Band 20} & Der zweite Entwurf --- Zerlegung, Prüfen, Aufhören\\
+\textbf{Band 21} & \textbf{Was darunter liegt --- Speicher, Zahlen, Grenzen}\\
+\textbf{Band 22} & Die Kunst des Weglassens --- Nebenläufigkeit, Nähte in Go\\
+\midrule
+\textbf{Hier} & \textbf{Was gilt, wenn keine Sprache mehr die Antwort gibt}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die Klammer: Zeit, Text, Zahlen, Fehler und Ausfall müssen durch jede Naht hindurch --- und keine Sprache beantwortet, in welcher Form. Das entscheidet, wer die Naht entwirft.}
+\end{minipage}
+\end{center}
+
+\textbf{Das Vorhaben, vollständig.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.2cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+\textbf{Bestandteil} & \textbf{Sprache} & \textbf{Merkmal} & \textbf{Band}\\
+\midrule
+Messerfassung & \textbf{C} & $2$ ms hart & $21$\\
+Übertragung & \textbf{Go} & $1000$ Verb. & $22$\\
+Speicherung & \textbf{SQL} & Historie & $12$\\
+Auswertung & \textbf{Python} & Fachlogik & $20$\\
+Oberfläche & Web & --- & $18$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Fünf Bestandteile, vier Nähte, und jede Naht ist ein Ort, an dem ein Messwert seine Bedeutung verlieren kann. Der Band folgt einem Kaliumwert von der Messung bis zur Warnung und fragt an jeder Naht, was ihm zustoßen kann.}
+\end{center}
+\end{merksatz}
+
+\section*{Was dieses Buch will}
+
+\textbf{Erstens: die Naht zum Entwurfsgegenstand machen.}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{In den meisten Vorhaben entsteht eine Schnittstelle nebenbei --- jemand braucht Daten, jemand liefert sie, und das Format ist, was gerade herauskam. Dieser Band behandelt sie als das, was sie ist: die langlebigste Entscheidung des ganzen Systems.}
+\end{minipage}
+\end{center}
+
+\textbf{Zweitens: die Größen benennen, die durch jede Naht müssen.}
+
+Zeitpunkt, Zeitzone, Kodierung, Einheit, Genauigkeit, Kennung. Sechs Größen, die in jedem Bestandteil anders dargestellt sind --- und deren Umrechnung an der Naht stattfindet oder gar nicht.
+
+\textbf{Drittens: sagen, wann man nicht teilen sollte.}
+
+\begin{center}
+\kursiv{Jede Naht kostet. Kapitel~\ref{kap:teilen} rechnet nach, was ein zusätzlicher Bestandteil an Aufwand, Fehlern und Verzögerung mit sich bringt --- und wann ein einziges Programm die bessere Antwort ist.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Drei Warnungen}
+\textbf{Erstens: Aufteilen löst keine Entwurfsprobleme.}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein schlecht geschnittenes Programm wird durch Aufteilen zu einem schlecht geschnittenen System --- mit denselben Abhängigkeiten, nun über das Netz. Die Zerlegungsfrage aus Band 17 kommt vor der Verteilungsfrage.}
+\end{minipage}
+\end{center}
+
+\textbf{Zweitens: Die Naht überlebt die Bestandteile.}
+
+Ein Datenformat, das zwanzig Bestandteile benutzen, lässt sich nicht mehr ändern. Man kann jeden Bestandteil neu schreiben; das Format bleibt. Deshalb verdient es die Sorgfalt, die man sonst dem Code widmet.
+
+\textbf{Drittens: Der Betrieb ist Teil des Entwurfs.}
+
+\begin{center}
+\kursiv{Ein System, das man im Betrieb nicht befragen kann, ist nicht fertig entworfen. Kapitel~\ref{kap:beobachtbarkeit} behandelt das als Entwurfsfrage, nicht als nachträgliche Zutat.}
+\end{center}
+\end{warnung}
+
+\section*{Zum Aufbau}
+
+\begin{itemize}
+\item \textbf{Teil I} (Kap.\ 1--3): Das Werk als Ganzes. Programm gegen Werk, \textbf{die Naht}, Verträge.
+\item \textbf{Teil II} (Kap.\ 4--6): Über die Grenze. \textbf{Zeit}, Text, Zahlen.
+\item \textbf{Teil III} (Kap.\ 7--9): Leistung im Großen. Messen, \textbf{wo die Zeit hingeht}, Zwischenspeicher.
+\item \textbf{Teil IV} (Kap.\ 10--12): Der Betrieb. Fehler, \textbf{Beobachtbarkeit}, Ausfall.
+\item \textbf{Teil V} (Kap.\ 13--15): Das Urteil. Der zweite Entwurf, \textbf{wann teilen}, der Stand 2026.
+\end{itemize}
+
+\begin{geschichte}
+\boxtitel{Ein Kaliumwert von 5{,}1}
+Ein Laborgerät misst Kalium und meldet $5{,}1$. Der Wert erreicht die Station als $51$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Das Gerät} & Sendet ganzzahlig in Einheiten der letzten Stelle: $51$\\
+\textbf{Die Naht} & \textbf{Der Exponent stand in einem Feld, das niemand las}\\
+\textbf{Der Empfänger} & Nahm den Wert als Zahl und zeigte $51$ an\\
+\textbf{Der Bereich} & $3{,}5$ bis $5{,}1$ --- also \enquote{stark erhöht}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Beide Programme sind richtig. Das Gerät sendet, was vereinbart war; der Empfänger liest, was er versteht. Der Fehler sitzt in der Naht --- in einer Vereinbarung, die einer der beiden Seiten nicht bekannt war.}
+\end{minipage}
+\end{center}
+
+\textbf{Was den Fall verhindert hätte.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Aufwand} & \textbf{Wirkung}\\
+\midrule
+Einheit mitsenden & \textcolor{gruen}{gering} & \textcolor{gruen}{Prüfung möglich}\\
+\textbf{Wert und Exponent als ein Feld} & \textcolor{gruen}{\textbf{gering}} & \textcolor{gruen}{\textbf{untrennbar}}\\
+Plausibilitätsgrenze & \textcolor{gruen}{gering} & \textcolor{gruen}{$51$ ist unmöglich}\\
+Gemeinsames Schema & mittel & \textcolor{gruen}{beide prüfen}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die dritte Zeile ist die billigste und wird am häufigsten unterlassen: Ein Kaliumwert von einundfünfzig ist mit dem Leben nicht vereinbar. Eine Grenzprüfung an der Naht hätte den Wert zurückgewiesen, statt ihn anzuzeigen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Fall ist erfunden und in seiner Bauart alltäglich. Er zeigt, worum es in diesem Band geht: Nicht darum, besseren Code zu schreiben, sondern darum, die Vereinbarungen zwischen gutem Code zu entwerfen.}
+\end{center}
+\end{geschichte}
+
+\bigskip
+\begin{flushright}
+\itshape\color{grau}
+Ein Programm kann man neu schreiben.\\
+Eine Naht muss man aushandeln ---\\
+mit allen, die daran hängen.\\[10pt]
+\normalfont\color{grau}\upshape
+--- der Leitgedanke dieses Bandes.\\
+\itshape Deshalb ist die Naht die teuerste Entscheidung\\
+und bekommt die geringste Aufmerksamkeit.
+\end{flushright}

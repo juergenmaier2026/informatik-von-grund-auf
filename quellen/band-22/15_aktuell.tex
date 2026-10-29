@@ -1,0 +1,251 @@
+\chapter{Der Stand im Jahr 2026}\label{kap:aktuell}
+
+\begin{merksatz}
+\boxtitel{Was gilt und was behauptet wird}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.6cm}P{2.0cm}P{2.4cm}@{}}
+\toprule
+\textbf{Aussage} & \textbf{Beleglage} & \textbf{Urteil}\\
+\midrule
+Goroutinen sind billig & \textcolor{gruen}{eindeutig} & \textcolor{gruen}{Faktor $\approx4000$}\\
+Kleine Schnittstellen tragen & \textcolor{gruen}{gut} & \textcolor{gruen}{Kap.~\ref{kap:schnittstellen}}\\
+Gegendruck ohne Puffer & \textcolor{gruen}{gut} & \\
+Werkzeuge werden benutzt & \textcolor{gruen}{gut} & \textcolor{gruen}{\textbf{weil mitgeliefert}}\\
+Auslieferung ist einfach & \textcolor{gruen}{eindeutig} & \\
+\midrule
+\enquote{Nebenläufigkeit gelöst} & \textcolor{akzent}{\textbf{falsch}} & \textcolor{akzent}{\textbf{Kap.~\ref{kap:schiefgeht}}}\\
+\enquote{Einfach heißt einfach} & \textcolor{akzent}{falsch} & \textcolor{akzent}{Komplexität wandert}\\
+\enquote{Fehlerbehandlung ist gelöst} & \textcolor{akzent}{umstritten} & \textbf{$30\,\%$ der Zeilen}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist der praktisch wertvollste Befund dieses Bandes und keine Sprachfrage: Werkzeuge, die mitgeliefert werden und ohne Einrichtung laufen, werden benutzt. Zwei Stunden Einrichtung gegen sechzehn --- das ist die Lehre für jedes Vorhaben, auch in anderen Sprachen.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{aktuell}
+\boxtitel{Fünf Entwicklungen}
+\textbf{Erstens: Generizität ist angekommen.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.2cm}P{2.2cm}@{}}
+\toprule
+\textbf{Wirkung} & \textbf{Befund} & \\
+\midrule
+Bibliotheken & \textcolor{gruen}{\textbf{schlanker}} & \code{slices}, \code{maps}\\
+Anwendungscode & \textcolor{mittel}{wenig verändert} & \textcolor{mittel}{selten nötig}\\
+Befürchtete Überkomplexität & \textcolor{gruen}{\textbf{blieb aus}} & \\
+Übersetzungszeit & \textcolor{mittel}{leicht gestiegen} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die zweite Zeile ist bemerkenswert: Vier Jahre nach der Einführung schreibt der durchschnittliche Anwendungscode kaum eigene Typparameter. Der Nutzen liegt in den Bibliotheken --- genau dort, wo die zwölf Jahre Wartezeit am meisten wehgetan hatten.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{Zweitens: Die Schleifenvariable ist behoben.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bis Go 1.21} & \textbf{Seit 1.22} & \\
+\midrule
+Eine Variable je Schleife & \textbf{eine je Durchlauf} & \\
+Häufigster Fehler & \textcolor{gruen}{\textbf{beseitigt}} & \textcolor{gruen}{Kap.~\ref{kap:werkzeuge}}\\
+Rückwärts\-verträglich & \textcolor{mittel}{über Version geregelt} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Eine seltene Entscheidung: Eine Sprachsemantik wurde geändert, weil sie mehr Fehler erzeugte als Nutzen brachte. Die Verträglichkeit wird über die in der Moduldatei genannte Sprachversion geregelt --- alter Code bleibt gültig.}
+\end{center}
+
+\medskip
+\textbf{Drittens: Regulierung erreicht auch Go.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{1.8cm}P{2.6cm}@{}}
+\toprule
+\textbf{Anforderung} & \textbf{Erfüllt?} & \\
+\midrule
+Speichersicherheit & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{empfohlene Sprache}\\
+Stückliste & \textcolor{gruen}{eingebaut} & \textbf{im Binärabbild}\\
+Reproduzierbares Bauen & \textcolor{gruen}{\textbf{ja}} & \\
+Abhängigkeits\-prüfung & \textcolor{gruen}{ja} & \code{govulncheck}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die zweite Zeile ist eine Go-Eigenheit mit regulatorischem Wert: Jede Binärdatei enthält die Liste ihrer Bestandteile samt Versionen und Prüfsummen. Für ein Medizinprodukt bedeutet das, dass die Stückliste nicht gepflegt werden muss --- sie ist im Ergebnis enthalten.}
+\end{minipage}
+\end{center}
+
+\medskip
+\textbf{Viertens: Die Nachfrage bleibt konzentriert.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bereich} & \textbf{Anteil} & \\
+\midrule
+Dienste im Netz & \textcolor{gruen}{\textbf{hoch}} & \\
+Werkzeuge, Betrieb & \textcolor{gruen}{hoch} & \\
+Anwendungen mit Oberfläche & \textcolor{akzent}{gering} & \\
+Wissenschaft & \textcolor{akzent}{\textbf{sehr gering}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Fünfzehn Jahre nach der Veröffentlichung ist die Verteilung stabil --- Go hat sich in seiner Nische durchgesetzt und ist darüber hinaus kaum gewachsen. Das ist ein Erfolg für eine Sprache, die für eine Nische entworfen wurde.}
+\end{center}
+
+\medskip
+\textbf{Fünftens: Werkzeuge, die Go schreiben.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Wirkung} & \textbf{Befund} & \\
+\midrule
+Erster Entwurf & \textcolor{gruen}{schneller} & \textbf{wenige Formen}\\
+Fehler\-behandlung & \textcolor{gruen}{\textbf{gut erzeugt}} & \textcolor{gruen}{gleichförmig}\\
+Nebenläufigkeit & \textcolor{akzent}{\textbf{fehlerhaft}} & \textcolor{akzent}{\textbf{Lecks, fehlender Abbruch}}\\
+Prüfbedarf & \textcolor{akzent}{steigt} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die zweite und dritte Zeile stehen im Gegensatz: Die gleichförmige Fehlerbehandlung wird gut erzeugt, weil sie wenige Formen hat. Nebenläufiger Code wird schlecht erzeugt, weil die Fehler nicht im Text sichtbar sind --- eine fehlende Abbruchbehandlung sieht aus wie funktionierender Code.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Umso wichtiger sind Wettlaufprüfer und Leckprüfung aus Kapitel~\ref{kap:werkzeuge}. Sie prüfen genau das, was beim Lesen nicht auffällt.}
+\end{center}
+\end{aktuell}
+
+\begin{merksatz}
+\boxtitel{Drei Einsichten}
+\textbf{Erstens: Weglassen ist eine Entscheidung mit Preis.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Auslassung} & \textbf{Gewinn} & \textbf{Preis}\\
+\midrule
+Ausnahmen & \textbf{sichtbarer Pfad} & \textcolor{akzent}{\textbf{$30\,\%$ der Zeilen}}\\
+Vererbung & \textbf{keine Hierarchien} & \textcolor{akzent}{Wiederholung}\\
+Überladung & Lesbarkeit & \textcolor{akzent}{Namenswucher}\\
+Kleine Sprache & \textbf{$2$--$5$ Tage} & \textcolor{akzent}{wenig Ausdruck}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Zeilen, acht Spalteneinträge, und keiner davon ist umsonst. Wer nur die mittlere Spalte liest, hält Go für überlegen; wer nur die rechte liest, für armselig. Beide Spalten sind wahr.}
+\end{center}
+
+\textbf{Zweitens: Nebenläufigkeit wird ausdrückbar, nicht sicher.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.8cm}P{2.0cm}@{}}
+\toprule
+\textbf{Fehlerklasse} & \textbf{In Go} & \\
+\midrule
+Wettlauf & \textcolor{akzent}{möglich} & \textcolor{gruen}{Prüfer findet}\\
+Verklemmung & \textcolor{akzent}{möglich} & \textcolor{mittel}{teils erkannt}\\
+Goroutinenleck & \textcolor{akzent}{\textbf{leichter als in C}} & \textcolor{akzent}{\textbf{kein Werkzeug}}\\
+Speicherfehler & \textcolor{gruen}{\textbf{ausgeschlossen}} & \textcolor{gruen}{der echte Gewinn}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der Fortschritt gegenüber Band 21 --- die häufigste Fehlerklasse überhaupt verschwindet. Die dritte Zeile ist der Rückschritt, den man dafür in Kauf nimmt, und er wird selten genannt.}
+\end{minipage}
+\end{center}
+
+\textbf{Drittens: Das Handwerk bleibt dasselbe.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Aus Band 20} & \textbf{Gilt hier?} & \\
+\midrule
+Aufgabe verstehen & \textcolor{gruen}{\textbf{unverändert}} & \\
+Daten zuerst & \textcolor{gruen}{unverändert} & \\
+Fehlersuche als Verfahren & \textcolor{gruen}{unverändert} & \textbf{plus Profile}\\
+Fremden Code lesen & \textcolor{gruen}{\textbf{leichter}} & \textcolor{gruen}{\textbf{kleine Sprache}}\\
+Wann aufhören & \textcolor{gruen}{plus zwei Kriterien} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Dreimal dasselbe Ergebnis über drei Bände: Fünf von sechs Fertigkeiten sind sprachunabhängig. Nur die vierte Zeile fällt hier besser aus --- eine kleine Sprache ist leichter zu lesen, und das war ihr erklärter Zweck.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Was dieser Band nicht behauptet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.6cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+\textbf{Behauptung} & \textbf{Aufgestellt?} & \\
+\midrule
+Go ist die beste Sprache & \textcolor{akzent}{\textbf{nein}} & \textbf{Kap.~\ref{kap:wann}}\\
+Weglassen ist immer richtig & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{vier Preise}\\
+Nebenläufigkeit ist gelöst & \textcolor{akzent}{nein} & \\
+Diese Zahlen sind Konstanten & \textcolor{akzent}{nein} & \textbf{Größen\-ordnungen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die wichtigste. Weglassen ist eine Entscheidung, keine Tugend --- und jede der acht Auslassungen hat einen Anwendungsbereich, außerhalb dessen sie schadet. Kapitel~\ref{kap:auslassungen} nennt für jede das Gegenbeispiel.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\bigskip
+\begin{flushright}
+\itshape\color{grau}
+Eine Sprache mit wenigen Mitteln\\
+zwingt dazu, das Problem zu verstehen.\\
+Eine mit vielen erlaubt es,\\
+das Verständnis zu vertagen.\\[10pt]
+\normalfont\color{grau}\upshape
+--- die Bilanz dieses Bandes.\\
+\itshape Beides hat seinen Preis.\\
+Nur der erste wird sofort bezahlt.
+\end{flushright}
+\vspace{6pt}
+\noindent Die Bei\-trä\-ge zu Typ\-pa\-ra\-me\-tern\zit{26} erklären die Rück\-nah\-me einer Aus\-las\-sung; Cox\zit{4} do\-ku\-men\-tiert die Ent\-wurfs\-ent\-schei\-dun\-gen; die Spe\-zi\-fi\-ka\-tion\zit{11} bleibt die ver\-bind\-li\-che Quelle.

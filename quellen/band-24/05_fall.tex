@@ -1,0 +1,163 @@
+\part{Der Ablauf}
+
+\chapter{Die Schleife, die zu viel fragt}\label{fall:schleife}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Baut die Verlaufsansicht auf. Läuft etwa $900$ mal am Tag.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{def verlaufsansicht(patient: PatientID) -> Ansicht:}\\
+\code{\ \ \ \ zeilen = []}\\
+\code{\ \ \ \ for fall in speicher.faelle(patient):}\\
+\code{\ \ \ \ \ \ \ \ for b in speicher.befunde(fall.id):}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ bereich = speicher.bereich(b.groesse, patient)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ zeilen.append(Zeile(b, bereich))}\\
+\code{\ \ \ \ return Ansicht(sortiere(zeilen))}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Zeilen, gut lesbar, richtig benannt. Die Struktur folgt der Aufgabe: Fälle durchgehen, Befunde durchgehen, Bereich holen. Wer den Code liest, versteht ihn sofort --- das ist kein Zufall, sondern der Grund, warum er so geschrieben wurde.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+\textbf{Patient} & \textbf{Fälle} & \textbf{Aufrufe} & \textbf{Dauer}\\
+\midrule
+Neuaufnahme & $1$ & $\mathbf{9}$ & $\mathbf{34}$ ms\\
+Regelfall & $12$ & $181$ & $190$ ms\\
+Langzeit & $\mathbf{340}$ & $\mathbf{4211}$ & \textcolor{akzent}{$\mathbf{5{,}1}$ \textbf{s}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei geschachtelte Schleifen, drei Abfragen je Durchlauf --- das $n{+}1$-Problem in seiner ausgeprägten Form. Der dritte Aufruf ist der ärgerlichste: Der Referenzbereich wird für jeden Befund einzeln geholt, obwohl es je Patient etwa vierzig verschiedene gibt.}
+\end{minipage}
+\end{center}
+
+\textbf{Wo die Zeit hingeht.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Posten} & \textbf{Aufrufe} & \textbf{Dauer} & \textbf{Anteil}\\
+\midrule
+Fälle & $1$ & $12$ ms & $<1\,\%$\\
+Befunde & $340$ & $1{,}3$ s & $25\,\%$\\
+\textbf{Bereiche} & $\mathbf{3870}$ & \textcolor{akzent}{$\mathbf{3{,}7}$ \textbf{s}} & \textcolor{akzent}{$\mathbf{73\,\%}$}\\
+Sortieren & --- & $\mathbf{8}$ ms & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Dreiundsiebzig Prozent der Zeit für Bereiche, von denen es vierzig verschiedene gibt --- jeder wird im Mittel siebenundneunzig mal geholt. Das ist kein Verfahrensproblem, sondern eine fehlende Bündelung.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{def verlaufsansicht(patient: PatientID) -> Ansicht:}\\
+\code{\ \ \ \ befunde = speicher.befunde\_des\_patienten(patient)}\\
+\code{\ \ \ \ groessen = \{b.groesse for b in befunde\}}\\
+\code{\ \ \ \ bereiche = speicher.bereiche(groessen, patient)}\\
+\code{\ \ \ \ zeilen = [Zeile(b, bereiche[b.groesse]) for b in befunde]}\\
+\code{\ \ \ \ return Ansicht(sortiere(zeilen))}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Sechs Zeilen statt sieben, drei Abfragen statt viertausend. Die Struktur folgt jetzt nicht mehr der Aufgabe, sondern den Kosten --- und das ist die Änderung, die zu begründen ist.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Zeilen & $7$ & $\mathbf{6}$ & \\
+Abfragen, Langzeit & $\mathbf{4211}$ & $\mathbf{3}$ & \\
+Dauer, Langzeit & $5{,}1$ s & $\mathbf{240}$ ms & $21\times$\\
+Dauer, Regelfall & $190$ ms & $\mathbf{61}$ ms & $3{,}1\times$\\
+Verstehenszeit & $\mathbf{22}$ s & $\mathbf{38}$ s & \textcolor{akzent}{$1{,}7\times$}\\
+Aufwand & --- & $1$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vorletzte Zeile ist der Preis und wird selten genannt: Der überarbeitete Code ist schwerer zu lesen. Die Schachtelung war eine Erzählung --- Fälle, dann Befunde, dann Bereiche. Die neue Fassung erzählt nichts, sie holt und verknüpft.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum lohnt es trotzdem?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Wert} & \\
+\midrule
+Betroffene Patienten & $\approx3\,\%$ & \textbf{Langzeit}\\
+\textbf{Für diese} & \textcolor{akzent}{\textbf{$5$ s Wartezeit}} & \textcolor{akzent}{bei jedem Aufruf}\\
+Wer sind sie? & \textbf{die schwersten Fälle} & \textcolor{akzent}{\textbf{Intensiv, Onkologie}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile entscheidet: Die drei Prozent mit dem längsten Verlauf sind genau die Patienten, bei denen der Verlauf am wichtigsten ist. Sechzehn Sekunden Verstehenszeit gegen fünf Sekunden Wartezeit am Krankenbett.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Keine geschachtelten Schleifen} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{über Daten harmlos}\\
+\enquote{Immer alles auf einmal holen} & \textcolor{akzent}{\textbf{nein}} & \textbf{Speicher\-grenze}\\
+\enquote{Lesbarkeit ist zweitrangig} & \textcolor{akzent}{\textbf{nein}} & \\
+\textbf{\enquote{Eine Abfrage in einer Schleife ist verdächtig}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist wichtig: Eine geschachtelte Schleife über bereits geladene Daten kostet nichts und liest sich besser. Das Problem ist nicht die Schachtelung, sondern der \kursiv{Aufruf} darin --- über eine Naht, eine Datenbank, ein Netz.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die Gegengrenze: Bei einem Patienten mit zwei Millionen Messwerten würde das Laden aller Befunde den Speicher sprengen. Dann bündelt man in Blöcken --- Band 23, Kapitel~2. Die richtige Blockgröße findet man durch Messen.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Fowler\zit{10} sammelt die Um\-ge\-stal\-tungs\-schrit\-te, die $n{+}1$ be\-sei\-ti\-gen; Gregg\zit{13} zeigt, wie man den Pos\-ten findet, bevor man ihn behebt.

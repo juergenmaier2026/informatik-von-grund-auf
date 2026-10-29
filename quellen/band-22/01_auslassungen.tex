@@ -1,0 +1,306 @@
+\part{Die Auslassungen}
+
+\chapter{Was fehlt und warum}\label{kap:auslassungen}
+
+\begin{merksatz}
+\boxtitel{Der Maßstab: Kosten für den Leser}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.8cm}P{2.6cm}@{}}
+\toprule
+\textbf{Sprachmittel} & \textbf{Nutzt dem Schreiber} & \textbf{Kostet den Leser}\\
+\midrule
+Operator\-überladung & \textcolor{gruen}{kürzer} & \textcolor{akzent}{\textbf{was tut \code{+}?}}\\
+Vererbung & Wiederver\-wendung & \textcolor{akzent}{\textbf{welche Methode gilt?}}\\
+Makros & Verallgemei\-nerung & \textcolor{akzent}{was steht wirklich da?}\\
+Ausnahmen & \textcolor{gruen}{knapper Ablauf} & \textcolor{akzent}{\textbf{wo geht es weiter?}}\\
+Implizite Umwandlung & bequem & \textcolor{akzent}{welcher Typ?}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Jede Zeile beschreibt einen Handel: Der Schreiber spart Zeichen, der Leser verliert Gewissheit. Go entscheidet diesen Handel durchgehend zugunsten des Lesers --- und das ist die einzige Regel, aus der sich alle acht Auslassungen ableiten lassen.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Begründung dahinter.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.4cm}@{}}
+\toprule
+\textbf{Die Lage} & Ein Bestand mit Millionen Zeilen und Tausenden Beteiligten\\
+\textbf{Die Beobachtung} & \textbf{Code wird öfter gelesen als geschrieben}\\
+\textbf{Die Folgerung} & Sprachmittel, die das Lesen erschweren, kosten mehr, als sie bringen\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die Zahl aus Band 20: dreißig Prozent Lesen, zwanzig Prozent Schreiben. Die Folgerung ist ungewöhnlich, weil fast alle anderen Sprachen den umgekehrten Handel eingehen.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Wo derselbe Maßstab anders entscheidet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Maßstab passt?} & \\
+\midrule
+Großer Bestand, viele Leute & \textcolor{gruen}{\textbf{ja}} & \\
+Bibliothek für viele Nutzer & \textcolor{gruen}{ja} & \\
+Ein Skript, einmal & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Ausdruck zählt}\\
+Mathematische Bibliothek & \textcolor{akzent}{nein} & \textbf{Überladung wäre richtig}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die letzte Zeile ist das ehrlichste Gegenbeispiel: Für Vektorrechnung ist \code{a.Add(b.Mul(c))} schlechter lesbar als \code{a + b*c} --- hier kostet die Auslassung genau das, was sie schützen sollte. Go ist für diese Aufgabe die falsche Sprache, und das ist kein Mangel, sondern eine Festlegung.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Formatierer}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+& \textbf{Mit Optionen} & \textbf{Ohne}\\
+\midrule
+Stildiskussionen & \textcolor{akzent}{\textbf{bleiben}} & \textcolor{gruen}{\textbf{beendet}}\\
+Anpassbar & \textcolor{gruen}{ja} & \textcolor{akzent}{nein}\\
+Fremder Code lesbar & \textcolor{mittel}{je nach Projekt} & \textcolor{gruen}{\textbf{immer gleich}}\\
+Zeilenunterschiede & \textcolor{akzent}{Formatierung} & \textcolor{gruen}{nur Inhalt}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Entscheidung, dem Formatierer keine Optionen zu geben, wirkt kleinlich und ist die folgenreichste des ganzen Werkzeugkastens. Sie beendet eine Diskussion, die in anderen Sprachen bei jedem neuen Projekt neu geführt wird --- und die niemand gewinnen kann, weil es keinen sachlichen Maßstab gibt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist der praktische Gewinn beim Durchsehen: Ein Unterschied zeigt nur, was sich geändert hat --- nicht, dass jemand anders einrückt. Band 17, Kapitel~13 fordert genau das und kann es nicht durchsetzen.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Was der Formatierer nicht leistet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Beantwortet?} & \\
+\midrule
+Wie sieht es aus? & \textcolor{gruen}{\textbf{ja}} & \\
+Sind die Namen gut? & \textcolor{akzent}{nein} & Band 20, Kap.~5\\
+Ist die Zerlegung richtig? & \textcolor{akzent}{\textbf{nein}} & \\
+Stimmt das Datenmodell? & \textcolor{akzent}{\textbf{nein}} & \textbf{Band 20, Kap.~2}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein einheitliches Aussehen erzeugt den Eindruck von Ordnung, und der kann täuschen. Alles, was Band 20 behandelt, bleibt zu tun --- der Formatierer nimmt nur die Diskussion ab, die ohnehin keine Substanz hatte.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Bewerten Sie eine Auslassung an einem Beispiel.
+\item Rechnen Sie die Kosten fehlender Generizität aus.
+\item Untersuchen Sie, was die Sprachgröße bewirkt.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine Auslassung bewerten.}
+
+\textbf{Der Fall.} Vererbung, am Befundmodell aus Band 20.
+
+\begin{center}
+\begin{minipage}{0.72\textwidth}
+\code{Befund}\\
+\code{\ \ Laborbefund}\\
+\code{\ \ \ \ Klinischchemie}\\
+\code{\ \ \ \ Mikrobiologie}\\
+\code{\ \ Bildbefund}\\
+\code{\ \ Funktionsbefund}
+\end{minipage}
+\end{center}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Neue Anforderung} & \textbf{Passt in die Hierarchie?} & \\
+\midrule
+Bakteriologie mit Zahlwert & \textcolor{mittel}{knapp} & \\
+Blutgasanalyse, bettseitig & \textcolor{akzent}{\textbf{zwei Zweige}} & \textcolor{akzent}{\textbf{Bruch}}\\
+Befund aus Fremdhaus & \textcolor{akzent}{quer} & \\
+Bild und Zahlen zugleich & \textcolor{akzent}{\textbf{beides}} & \textcolor{akzent}{Mehrfach\-vererbung}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Hierarchie ist nach zwei Jahren richtig und nach fünf falsch --- weil die Wirklichkeit sich nicht in einen Baum fügt. Das ist die Begründung für die Auslassung, und sie stammt aus Erfahrung, nicht aus Theorie.}
+\end{minipage}
+\end{center}
+
+\textbf{Ohne Vererbung.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{type Befund interface \{}\\
+\code{\ \ \ \ Patient() PatientID}\\
+\code{\ \ \ \ Abnahme() time.Time}\\
+\code{\}}\\
+\\
+\code{type Messbar interface \{}\\
+\code{\ \ \ \ Wert() Ergebnis}\\
+\code{\ \ \ \ Bereich() Referenz}\\
+\code{\}}\\
+\\
+\code{type Bebildert interface \{ Bilder() []BildID \}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Drei kleine Schnittstellen statt eines Baums. Ein Befund mit Bild \kursiv{und} Zahlen erfüllt beide --- ohne Mehrfachvererbung, ohne Umbau der Hierarchie. Kapitel~\ref{kap:schnittstellen} führt das aus.}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.4cm}P{1.6cm}@{}}
+\toprule
+& \textbf{Hierarchie} & \textbf{Schnitt\-stellen} & \\
+\midrule
+Neue Art einfügen & \textcolor{akzent}{Umbau} & \textcolor{gruen}{\textbf{nichts}} & \\
+Zwei Eigenschaften & \textcolor{akzent}{unmöglich} & \textcolor{gruen}{ja} & \\
+Wo ist die Methode? & \textcolor{akzent}{\textbf{suchen}} & \textcolor{gruen}{\textbf{beim Typ}} & \\
+Gemeinsamer Code & \textcolor{gruen}{geerbt} & \textcolor{akzent}{wiederholt} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist der Preis, und er ist echt: Gemeinsamer Code wird nicht geerbt, sondern eingebettet oder wiederholt. Kapitel~\ref{kap:zusammensetzung} zeigt, wie das aussieht --- und wo es lästig bleibt.}
+\end{center}
+
+\medskip
+\textbf{(b) Kosten fehlender Generizität.}
+
+\textbf{Die Lage vor 2022.} Eine Filterfunktion für drei Typen.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{1.8cm}P{2.2cm}P{1.8cm}@{}}
+\toprule
+\textbf{Weg} & \textbf{Zeilen} & \textbf{Typprüfung} & \textbf{Dauer}\\
+\midrule
+Dreimal schreiben & $\mathbf{42}$ & \textcolor{gruen}{\textbf{voll}} & \textcolor{gruen}{$1{,}0$}\\
+Über \code{interface\{\}} & $16$ & \textcolor{akzent}{\textbf{keine}} & \textcolor{akzent}{$3{,}4$}\\
+Codeerzeugung & $18$ & \textcolor{gruen}{voll} & $1{,}0$\\
+\midrule
+\textbf{Typparameter} & $\mathbf{16}$ & \textcolor{gruen}{\textbf{voll}} & \textcolor{gruen}{$\mathbf{1{,}0}$}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwölf Jahre lang musste man zwischen den ersten drei Zeilen wählen --- und alle drei sind unbefriedigend. Die vierte Zeile zeigt, dass die Auslassung tatsächlich etwas gekostet hat und dass ihre Rücknahme richtig war.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Bemerkenswert ist die Begründung für das lange Warten: Man wollte keine Lösung, die die Übersetzungszeit oder die Lesbarkeit beschädigt. Ob das zwölf Jahre wert war, kann man bestreiten --- dass es eine Entscheidung und kein Versäumnis war, nicht.}
+\end{center}
+
+\medskip
+\textbf{(c) Was die Sprachgröße bewirkt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.0cm}P{2.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Sprache} & \textbf{Schlüssel\-wörter} & \textbf{Spezifi\-kation} & \textbf{Einarbeitung}\\
+\midrule
+Go & $\mathbf{25}$ & $\approx90$ S. & \textcolor{gruen}{$\mathbf{2}$--$\mathbf{5}$ \textbf{Tage}}\\
+C & $32$--$44$ & $\approx550$ S. & $2$--$4$ Wochen\\
+Python & $35$ & $\approx200$ S. & $1$--$2$ Wochen\\
+C++ & $\approx95$ & \textcolor{akzent}{$\approx1800$ S.} & \textcolor{akzent}{Monate}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Spalte ist die interessante: Ein erfahrener Programmierer liest die Go-Spezifikation an einem Nachmittag und kann danach jeden Go-Code lesen. Das ist kein Anfängervorteil, sondern einer für den, der fremden Code beurteilen muss --- Band 20, Kapitel~8.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Kehrseite.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Folge} & \textbf{Bewertung} & \\
+\midrule
+Wenig zu lernen & \textcolor{gruen}{gut} & \\
+Wenig auszudrücken & \textcolor{akzent}{\textbf{einschrän\-kend}} & \\
+Wiederholung im Code & \textcolor{akzent}{\textbf{häufig}} & \textbf{Kap.~\ref{kap:fehler}}\\
+Weniger Überraschungen & \textcolor{gruen}{gut} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die ehrlichste Kritik: Go-Code enthält viel Wiederholung, und die Sprache bietet wenig dagegen. Wer das als Nachteil empfindet, hat recht --- und wer die Wiederholung der Undurchschaubarkeit vorzieht, auch.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Auslassungen sind nicht neutral}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.6cm}P{2.2cm}@{}}
+\toprule
+\textbf{Auslassung} & \textbf{Wirkt gegen} & \\
+\midrule
+Keine Ausnahmen & \textcolor{akzent}{knappen Code} & \textbf{Kap.~\ref{kap:fehler}}\\
+Keine Überladung & \textcolor{akzent}{Mathematik} & \\
+Keine Vererbung & \textcolor{akzent}{Rahmenwerke} & \textbf{schwer zu bauen}\\
+Kein Makrosystem & \textcolor{akzent}{Sprach\-erweiterung} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die folgenreichste: Ein Rahmenwerk, das den Ablauf übernimmt und den eigenen Code aufruft, lässt sich in Go schwer bauen. Deshalb gibt es in Go Bibliotheken statt Rahmenwerken --- und das ist eine Wirkung der Sprachentscheidung auf die Baukultur.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Wer Go beurteilt, sollte diese Wirkungen kennen. Eine Sprache formt, was in ihr entsteht --- Conways Gesetz aus Band 17, angewandt auf Sprachentwurf statt auf Organisationen.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Pike\zit{19} beschreibt, aus welchen Erfahrungen mit großen Beständen die Entscheidungen entstanden; die Ent\-wurfs\-do\-ku\-men\-te\zit{12} be\-grün\-den jede Aus\-las\-sung einzeln; die Sprich\-wort\-samm\-lung\zit{20} verdichtet die Haltung auf zwanzig Sätze.

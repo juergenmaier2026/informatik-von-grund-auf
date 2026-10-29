@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Wenn Sie dieses Werk verwenden, zitieren Sie es bitte wie unten angegeben."
+title: "Informatik von Grund auf"
+abstract: "Eine Einführung in die Informatik in sechsundzwanzig Bänden (4143 Seiten), vom Schalter bis zur Quanteninformatik und vom Algorithmus bis zum fertigen Programm. Jeder Schritt erklärt, alle Übungsaufgaben vollständig gelöst, jedes Kapitel mit Geschichte und Stand der Forschung; verbreitete Behauptungen des Fachs werden einzeln geprüft."
+type: dataset
+authors:
+  - family-names: Maier
+    given-names: Jürgen
+version: "1.0.0"
+date-released: "2026-10-29"
+license: CC-BY-SA-4.0
+repository-code: "https://github.com/juergenmaier2026/informatik-von-grund-auf"
+url: "https://juergenmaier2026.github.io/informatik-von-grund-auf"
+keywords:
+  - Informatik
+  - Lehrbuch
+  - Algorithmen
+  - Berechenbarkeit
+  - Rechnerarchitektur
+  - Kryptographie
+  - Maschinelles Lernen
+  - Programmieren
+  - Open Educational Resources

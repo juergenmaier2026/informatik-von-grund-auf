@@ -1,0 +1,158 @@
+\chapter{Die Funktion mit acht Argumenten}\label{fall:argumente}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Formatiert einen Laborwert für die Anzeige. Sechs Aufrufstellen.
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{def formatiere(betrag, exp, einheit, nachkomma, trenner,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprache, breite, mit\_einheit):}\\
+\code{\ \ \ \ ...\ \ \# 34 Zeilen}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Acht Argumente. Nach Band 20, Kapitel~5 ist die Zahl der Argumente der beste Schnelltest für eine fehlende Zerlegung --- und acht liegt weit über der Schwelle, ab der man hinsehen sollte.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Wer ruft wie auf?}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Aufrufstelle} & \textbf{Argumente} & \textbf{Muster}\\
+\midrule
+Verlaufsansicht & $8$ & \textbf{A}\\
+Befundliste & $8$ & \textbf{A}\\
+Ausdruck & $8$ & \textcolor{mittel}{B}\\
+Ausleitung CSV & $8$ & \textcolor{akzent}{C}\\
+Warnungstext & $8$ & A\\
+Protokoll & $8$ & \textcolor{akzent}{C}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechs Aufrufe, drei feste Kombinationen. Das ist der Befund: Die acht Argumente sind nicht acht Freiheitsgrade, sondern drei Fälle, die zu einer Funktion mit Schaltern zusammengezogen wurden --- die verfrühte Zusammenfassung aus Band 20, Kapitel~14.}
+\end{minipage}
+\end{center}
+
+\textbf{Was die Argumente wirklich sind.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Gruppe} & \textbf{Argumente} & \textbf{Ist} \\
+\midrule
+Wert & \textbf{betrag, exp, einheit} & \textbf{eine Größe}\\
+Darstellung & nachkomma, trenner, sprache & \textbf{ein Format}\\
+Ausgabe & breite, mit\_einheit & Zweck\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Drei Gruppen, die immer gemeinsam wandern --- das Erkennungszeichen für einen fehlenden Begriff. Die erste Gruppe ist die \code{Groesse} aus Fall~\ref{fall:einheit}; sie existierte schon und wurde hier auseinandergenommen.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: überarbeitet}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{def fuer\_anzeige(wert: Groesse, sprache: Sprache) -> str: ...}\\
+\code{def fuer\_druck(wert: Groesse, sprache: Sprache) -> str: ...}\\
+\code{def fuer\_ausleitung(wert: Groesse) -> str: ...}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Drei Funktionen mit ein oder zwei Argumenten statt einer mit acht. Die Formatvorgaben --- Nachkommastellen, Trenner, Breite --- stehen jetzt \kursiv{in} den Funktionen, wo sie hingehören: Sie sind nicht wählbar, sondern folgen aus dem Zweck.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Überarbeitet} & \\
+\midrule
+Funktionen & $1$ & $\mathbf{3}$ & \\
+Zeilen gesamt & $34$ & $\mathbf{41}$ & $+21\,\%$\\
+Argumente je Aufruf & $\mathbf{8}$ & $\mathbf{1}$--$\mathbf{2}$ & \\
+Zweige & $\mathbf{11}$ & $\mathbf{2}$ & $-82\,\%$\\
+Verstehenszeit & $95$ s & $\mathbf{24}$ s & $4{,}0\times$\\
+Unzulässige Kombinationen & \textcolor{akzent}{$\mathbf{18}$} & \textcolor{gruen}{$\mathbf{0}$} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist der eigentliche Gewinn und stand nirgends geschrieben: Von den zweihundertsechsundfünfzig möglichen Argumentkombinationen waren achtzehn sinnlos --- Breite null mit Einheit, CSV-Trenner mit Anzeigesprache. Nach der Trennung gibt es sie nicht mehr.}
+\end{minipage}
+\end{center}
+
+\textbf{Und die Doppelung?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Posten} & \textbf{Zeilen} & \\
+\midrule
+Gemeinsam, ausgelagert & $\mathbf{19}$ & \textcolor{gruen}{Zahl\-formatierung}\\
+Je Funktion eigen & $6$--$9$ & \\
+\textbf{Tatsächlich doppelt} & $\mathbf{4}$ & \textcolor{gruen}{\textbf{tragbar}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Vier doppelte Zeilen --- die Rechnung aus Band 22, Kapitel~8: Ein wenig Kopieren ist billiger als eine Fallunterscheidung mit elf Zweigen. Wäre die Doppelung bei dreißig Zeilen gelegen, wäre das Urteil anders ausgefallen.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Höchstens drei Argumente} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Zahl ohne Begründung}}\\
+\enquote{Argumente in ein Objekt} & \textcolor{akzent}{\textbf{nein}} & \textbf{verschiebt nur}\\
+\enquote{Immer aufteilen} & \textcolor{akzent}{nein} & \textbf{Fall 17}\\
+\textbf{\enquote{Gruppen sind fehlende Begriffe}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der häufigste Kurzschluss: Acht Argumente in eine Optionsstruktur zu packen macht die Signatur kurz und ändert nichts --- der Aufrufer muss dieselben acht Entscheidungen treffen, und die achtzehn sinnlosen Kombinationen bleiben.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Unterschied: Eine \kursiv{Gruppe}, die immer gemeinsam auftritt und einen Fachnamen hat, wird ein Typ. Eine \kursiv{Sammlung} von Schaltern, die verschiedene Aufrufer verschieden setzen, wird in getrennte Funktionen zerlegt.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Parnas\zit{24} liefert das Kri\-te\-rium, wonach ge\-schnit\-ten wird; Ous\-ter\-hout\zit{23} zeigt an der Zahl der Ar\-gu\-men\-te, wann eine Schnitt\-stel\-le flach ist.

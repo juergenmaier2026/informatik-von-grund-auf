@@ -1,0 +1,265 @@
+\part{Der Entwurf}
+
+\chapter{Pakete}\label{kap:pakete}
+
+\begin{merksatz}
+\boxtitel{Sichtbarkeit mit einem Zeichen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Name} & \textbf{Sichtbar} & \\
+\midrule
+\code{Messwert} & \textbf{überall} & \textbf{großer Anfangsbuchstabe}\\
+\code{messwert} & nur im Paket & \\
+Zwischenstufen & \textcolor{akzent}{gibt es nicht} & \textcolor{akzent}{kein \code{protected}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei Stufen statt vier, und die Entscheidung ist im Namen sichtbar --- man muss keine Deklaration suchen, um zu wissen, ob etwas öffentlich ist. Der Preis: Es gibt kein \enquote{sichtbar für verwandte Pakete}, und manchmal fehlt genau das.}
+\end{minipage}
+\end{center}
+
+\textbf{Wie groß ein Paket sein soll.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Maßstab} & \textbf{Trägt?} & \\
+\midrule
+Zeilenzahl & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Band 20, Kap.~5}\\
+Eine Klasse je Datei & \textcolor{akzent}{nein} & \textbf{fremde Gewohnheit}\\
+\textbf{Ein Geheimnis} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Parnas}}\\
+Was gemeinsam geändert wird & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Ein Paket ist die Einheit der Kapselung, nicht die Datei. Innerhalb eines Pakets darf alles auf alles zugreifen --- die Grenze verläuft am Paketrand. Deshalb ist die Frage nicht \enquote{wie viele Dateien}, sondern \enquote{was verbirgt dieses Paket}.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Der Paketname ist Teil des Aufrufs}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{4.6cm}P{1.9cm}P{1.7cm}@{}}
+\toprule
+\textbf{Aufruf} & \textbf{Bewer\-tung} & \\
+\midrule
+\code{uebertragung.} \code{Uebertrage} & \textcolor{akzent}{doppelt} & \textcolor{akzent}{Stotterei}\\
+\code{uebertragung.Starte} & \textcolor{gruen}{\textbf{gut}} & \\
+\code{util.Hilfsfunktion} & \textcolor{akzent}{\textbf{nichts\-sagend}} & \textbf{kein Geheimnis}\\
+\code{ring.Neu} & \textcolor{gruen}{gut} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Der Paketname steht bei jedem Aufruf davor --- deshalb wiederholt man ihn nicht im Funktionsnamen. Die dritte Zeile ist der häufigste Entwurfsfehler: Ein Paket namens \code{util} verbirgt kein Geheimnis, sondern sammelt Reste. Es wächst, bis es von allem abhängt.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Abhängigkeiten ohne Zyklen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{In Go} & \\
+\midrule
+Zirkuläre Einschlüsse & \textcolor{akzent}{\textbf{Fehler}} & \textbf{beim Übersetzen}\\
+Unbenutzte Einschlüsse & \textcolor{akzent}{Fehler} & \\
+Bauzeit & \textcolor{gruen}{\textbf{linear}} & \textcolor{gruen}{Band 21, Kap.~11}\\
+Abhängigkeits\-graph & \textcolor{gruen}{ohne Zyklen} & \textcolor{gruen}{erzwungen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist eine harte Sprachregel und wirkt als Entwurfszwang: Wenn zwei Pakete einander brauchen, gehören sie entweder zusammen oder es fehlt ein drittes. Der Übersetzer zwingt zur Klärung, die man sonst jahrelang vertagt.}
+\end{minipage}
+\end{center}
+
+\textbf{Der übliche Fall und seine Auflösung.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.6cm}P{2.6cm}P{2.0cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Auflösung} & \\
+\midrule
+\code{geraet} braucht \code{ueber\-tragung} & \textbf{Schnittstelle beim Aufrufer} & \textcolor{gruen}{Kap.~\ref{kap:schnittstellen}}\\
+Beide brauchen Typen & drittes Paket & \textcolor{gruen}{nur Typen}\\
+Wirklich untrennbar & \textbf{zusammen\-legen} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist der häufigste Fall und wird durch die Gestaltprüfung gelöst: Das Übertragungspaket definiert die Schnittstelle, die es braucht --- und das Gerätepaket erfüllt sie, ohne es zu wissen. Der Zyklus verschwindet, ohne dass jemand etwas anpassen muss.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Fremde Abhängigkeiten}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Vor der Aufnahme} & \\
+\midrule
+Wie viele Zeilen? & \textbf{prüfen} & \textcolor{akzent}{oft mehr als erwartet}\\
+Wie viele weitere? & \textbf{prüfen} & \textcolor{akzent}{\textbf{der Baum wächst}}\\
+Wer pflegt es? & prüfen & \\
+Selbst schreiben? & \textcolor{gruen}{\textbf{oft billiger}} & \textcolor{gruen}{bei $<200$ Zeilen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die unterschätzte: Eine Bibliothek mit dreihundert Zeilen bringt vierzig weitere mit, und jede davon ist Code, den man ausliefert und für den man haftet. In einem Medizinprodukt gehört jede in die Stückliste.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine Go-Eigenheit mit gutem Grund: Weil die Standardbibliothek viel abdeckt, ist \enquote{selbst schreiben} öfter richtig als anderswo --- und zweihundert Zeilen eigener Code sind leichter zu prüfen als eine fremde Abhängigkeitskette.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Schneiden Sie die Übertragungsschicht in Pakete.
+\item Lösen Sie einen Zyklus auf.
+\item Bewerten Sie eine fremde Abhängigkeit.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die Übertragungsschicht schneiden.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.8cm}P{1.6cm}P{1.6cm}@{}}
+\toprule
+\textbf{Paket} & \textbf{Geheimnis} & \textbf{Zeilen} & \textbf{Hängt von}\\
+\midrule
+\code{messwert} & \textbf{Datenmodell} & $180$ & $\mathbf{0}$\\
+\code{geraet} & Protokoll des Geräts & $640$ & $1$\\
+\code{ring} & \textbf{Pufferverwaltung} & $210$ & $1$\\
+\code{uebertragung} & Ablauf, Wiederholung & $520$ & $2$\\
+\code{ziel} & Netzprotokoll & $380$ & $1$\\
+\code{main} & Zusammenbau & $90$ & $5$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die wichtigste: Das Datenmodell hängt von nichts ab. Damit können alle anderen es benutzen, ohne einander zu kennen --- Wirths Rangordnung aus Band 20 als Paketstruktur.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die zweite Regel: Nur \code{main} kennt alle. Der Zusammenbau geschieht an einer Stelle, und die ist neunzig Zeilen lang. Wer diese Regel einhält, kann jedes andere Paket einzeln prüfen und ersetzen.}
+\end{center}
+
+\medskip
+\textbf{(b) Einen Zyklus auflösen.}
+
+\textbf{Die Lage.} \code{geraet} will Fehler an \code{uebertragung} melden.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Weg} & \textbf{Zyklus?} & \\
+\midrule
+\code{geraet} ruft \code{uebertragung} & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{Über\-setzungs\-fehler}\\
+Rückrufadresse & \textcolor{gruen}{nein} & \textcolor{gruen}{\textbf{Funktionswert}}\\
+Fehler zurückgeben & \textcolor{gruen}{\textbf{nein}} & \textcolor{gruen}{\textbf{am einfachsten}}\\
+Drittes Paket & \textcolor{gruen}{nein} & \textcolor{mittel}{mehr Struktur}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist fast immer die richtige und wird oft übersehen: Statt zu melden, gibt man den Fehler zurück und lässt den Aufrufer entscheiden. Der Zyklus verschwindet, weil die Abhängigkeit nur noch in eine Richtung zeigt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Das ist derselbe Gedanke wie in Band 21, Kapitel~11: Abhängigkeiten zeigen nach unten. Der Unterschied ist, dass Go es erzwingt statt zu empfehlen --- und dass die Klärung damit sofort stattfindet statt nach fünf Jahren.}
+\end{center}
+
+\medskip
+\textbf{(c) Eine fremde Abhängigkeit bewerten.}
+
+\textbf{Der Fall.} Eine Bibliothek für strukturierte Protokollierung.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Bibliothek} & \textbf{Standard} & \textbf{Selbst}\\
+\midrule
+Eigene Zeilen & $\mathbf{0}$ & $\mathbf{0}$ & $140$\\
+Fremde Zeilen & \textcolor{akzent}{$\approx24\,000$} & \textcolor{gruen}{$\mathbf{0}$} & \textcolor{gruen}{$0$}\\
+Weitere Pakete & \textcolor{akzent}{$\mathbf{11}$} & $0$ & $0$\\
+Leistung & \textcolor{gruen}{sehr gut} & \textcolor{gruen}{gut} & \textcolor{mittel}{ausreichend}\\
+In der Stückliste & \textcolor{akzent}{$12$ Einträge} & \textcolor{gruen}{$\mathbf{0}$} & \textcolor{gruen}{$0$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Seit Go 1.21 gibt es strukturierte Protokollierung in der Standardbibliothek --- damit wird die mittlere Spalte fast immer richtig. Vor 2023 war die Entscheidung schwerer, und viele haben die vierundzwanzigtausend Zeilen genommen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vorletzte Zeile zeigt die Größenordnung des Unterschieds: sehr gut gegen gut. Bei einer Übertragungsschicht, die auf das Netz wartet, ist das nicht messbar --- und elf zusätzliche Pakete sind es sehr wohl.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Standardbibliothek zuerst}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Bereich} & \textbf{Standard reicht?} & \\
+\midrule
+Netz, HTTP & \textcolor{gruen}{\textbf{ja}} & \textbf{ungewöhnlich vollständig}\\
+Verschlüsselung & \textcolor{gruen}{ja} & \\
+Protokollierung & \textcolor{gruen}{ja} & \textcolor{gruen}{seit 1.21}\\
+Datenbanktreiber & \textcolor{akzent}{nein} & Schnittstelle ja\\
+Zeitzonen, Text & \textcolor{gruen}{ja} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist ungewöhnlich: Ein vollständiger HTTP-Bedienteil und -Anfrager in der Standardbibliothek, betriebstauglich, ohne Rahmenwerk. In den meisten Sprachen ist das der Ort, an dem man die erste große Abhängigkeit aufnimmt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt die praktische Regel dieses Kapitels: Erst nachsehen, ob es die Standardbibliothek kann. Bei Go lautet die Antwort öfter ja als anderswo --- und jede vermiedene Abhängigkeit ist Code, den man nicht ausliefert und nicht verantwortet.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Parnas\zit{17} begründete das Ge\-heim\-nis\-prin\-zip, an dem sich der Pa\-ket\-schnitt misst; \enquote{Effective Go}\zit{7} legt die Na\-mens\-re\-geln fest; Cox\zit{3} beschreibt, was fremde Ab\-hän\-gig\-kei\-ten tat\-säch\-lich kosten.

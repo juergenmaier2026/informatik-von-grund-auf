@@ -1,0 +1,282 @@
+\part{Das Werk als Ganzes}
+
+\chapter{Programm und Werk}\label{kap:werk}
+
+\begin{merksatz}
+\boxtitel{Der Unterschied}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Programm} & \textbf{Werk}\\
+\midrule
+Läuft & \textbf{einmal, irgendwo} & \textbf{dauernd, an vielen Orten}\\
+Fehler & \textcolor{mittel}{Absturz} & \textcolor{akzent}{\textbf{Teilausfall}}\\
+Ändern & neu übersetzen & \textcolor{akzent}{im laufenden Betrieb}\\
+Zustand & im Speicher & \textcolor{akzent}{\textbf{verteilt, dauerhaft}}\\
+Zuständigkeit & \textbf{einer} & \textcolor{akzent}{\textbf{mehrere}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der wichtigste Unterschied: Ein Programm läuft oder es läuft nicht. Ein Werk kann zu vierzig Prozent laufen --- und diese Möglichkeit ist der Ursprung fast aller Schwierigkeiten, die dieser Band behandelt.}
+\end{minipage}
+\end{center}
+
+\textbf{Was der Teilausfall bedeutet.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Im Programm} & \textbf{Im Werk}\\
+\midrule
+Aufruf schlägt fehl & \textcolor{gruen}{Fehlerwert} & \textcolor{akzent}{\textbf{oder Stille}}\\
+Empfänger weg & \textcolor{akzent}{gibt es nicht} & \textcolor{akzent}{Normalfall}\\
+Antwort verspätet & \textcolor{akzent}{gibt es nicht} & \textcolor{akzent}{\textbf{nicht von \enquote{weg} zu trennen}}\\
+Halb ausgeführt & \textcolor{gruen}{selten} & \textcolor{akzent}{\textbf{häufig}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die grundlegende: Ein Aufruf, der nicht antwortet, kann verlorengegangen, unterwegs oder ausgeführt und die Antwort verloren sein. Der Sender kann die drei Fälle nicht unterscheiden --- und muss trotzdem handeln.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die Größenordnungen}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{Dauer} & \\
+\midrule
+Funktionsaufruf & $\approx2$ ns & \\
+Sprachgrenze & $\approx60$ ns & \textbf{Band 21, Kap.~14}\\
+Prozessgrenze & $\approx5$ µs & \textcolor{mittel}{Rohr, Steckdose}\\
+Rechner im Haus & $\approx0{,}5$ ms & \textbf{Faktor $\mathbf{250\,000}$}\\
+Rechenzentrum entfernt & $\approx80$ ms & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Zwischen einem Funktionsaufruf und einem Aufruf über das Hausnetz liegt Faktor zweihundertfünfzigtausend. Wer eine Naht dort legt, wo vorher ein Aufruf stand, ändert nicht die Struktur, sondern die Größenordnung --- und Größenordnungen ändern die richtige Bauform.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Zerlegung kommt vor der Verteilung}
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.8cm}P{6.0cm}@{}}
+\toprule
+\textbf{Zuerst} & Wonach schneidet man? --- Parnas' Frage aus Band 17\\
+\textbf{Dann erst} & \textbf{Was davon läuft in einem eigenen Prozess?}\\
+\textbf{Der Fehler} & Beides zugleich entscheiden\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Ein schlecht geschnittenes Programm wird durch Aufteilen zu einem schlecht geschnittenen Werk --- mit denselben Abhängigkeiten, nun über das Netz, mit Latenz und Teilausfall. Man hat nichts gewonnen und fünf Schwierigkeiten hinzugefügt.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Probe.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Antwort} & \\
+\midrule
+Ließe sich der Teil als Modul sauber trennen? & \textcolor{gruen}{\textbf{muss ja sein}} & \textbf{sonst nicht verteilen}\\
+Ändert er sich aus eigenem Grund? & \textcolor{gruen}{muss ja sein} & \\
+Hat er eigene Betriebsanforderungen? & \textcolor{gruen}{dann lohnt es} & \\
+Nur weil es modern ist? & \textcolor{akzent}{\textbf{nein}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist der beste positive Grund: Wenn ein Teil andere Zeitschranken, andere Verfügbarkeit oder anderen Speicherbedarf hat als der Rest, gehört er in einen eigenen Prozess. Beim Messdatenerfasser ist das offensichtlich; bei einer Auswertungsfunktion meist nicht.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Conways Beobachtung}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{6.0cm}@{}}
+\toprule
+\textbf{Die Aussage} & Ein System bildet die Kommunikationsstruktur seiner Erbauer ab\\
+\textbf{Die Folge} & \textbf{Drei Teams erzeugen drei Bestandteile --- auch wenn zwei genügten}\\
+\textbf{Der Umkehrschluss} & Wer die Struktur ändern will, ändert zuerst die Zuständigkeiten\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Beobachtung ist fast sechzig Jahre alt und in jedem größeren Vorhaben nachprüfbar. Sie erklärt, warum Nähte oft dort verlaufen, wo Abteilungsgrenzen liegen --- und nicht dort, wo die Sache es verlangt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Für ein Klinikvorhaben heißt das konkret: Wenn Labor, Station und Verwaltung je eigene Zuständigkeiten haben, entstehen drei Bestandteile mit drei Nähten --- unabhängig davon, ob der Befund das nahelegt.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Bewerten Sie eine vorgeschlagene Aufteilung.
+\item Rechnen Sie die Kosten einer Naht aus.
+\item Bestimmen Sie, was ein Werk fertig macht.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine Aufteilung bewerten.}
+
+\textbf{Der Vorschlag.} Die Auswertung in vier Dienste zerlegen.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.0cm}P{1.8cm}@{}}
+\toprule
+\textbf{Vorschlag} & \textbf{Eigener Grund?} & \textbf{Eigener Betrieb?} & \textbf{Urteil}\\
+\midrule
+Befunddienst & \textcolor{gruen}{ja} & \textcolor{gruen}{ja} & \textcolor{gruen}{\textbf{ja}}\\
+Verlaufsdienst & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{nein} & \textcolor{akzent}{\textbf{nein}}\\
+Anlassdienst & \textcolor{akzent}{nein} & \textcolor{akzent}{nein} & \textcolor{akzent}{nein}\\
+Benachrichtigung & \textcolor{gruen}{ja} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei von vier tragen. Verlauf und Anlassbestimmung sind reine Rechnung auf denselben Daten und ändern sich aus demselben Grund --- sie gehören in denselben Prozess. Ein eigener Dienst dafür erzeugt zwei Nähte für null Gewinn.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Rechnung für den Verlaufsdienst.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Im Prozess} & \textbf{Als Dienst} & \\
+\midrule
+Aufrufdauer & $\mathbf{48}$ ms & $\mathbf{51}$ ms & \\
+Bei Ausfall & \textcolor{gruen}{unmöglich} & \textcolor{akzent}{\textbf{Auswertung steht}} & \\
+Zeilen zusätzlich & $0$ & $\approx340$ & \\
+Bereitstellungen & $1$ & $2$ & \\
+Fehlerklassen neu & $0$ & $\mathbf{5}$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Drei Millisekunden mehr, dreihundertvierzig Zeilen Netzcode, eine zusätzliche Ausfallmöglichkeit und fünf neue Fehlerklassen --- für einen Bestandteil, der mit dem Aufrufer immer gemeinsam geändert wird.}
+\end{center}
+
+\medskip
+\textbf{(b) Kosten einer Naht.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Posten} & \textbf{Einmalig} & \textbf{Laufend}\\
+\midrule
+Format vereinbaren & $\approx2$ PT & \\
+Beide Seiten umsetzen & $\approx5$ PT & \\
+Fehlerbehandlung & $\approx4$ PT & \\
+Prüfung über die Naht & $\approx3$ PT & \textcolor{akzent}{\textbf{je Änderung}}\\
+Betriebs\-überwachung & $\approx2$ PT & \textcolor{akzent}{Bereitschaft}\\
+Versionierung & $\approx2$ PT & \textcolor{akzent}{\textbf{dauerhaft}}\\
+\midrule
+\textbf{Summe} & $\approx\mathbf{18}$ \textbf{PT} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Achtzehn Personentage für eine Naht, bevor eine Zeile Fachlogik geschrieben ist. Bei fünf Bestandteilen und vier Nähten sind das zweiundsiebzig Tage --- ein Drittel Personenjahr, das im Zeitplan meist nicht auftaucht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vorletzte Zeile ist die dauerhafteste: Eine Naht muss versioniert werden, weil beide Seiten nicht gleichzeitig umgestellt werden können. Kapitel~\ref{kap:vertraege} behandelt, wie.}
+\end{center}
+
+\medskip
+\textbf{(c) Was ein Werk fertig macht.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bedingung} & \textbf{Bei einem Programm} & \textbf{Bei einem Werk}\\
+\midrule
+Rechnet richtig & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{ja}\\
+Läuft schnell genug & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Prüfbar & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+\textbf{Übersteht Teilausfall} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\textbf{Im Betrieb befragbar} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\textbf{Einzeln erneuerbar} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Drei zusätzliche Bedingungen gegenüber Band 20, Kapitel~14 --- und alle drei sind prüfbar. Die fünfte wird am häufigsten vergessen: Ein Werk, das man im Betrieb nicht befragen kann, ist nicht fertig, gleichgültig wie gut es rechnet.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die sechste ist die anspruchsvollste: Jeder Bestandteil muss einzeln ausgetauscht werden können, während die anderen laufen. Wer das nicht kann, muss für jede Änderung das ganze Werk anhalten --- in einer Klinik ein Vorgang mit Terminplanung.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Zeitplan lügt bei Werken}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+\textbf{Posten} & \textbf{Geschätzt} & \textbf{Tatsächlich} & \\
+\midrule
+Fachlogik & $60\,\%$ & $\mathbf{35\,\%}$ & \\
+Nähte & \textcolor{akzent}{$15\,\%$} & \textcolor{akzent}{$\mathbf{30\,\%}$} & \\
+Betrieb, Überwachung & $10\,\%$ & $\mathbf{20\,\%}$ & \\
+Fehlerfälle & $15\,\%$ & $15\,\%$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite und dritte Zeile werden regelmäßig halbiert geschätzt, weil sie beim Entwurf unsichtbar sind: Man plant, was das System \kursiv{tun} soll, und nicht, wie die Teile miteinander reden und wie man ihnen dabei zusieht.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Brooks' Beobachtung, dass Vorhaben nicht durch mehr Leute schneller werden, hat hier eine Entsprechung: Sie werden auch nicht dadurch schneller, dass man sie in mehr Bestandteile zerlegt. Jede Naht ist Kommunikationsaufwand, in Code gegossen.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Parnas\zit{19} stellt die Zer\-le\-gungs\-fra\-ge, die vor jeder Ver\-tei\-lung steht; Ford und Richards\zit{9} ordnen die Ent\-wurfs\-ent\-schei\-dun\-gen im Großen; Brooks\zit{5} beschreibt, warum Auf\-tei\-lung Kom\-mu\-ni\-ka\-tions\-auf\-wand erzeugt.

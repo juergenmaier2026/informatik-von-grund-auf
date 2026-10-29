@@ -1,0 +1,249 @@
+\part{Das Urteil}
+
+\chapter{Der zweite Entwurf im Großen}\label{kap:zweiter}
+
+\begin{merksatz}
+\boxtitel{Was hier zusätzlich zählt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Kriterium} & \textbf{Band 20} & \textbf{Hier}\\
+\midrule
+Verstehenszeit & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Änderbarkeit & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Prüfbarkeit & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Größenordnung & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+\midrule
+\textbf{Übersteht Teilausfall} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\textbf{Im Betrieb befragbar} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\textbf{Einzeln erneuerbar} & --- & \textcolor{gruen}{\textbf{ja}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Bedingungen, alle prüfbar --- und die drei unteren lassen sich nicht nachträglich herstellen. Sie folgen aus der Bauform, und wer sie beim ersten Entwurf übergeht, baut beim zweiten das Werk um, nicht den Code.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Fall: die Verlaufsansicht durch das Werk}
+\textbf{Der erste Entwurf.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.4cm}P{2.4cm}@{}}
+\toprule
+\textbf{Schwäche} & \textbf{Kapitel} & \textbf{Wirkung}\\
+\midrule
+Nur ein Zeitpunkt & \ref{kap:zeit} & \textcolor{akzent}{\textbf{Verlauf falsch}}\\
+Einheit implizit & \ref{kap:zahlen} & \textcolor{akzent}{\textbf{Faktor $18$}}\\
+$n{+}1$ über die Naht & \ref{kap:zeit_hin} & \textcolor{akzent}{$5{,}1$ s}\\
+Keine Zeitschranken & \ref{kap:fehler} & \textcolor{akzent}{\textbf{Kaskade}}\\
+Fehler verschwiegen & \ref{kap:fehler} & \textcolor{akzent}{\textbf{Lücke unsichtbar}}\\
+Keine Verfolgung & \ref{kap:beobachtbarkeit} & \textcolor{akzent}{nicht aufklärbar}\\
+Wiederholung ohne Kennung & \ref{kap:naht} & \textcolor{akzent}{Werte doppelt}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Schwächen, und jede stammt aus einem anderen Kapitel. Keine davon ist ein Codefehler --- jede ist eine Entscheidung, die an einer Naht nicht getroffen wurde. Der Code selbst kann in jedem Bestandteil vorbildlich sein.}
+\end{minipage}
+\end{center}
+
+\textbf{Der zweite Entwurf.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Erster} & \textbf{Zweiter} & \\
+\midrule
+Zeilen gesamt & $4200$ & $\mathbf{5100}$ & $+21\,\%$\\
+Felder je Befund & $6$ & $\mathbf{11}$ & \\
+$95.$ Perzentil & $410$ ms & $\mathbf{95}$ ms & $4{,}3\times$\\
+Bei Langzeitpatient & $\mathbf{5{,}1}$ s & $\mathbf{298}$ ms & $17\times$\\
+Teilausfall verkraftet & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}} & \\
+Aufklärbar & \textcolor{akzent}{nein} & \textcolor{gruen}{ja} & \\
+Schwächen & $\mathbf{7}$ & $\mathbf{0}$ & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Einundzwanzig Prozent mehr Zeilen, fünf zusätzliche Felder je Befund --- und sieben Fehlerklassen fort. Das Muster aus Band 20 wiederholt sich: Der zweite Entwurf ist länger.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Was die fünf Felder kosten}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Zuwachs} & \\
+\midrule
+Byte je Befund & $16 \to \mathbf{34}$ & $+112\,\%$\\
+Bei $10^9$ Befunden & \textcolor{akzent}{$+\mathbf{18}$ \textbf{GB}} & \textcolor{mittel}{tragbar}\\
+Übertragungs\-dauer & $+3\,\%$ & \textcolor{gruen}{unerheblich}\\
+\textbf{Beantwortbare Fragen} & \textcolor{gruen}{\textbf{$+5$}} & \textcolor{gruen}{\textbf{der Gewinn}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Achtzehn Gigabyte für eine Milliarde Befunde --- bei heutigen Preisen ein zweistelliger Eurobetrag im Jahr. Dagegen stehen fünf Fragen, die vorher unbeantwortbar waren: Welcher Zeitpunkt? Welche Einheit? Wer hat wann was gesehen? Wurde korrigiert? Ist der Wert vollständig?}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Prüfen Sie die sieben Bedingungen.
+\item Bestimmen Sie die Reihenfolge des Umbaus.
+\item Untersuchen Sie, was nicht mehr zu ändern war.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Die sieben Bedingungen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bedingung} & \textbf{Prüfung} & \textbf{Ergebnis}\\
+\midrule
+Verstehenszeit & $5$ Fragen & \textcolor{mittel}{$88$ s}\\
+Änderbarkeit & neues Feld & \textcolor{gruen}{ohne Bruch}\\
+Prüfbarkeit & je Bestandteil & \textcolor{gruen}{\textbf{einzeln}}\\
+Größenordnung & $1000$ Geräte & \textcolor{gruen}{$495$ k/s}\\
+Teilausfall & \textbf{fünf Versuche} & \textcolor{gruen}{\textbf{bestanden}}\\
+Befragbar & Verfolgung & \textcolor{gruen}{ja}\\
+Einzeln erneuerbar & \textbf{Rollentausch} & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist wieder der Preis: achtundachtzig Sekunden gegen einundsechzig beim ersten Entwurf. Ein Werk mit Zeitschranken, Wiederholungen und Verfolgung ist schwerer zu lesen als eines ohne --- so wie in Band 21 und 22.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Antwort ist dieselbe wie dort und keine Rücknahme: Zerlegen und einen Kommentar an die Naht, der das Zusammenspiel erklärt. Danach liegt die Verstehenszeit bei zweiundsechzig Sekunden.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Reihenfolge des Umbaus.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.2cm}P{2.0cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Schritt} & \textbf{Aufwand} & \textbf{Wirkung}\\
+\midrule
+$1$ & \textbf{Verfolgung einbauen} & $4$ PT & \textcolor{gruen}{\textbf{sehen, was ist}}\\
+$2$ & Zeitschranken & $2$ PT & \textcolor{gruen}{keine Kaskaden}\\
+$3$ & \textbf{Vertrag erweitern} & $6$ PT & \textcolor{gruen}{\textbf{Zeit, Einheit}}\\
+$4$ & Beide Seiten umstellen & \textcolor{akzent}{$14$ PT} & \textbf{Kap.~\ref{kap:vertraege}}\\
+$5$ & Aufrufe bündeln & $2$ PT & \textcolor{gruen}{$17\times$}\\
+$6$ & Fehler sichtbar machen & $3$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Schritt eins steht vorn, obwohl er nichts verbessert: Ohne Verfolgung weiß man nicht, ob die späteren Schritte wirken. Das ist dieselbe Regel wie in Band 21 und 22 --- messen vor ändern.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Schritt vier ist der teuerste und der langwierigste: fünf Schritte über Wochen, weil beide Seiten nicht gleichzeitig umgestellt werden können. Das ist der Preis der Naht, den Kapitel~\ref{kap:vertraege} beziffert hat.}
+\end{center}
+
+\medskip
+\textbf{(c) Was nicht mehr zu ändern war.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Gegenstand} & \textbf{Änderbar?} & \\
+\midrule
+Code eines Bestandteils & \textcolor{gruen}{\textbf{leicht}} & \\
+Naht zwischen zweien & \textcolor{mittel}{mühsam} & \textbf{Wochen}\\
+\textbf{Format nach außen} & \textcolor{akzent}{\textbf{kaum}} & \textcolor{akzent}{\textbf{zwölf Fremdsysteme}}\\
+Bedeutung eines Feldes & \textcolor{akzent}{nie} & \textcolor{akzent}{\textbf{Altbestand}}\\
+Kennungs\-schema & \textcolor{akzent}{nie} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist die härteste Grenze des Umbaus: Der gespeicherte Zeitpunkt war über Jahre der Speicherzeitpunkt. Man kann das Feld künftig richtig füllen --- die Millionen alten Werte bleiben, wie sie sind, und der Verlauf bleibt für sie falsch.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Umgang mit Altbestand} & \textbf{Tauglich?} & \\
+\midrule
+Nachträglich ableiten & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Information fehlt}\\
+Schätzen & \textcolor{akzent}{\textbf{nie}} & \textcolor{akzent}{\textbf{erfundene Daten}}\\
+\textbf{Als unbekannt kennzeichnen} & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{ehrlich}}\\
+Stichtag einführen & \textcolor{gruen}{ja} & \textbf{ab da verlässlich}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die Versuchung, der man widerstehen muss: Aus dem Speicherzeitpunkt eine Abnahmezeit zu schätzen erzeugt Daten, die richtig aussehen und es nicht sind. Die dritte Zeile ist unbequem und die einzige zulässige.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Naht überlebt alles}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Gegenstand} & \textbf{Lebensdauer} & \\
+\midrule
+Eine Zeile Code & $\approx2$ Jahre & \\
+Ein Bestandteil & $\approx7$ Jahre & \\
+Eine Sprache im Werk & $\approx12$ Jahre & \\
+\textbf{Ein Datenformat} & \textcolor{akzent}{$\approx\mathbf{20}$ \textbf{Jahre}} & \\
+\textbf{Ein Kennungs\-schema} & \textcolor{akzent}{\textbf{unbegrenzt}} & \textcolor{akzent}{\textbf{Patientendaten}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die längste Verpflichtung, die man in einem Klinikvorhaben eingeht: Eine Patientenkennung muss die Aufbewahrungsfristen überdauern --- dreißig Jahre und mehr. Sie wird jeden Bestandteil, jede Sprache und jeden Beteiligten überleben.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb rechtfertigt eine Naht einen Aufwand, der für Code unangemessen wäre. Zwei Wochen für ein Format, das zwanzig Jahre gilt, sind gut angelegt --- und zwei Tage sind es nicht.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Fowler\zit{8} liefert die Schritte des Um\-baus im Großen; Ford und Richards\zit{9} ordnen die Ent\-schei\-dun\-gen ein; Newman\zit{17} behandelt die schritt\-wei\-se Ver\-än\-de\-rung ge\-wach\-se\-ner Werke.

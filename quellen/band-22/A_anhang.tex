@@ -1,0 +1,223 @@
+\appendix
+\part{Anhang}
+
+\newcommand{\lit}[3]{\vspace{5pt}\noindent\textbf{[#1]} #2\par\nopagebreak\vspace{1pt}{\small\itshape\color{grau} #3}\par\vspace{2pt}}
+
+\chapter{Regeln und Kenngrößen}
+
+\begin{merksatz}
+\boxtitel{Die Regeln}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{5.4cm}@{}}
+\toprule
+\textbf{Fehler} & Zusammenhang hinzufügen, ursprünglichen behalten\\
+\textbf{Schnittstellen} & Beim Aufrufer, so klein wie möglich\\
+\textbf{Goroutinen} & \textbf{Wer sie startet, weiß, wann sie endet}\\
+\textbf{Kanäle} & Der Sender schließt, nie der Empfänger\\
+\textbf{Puffer} & \textbf{Vorgabe null --- Gegendruck erhalten}\\
+\textbf{Nullwert} & Typen so entwerfen, dass er brauchbar ist\\
+\textbf{Abschnitte} & Teilstücke nach außen mit begrenzter Kapazität\\
+\textbf{Pakete} & Ein Geheimnis je Paket, keine Zyklen\\
+\textbf{Abhängigkeiten} & \textbf{Erst die Standardbibliothek prüfen}\\
+\textbf{Prüfstrecke} & \code{vet} und Wettlaufprüfer bei jeder Übergabe\\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die wichtigsten Zahlen}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.42}
+\begin{tabular}{@{}P{4.0cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Wert} & \textbf{Kapitel}\\
+\midrule
+Keller Goroutine gegen Faden & Faktor $\approx4000$ & \ref{kap:goroutinen}\\
+Goroutine erzeugen & $\approx0{,}3$ µs & \ref{kap:goroutinen}\\
+Praktische Obergrenze & $\approx10^6$ & \ref{kap:goroutinen}\\
+Kanaloperation & $\approx100$ ns & \ref{kap:kanaele}\\
+Sperre gegen Kanal & Faktor $\approx14$ & \ref{kap:kanaele}\\
+Schnittstellenaufruf & $\approx2{,}4$ ns & \ref{kap:schnittstellen}\\
+Anteil Fehlerbehandlung & $\approx30\,\%$ & \ref{kap:fehler}\\
+Zeit bis Ursache & $\approx6$ min & \ref{kap:fehler}\\
+Anhaltezeit Bereinigung & $<0{,}5$ ms & \ref{kap:leistung}\\
+Anteil Bereinigung & $5$--$25\,\%$ & \ref{kap:leistung}\\
+Go gegen C, Rechenarbeit & $\approx1{,}3\times$ & \ref{kap:leistung}\\
+Einarbeitung & $2$--$5$ Tage & \ref{kap:auslassungen}\\
+Prüfstrecke einrichten & $\approx2$ h & \ref{kap:werkzeuge}\\
+Wettlaufprüfer, Laufzeit & $\times5$--$10$ & \ref{kap:schiefgeht}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Alle Werte sind Größenordnungen. Die Verhältnisse sind belastbarer als die absoluten Zahlen --- und auf Verhältnissen beruhen die Argumente dieses Bandes.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die acht Auslassungen, bilanziert}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Fehlt} & \textbf{Gewinn} & \textbf{Preis}\\
+\midrule
+Ausnahmen & \textbf{sichtbarer Pfad} & \textcolor{akzent}{$30\,\%$ Zeilen}\\
+Vererbung & \textbf{keine Hierarchien} & \textcolor{akzent}{Wiederholung}\\
+Klassen & wenige Begriffe & \\
+Konstruktoren & \textbf{Nullwert nutzbar} & \textcolor{akzent}{nicht immer möglich}\\
+Makros & \textbf{lesbarer Text} & \textcolor{akzent}{keine Erweiterung}\\
+Operator\-überladung & Lesbarkeit & \textcolor{akzent}{\textbf{Mathematik leidet}}\\
+Implizite Umwandlung & \textbf{keine Überraschung} & \textcolor{akzent}{mehr Text}\\
+Generizität bis 2022 & \textcolor{gruen}{zurück\-genommen} & \textcolor{akzent}{zwölf Jahre}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Acht Auslassungen, acht Gewinne, sieben Preise --- die Zusammenfassung dieses Bandes auf einer Seite. Keine Zeile ist umsonst zu haben.}
+\end{center}
+\end{merksatz}
+
+\chapter{Landkarte und Glossar}
+
+\begin{merksatz}
+\boxtitel{Wo was steht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.6cm}P{4.2cm}@{}}
+\toprule
+\textbf{Kap.} & \textbf{Thema} & \textbf{Verweise}\\
+\midrule
+$1$ & Was fehlt und warum & \textbf{Band 20, Kap.~8}\\
+$2$ & Fehler als Werte & \textbf{Band 21, Kap.~5}\\
+$3$ & Schnittstellen & \textbf{Band 17, Kap.~4}\\
+$4$ & Goroutinen & \textbf{Band 4}\\
+$5$ & Kanäle & Band 4, Band 21, Kap.~9\\
+$6$ & Wo es schiefgeht & \textbf{Band 21, Kap.~10}\\
+$7$ & Pakete & \textbf{Band 21, Kap.~11}\\
+$8$ & Zusammensetzung & Band 17, Band 20, Kap.~14\\
+$9$ & Der Nullwert & \textbf{Band 21, Kap.~3}\\
+$10$ & Werkzeuge & \textbf{Band 21, Kap.~10}\\
+$11$ & Prüfen & \textbf{Band 20, Kap.~9}\\
+$12$ & Leistung & Band 21, Kap.~2\\
+$13$ & Der zweite Entwurf & \textbf{Band 20, Kap.~13}\\
+$14$ & Wann Go & \textbf{Band 21, Kap.~14}\\
+$15$ & Stand 2026 & Band 19\\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Begriffe}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.32}
+\begin{tabular}{@{}P{3.3cm}P{5.4cm}@{}}
+\toprule
+\textbf{Abschnitt} & Fenster auf ein Feld: Zeiger, Länge, Kapazität\\
+\textbf{Einbettung} & Feld ohne Namen; Methoden werden hochgereicht\\
+\textbf{Gegendruck} & Bremsen des Senders durch blockiertes Senden\\
+\textbf{Gestaltprüfung} & Erfüllung einer Schnittstelle ohne Erklärung\\
+\textbf{Goroutine} & Von der Laufzeitumgebung verwalteter Ablauf\\
+\textbf{Goroutinenleck} & Goroutine, die nie endet\\
+\textbf{Kanal} & Typisierte Übergabestelle zwischen Goroutinen\\
+\textbf{Nullwert} & Anfangswert eines Typs ohne Zuweisung\\
+\textbf{Tabellenprüfung} & Prüffälle als Datenzeilen statt als Funktionen\\
+\textbf{Zählgruppe} & Zähler, der auf das Ende mehrerer Goroutinen wartet\\
+\bottomrule
+\end{tabular}}
+\end{center}
+\end{merksatz}
+
+\chapter{Kommentierte Quellen}
+
+\lit{1}{Bodner, J.: \textit{Learning Go}. 2.\ Aufl., O'Reilly 2024.}{Die beste Einführung für Umsteiger. Behandelt ausdrücklich die Umgewöhnung --- warum man keine Hierarchien baut und was stattdessen tritt. Aktuell bis einschließlich der Typparameter.}
+
+\lit{2}{Cheney, D.: Beiträge und Vorträge zu Go. Fortlaufend.}{Frei verfügbar und über Jahre gepflegt. Die Beiträge zur Fehlerbehandlung und zur Messpraxis sind die gründlichsten Texte zu diesen Fragen, die es gibt --- gründlicher als jedes Buch.}
+
+\lit{3}{Cox, R.: \textit{Our Software Dependency Problem}. 2019.}{\textbf{Der Aufsatz zur Frage, was eine fremde Abhängigkeit kostet.} Nüchtern, mit Belegen, ohne Alarmismus --- und mit einer brauchbaren Prüfliste vor der Aufnahme.}
+
+\lit{4}{Cox, R.: Beiträge zum Sprachentwurf und zu Modulen. Fortlaufend.}{Erklärt die Entscheidungen von innen: warum Module so aussehen, wie sie aussehen, und warum die Typparameter zwölf Jahre gebraucht haben. Selten, dass ein Sprachentwurf so offen begründet wird.}
+
+\lit{5}{Dijkstra, E.: \textit{Cooperating Sequential Processes}. 1965.}{Die Grundlagenschrift zur nebenläufigen Koordination --- Semaphore, gegenseitiger Ausschluss, Verklemmung. Alles, was Kapitel~\ref{kap:schiefgeht} behandelt, steht hier zum ersten Mal.}
+
+\lit{6}{Donovan, A., Kernighan, B.: \textit{The Go Programming Language}. Addison-Wesley 2015.}{\textbf{Das Standardwerk, in der Tradition von [K\&R].} Vollständig, knapp, mit durchdachten Beispielen. Älter als die Typparameter und in allem anderen unverändert gültig.}
+
+\lit{7}{\textit{Effective Go}. Go-Dokumentation, seit 2009.}{Die Gewohnheiten der Sprache auf etwa vierzig Seiten --- Benennung, Zerlegung, Nebenläufigkeitsmuster. Frei verfügbar und in zwei Stunden gelesen.}
+
+\lit{8}{Fowler, M.: \textit{Refactoring}. 2.\ Aufl., Addison-Wesley 2018.}{Der Katalog der Umgestaltungsschritte, sprachunabhängig. Für Kapitel~\ref{kap:zweiter} die Grundlage --- und die Erinnerung, dass ohne Prüfnetz kein Umbau stattfindet.}
+
+\lit{9}{Gerrand, A.: \textit{Go Slices: usage and internals}. 2011.}{\textbf{Der Text, der Abschnitte erklärt} --- die drei Zahlen, das geteilte Feld, die Folgen für \code{append}. Wer ihn gelesen hat, macht die Fehler aus Kapitel~\ref{kap:nullwert} nicht mehr.}
+
+\lit{10}{\textit{The Go Memory Model}. Sprachdokumentation.}{Legt fest, welche Zu\-si\-che\-run\-gen zur Sicht\-bar\-keit zwischen Go\-rou\-ti\-nen gelten. Kurz, formal und die einzige verbindliche Antwort auf die Frage, was ein Wettlauf ist.}
+
+\lit{11}{\textit{The Go Programming Language Specification}. Fortlaufend.}{Etwa neunzig Seiten für die vollständige Sprache --- lesbar an einem Nachmittag. Dass das möglich ist, ist selbst ein Argument in der Sache dieses Bandes.}
+
+\lit{12}{Griesemer, R., Pike, R., Thompson, K.: Go FAQ und Entwurfsdokumente. Fortlaufend.}{\textbf{Begründet jede Auslassung einzeln.} Wer wissen will, warum es keine Vererbung und keine Ausnahmen gibt, findet hier die Antwort der Urheber statt der Vermutung Dritter.}
+
+\lit{13}{Hoare, C.\,A.\,R.: \textit{Communicating Sequential Processes}. CACM 21(8), 1978.}{Die theoretische Grundlage der Kanäle. Anspruchsvoll und lohnend --- man sieht, dass Go hier eine vierzig Jahre alte Idee aufgegriffen und praktisch gemacht hat.}
+
+\lit{14}{Kennedy, W., u.\,a.: \textit{Ultimate Go Notebook}. Ardan Labs 2021.}{Gründlich in den Entwurfsfolgen: Wert oder Zeiger, Belegungen, Speicheranordnung. Näher an der Maschine als die übrigen Go-Bücher --- die Brücke zu Band 21.}
+
+\lit{15}{Lamport, L.: \textit{Time, Clocks, and the Ordering of Events}. CACM 21(7), 1978.}{Begründete den Begriff der Ordnung von Ereignissen in nebenläufigen Systemen. Ohne diesen Begriff lässt sich nicht sagen, was ein Wettlauf überhaupt ist.}
+
+\lit{16}{Ousterhout, J.: \textit{A Philosophy of Software Design}. Yaknyam Press 2018.}{Fordert tiefe Schnittstellen --- wenig nach außen, viel dahinter. Dieselbe These wie in Band 20 und 21, und in Go am unmittelbarsten umsetzbar.}
+
+\lit{17}{Parnas, D.: \textit{On the Criteria To Be Used in Decomposing Systems into Modules}. CACM 15(12), 1972.}{\textbf{Fünf Seiten, die den Modulbegriff begründet haben.} Für Kapitel~\ref{kap:pakete} unmittelbar anwendbar: Ein Paket verbirgt ein Geheimnis, sonst ist es keines.}
+
+\lit{18}{Pike, R.: \textit{Concurrency Is Not Parallelism}. Vortrag, 2012.}{\textbf{Beendet eine Verwechslung in dreißig Minuten.} Nebenläufigkeit ist eine Entwurfsform, Parallelität eine Ausführungsform --- danach redet man präziser über beides.}
+
+\lit{19}{Pike, R.: \textit{Go at Google: Language Design in the Service of Software Engineering}. 2012.}{Erklärt, aus welchen Erfahrungen mit großen Beständen die Entscheidungen entstanden. Das wichtigste Dokument, um Go zu verstehen statt es nur zu benutzen.}
+
+\lit{20}{Pike, R.: \textit{Go Proverbs}. Vortrag, 2015.}{Zwanzig Sätze, die die Haltung verdichten --- \enquote{ein wenig Kopieren ist besser als ein wenig Abhängigkeit} und ähnliche. Merksätze, keine Regeln, und als solche brauchbar.}
+
+\lit{21}{\textit{Go Concurrency Patterns}. Vorträge und Beiträge, seit 2012.}{Die wieder\-kehrenden Bau\-for\-men: Ver\-ar\-bei\-tungs\-ket\-ten, Auf\-tei\-len und Zu\-sam\-men\-füh\-ren, Abbruch, Zeit\-schran\-ken. Kapitel~\ref{kap:kanaele} folgt ihnen.}
+
+\lit{22}{Valsorda, F.: Beiträge zu Sicherheit und Kryptographie in Go. Fortlaufend.}{Von jemandem, der die Kryptographie der Standardbibliothek gepflegt hat. Behandelt auch die Fragen der Auslieferung und der Abhängigkeitsprüfung.}
+
+\lit{23}{Wirth, N.: \textit{Algorithms + Data Structures = Programs}. Prentice Hall 1976.}{Der Titel ist die These und enthält eine Rangordnung. Sie gilt auch hier: Die Datenstruktur kommt vor der Einstellung des Bereinigungsanteils.}
+
+\lit{24}{Brooks, F.: \textit{No Silver Bullet}. IEEE Computer 20(4), 1987.}{\textbf{Trennt wesentliche von zufälliger Komplexität.} Keine Sprache beseitigt die erste --- Go beseitigt einen Teil der zweiten, und mehr zu behaupten wäre unredlich.}
+
+\lit{25}{\textit{Error Handling and Go} und \textit{Working with Errors in Go 1.13}. Go-Blog, 2015 und 2019.}{Erklären Kette, \code{Is} und \code{As}. Kurz und für Kapitel~\ref{kap:fehler} die maßgebliche Quelle --- die Fehlerbehandlung hat sich seit 1.13 erheblich verbessert.}
+
+\lit{26}{\textit{An Introduction to Generics}. Go-Blog, 2022.}{Erklärt die Typparameter und ihre Grenzen. Bemerkenswert ist die Zurückhaltung: Der Text rät ausdrücklich davon ab, sie zu verwenden, wo konkrete Typen genügen.}
+
+\lit{27}{Werkzeugdokumentation: \code{go vet}, \code{pprof}, \code{go test}, \code{govulncheck}.}{Frei verfügbar, kürzer als erwartet, und ohne Einrichtungsaufwand nutzbar. Zwei Stunden genügen für eine vollständige Prüfstrecke --- Kapitel~\ref{kap:werkzeuge} rechnet es vor.}
+
+\lit{28}{\textit{Data Race Detector}. Go-Dokumentation.}{Beschreibt den Wettlaufprüfer und seine Grenzen. Wichtigster Satz: Er meldet keine Fehlalarme --- was er meldet, ist ein Wettlauf. Und er sieht nur, was ausgeführt wird.}
+
+\begin{merksatz}
+\boxtitel{Wenn Sie nur drei Bücher kaufen}
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{@{}P{1.0cm}P{3.0cm}P{4.6cm}@{}}
+\toprule
+\textbf{[6]} & \textbf{Donovan, Kernighan} & \textbf{Für die Sprache}\\
+\textbf{[1]} & \textbf{Bodner} & Für die Umgewöhnung\\
+\textbf{[14]} & \textbf{Kennedy} & \textbf{Für die Entwurfsfolgen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Donovan und Kernighan lehren die Sprache, Bodner die Umstellung, Kennedy das, was darunter geschieht. Auffällig ist, wie viel hier nicht Buchform hat: Die besten Texte zu Fehlerbehandlung, Abschnitten und Nebenläufigkeit sind Beiträge und Vorträge.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Zwei Ergänzungen, beide frei verfügbar und beide kurz: [19] Pike, um zu verstehen, warum Go so aussieht. Und [18] --- dreißig Minuten, nach denen man Nebenläufigkeit und Parallelität nicht mehr verwechselt.}
+\end{center}
+\end{merksatz}

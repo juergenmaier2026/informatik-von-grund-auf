@@ -1,0 +1,172 @@
+\chapter{Das Werkzeug, das bleibt}\label{fall:werkzeug}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Kein Code --- ein Vorschlag. Die Auswertung soll von der bestehenden Prüf- und Bauumgebung auf ein modernes Rahmenwerk umgestellt werden.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Versprechen} & \textbf{Glaubhaft?} & \\
+\midrule
+Schnellere Bauläufe & \textcolor{gruen}{\textbf{ja}} & $210$ s $\to$ $40$ s\\
+Bessere Fehlermeldungen & \textcolor{gruen}{ja} & \\
+Weniger Konfiguration & \textcolor{gruen}{\textbf{ja}} & $340 \to 60$ Zeilen\\
+Verbreiteter & \textcolor{gruen}{ja} & \textbf{leichtere Einstellung}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Versprechen, alle zutreffend, alle nachprüfbar. Der Vorschlag ist gut begründet und kommt von jemandem, der die neue Umgebung kennt. Es gibt kein technisches Gegenargument.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Was die Umstellung tatsächlich umfasst.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Posten} & \textbf{Aufwand} & \\
+\midrule
+Umstellung selbst & $\mathbf{6}$ PT & \textcolor{gruen}{wie veranschlagt}\\
+Bauläufe anpassen & $\mathbf{4}$ PT & \\
+\textbf{Prüfstrecke} & $\mathbf{9}$ PT & \textcolor{akzent}{nicht veranschlagt}\\
+\textbf{Vier weitere Bestandteile} & \textcolor{akzent}{$\mathbf{22}$ \textbf{PT}} & \textcolor{akzent}{\textbf{sonst zwei Welten}}\\
+Einarbeitung, $6$ Personen & $\mathbf{12}$ PT & \\
+Nachweis\-dokumentation & \textcolor{akzent}{$\mathbf{8}$ PT} & \textcolor{akzent}{Medizinprodukt}\\
+\midrule
+\textbf{Summe} & \textcolor{akzent}{$\approx\mathbf{61}$ \textbf{PT}} & \textbf{veranschlagt: $6$}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Einundsechzig Personentage statt sechs. Der größte Posten ist die vierte Zeile und wird regelmäßig übersehen: Ein Werkzeug in einem von fünf Bestandteilen bedeutet zwei Bauwelten, zwei Anleitungen und zwei Wege, dieselbe Frage zu beantworten.}
+\end{minipage}
+\end{center}
+
+\textbf{Was der Gewinn wert ist.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ersparnis} & \textbf{Je Jahr} & \\
+\midrule
+Bauzeit, $170$ s je Lauf & $\approx\mathbf{9}$ \textbf{PT} & \textbf{$1200$ Läufe}\\
+Konfigurations\-pflege & $\approx2$ PT & \\
+Fehlersuche & $\approx1$ PT & \\
+\midrule
+\textbf{Summe} & $\approx\mathbf{12}$ \textbf{PT/Jahr} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Zwölf Personentage im Jahr gegen einundsechzig einmalig --- die Umstellung amortisiert sich nach etwa fünf Jahren. Das ist keine Ablehnung, sondern eine Zahl, die niemand erhoben hatte.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: so gelassen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Erwägung} & \textbf{Gewicht} & \\
+\midrule
+Amortisation $5$ Jahre & \textcolor{akzent}{gegen} & \textbf{länger als geplant}\\
+Zwei Bauwelten & \textcolor{akzent}{\textbf{gegen}} & \textcolor{akzent}{oder $22$ PT mehr}\\
+Bestehendes läuft & \textcolor{akzent}{gegen} & \textcolor{gruen}{keine Beschwerden}\\
+Bauzeit stört & \textcolor{gruen}{dafür} & $210$ s\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Stattdessen wurde das Naheliegende gemessen: Von den zweihundertzehn Sekunden Bauzeit entfielen hundertdreißig auf einen ungünstig gesetzten Prüfschritt. Vier Stunden Arbeit brachten die Bauzeit auf achtzig Sekunden --- die Hälfte des versprochenen Gewinns für ein Sechzigstel des Aufwands.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Umstellen} & \textbf{Messen} & \\
+\midrule
+Aufwand & $\mathbf{61}$ PT & \textcolor{gruen}{$\mathbf{0{,}5}$ PT} & \\
+Bauzeit nachher & $\mathbf{40}$ s & $\mathbf{80}$ s & \\
+Gewinn erreicht & $100\,\%$ & \textcolor{gruen}{$\mathbf{76\,\%}$} & \\
+Zwei Bauwelten & \textcolor{akzent}{ja} & \textcolor{gruen}{nein} & \\
+Rückweg möglich & \textcolor{akzent}{schwer} & \textcolor{gruen}{\textbf{trivial}} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sechsundsiebzig Prozent des Gewinns für ein Hundertzwanzigstel des Aufwands. Der Rest --- vierzig Sekunden Unterschied je Lauf --- rechtfertigt keine Umstellung, die fünf Jahre braucht, um sich zu tragen.}
+\end{minipage}
+\end{center}
+
+\textbf{Was aufgeschrieben wurde.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Der Vorschlag} & mit vollständiger Aufwandsschätzung\\
+\textbf{Die Bedingungen} & \textbf{Wann er wieder zu prüfen ist}\\
+\textbf{Das Datum} & \textbf{in zwei Jahren, oder früher bei Anlass}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Ein abgelehnter Vorschlag ohne Wiedervorlage kommt in einem Jahr unverändert zurück, und dieselbe Diskussion wird noch einmal geführt. Mit Datum und Bedingungen wird aus der Ablehnung eine Vertagung --- und die Zahlen liegen beim nächsten Mal schon vor.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Neue Werkzeuge lohnen nie} & \textcolor{akzent}{\textbf{nein}} & \textbf{oft doch}\\
+\enquote{Das Bestehende ist gut} & \textcolor{akzent}{nein} & \textcolor{akzent}{es ist bezahlt}\\
+\enquote{Der Vorschlag war falsch} & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{\textbf{er war unvollständig}}\\
+\textbf{\enquote{Der Umstellungsaufwand gehört in die Rechnung}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist mir wichtig: Der Vorschlag war sachlich richtig in allem, was er behauptete. Er hat nur die Hälfte der Rechnung aufgemacht --- den Nutzen vollständig, die Kosten teilweise. Das ist der Normalfall bei Werkzeugvorschlägen, und zwar auf beiden Seiten.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist der Fehlschluss in die Gegenrichtung, gegen den sich dieser Band ebenso wendet: Bestehendes ist nicht deshalb richtig, weil es besteht. Hätte die Messung nichts gebracht, wäre das Urteil anders ausgefallen.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Brooks\zit{3} zeigt, warum kein Werk\-zeug die we\-sent\-li\-che Kom\-ple\-xi\-tät be\-sei\-tigt; Hunt und Thomas\zit{15} raten, Werk\-zeu\-ge zu be\-herr\-schen statt sie zu wech\-seln.

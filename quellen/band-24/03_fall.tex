@@ -1,0 +1,175 @@
+\chapter{Die verfrühte Abstraktion}\label{fall:abstraktion}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Vor drei Jahren wurden zwei ähnliche Prüfungen zu einer verallgemeinerten Regelmaschine zusammengefasst.
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{class RegelMaschine:}\\
+\code{\ \ \ \ def \_\_init\_\_(self, regeln: list[Regel],}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ modus: str = "alle",}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ abbruch: bool = False,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kontext: dict | None = None): ...}\\
+\\
+\code{\ \ \ \ def pruefe(self, gegenstand, \*\*args) -> list[Treffer]: ...}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Umfang} & \textbf{Zeilen} & \\
+\midrule
+Maschine & $\mathbf{340}$ & \\
+Regelbasisklasse & $90$ & \\
+Regeln & $6 \times \approx25$ & \\
+Verwendungen & $\mathbf{2}$ & \textcolor{akzent}{\textbf{seit drei Jahren}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vierhundertdreißig Zeilen Gerüst für zwei Verwendungen --- die Grenzwertprüfung und die Plausibilitätsprüfung. Die dritte, für die sie gebaut wurde, ist nie gekommen.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Anzeichen} & \textbf{Vorhanden?} & \\
+\midrule
+Weniger als drei Fälle & \textcolor{akzent}{\textbf{ja}} & \textbf{Band 20, Kap.~14}\\
+Schaltparameter & \textcolor{akzent}{ja} & $3$\\
+Unzulässige Kombinationen & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{nicht dokumentiert}\\
+\code{**args} durchgereicht & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{\textbf{Typprüfung fort}}\\
+Beide Nutzer nutzen Teilmengen & \textcolor{akzent}{ja} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf von fünf Anzeichen. Der vierte ist der schwerste: Das Durchreichen beliebiger Argumente hebt jede Typprüfung auf --- man erfährt erst zur Laufzeit, dass eine Regel ein Feld erwartet, das es nicht gibt.}
+\end{minipage}
+\end{center}
+
+\textbf{Was die Verallgemeinerung tatsächlich erlaubt hat.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Erwartet} & \textbf{Eingetreten} & \\
+\midrule
+Neue Regeln ohne Code & \textcolor{akzent}{\textbf{nein}} & \textbf{jede war Code}\\
+Regeln zur Laufzeit ändern & \textcolor{akzent}{nein} & nie gebraucht\\
+Dritte Verwendung & \textcolor{akzent}{\textbf{nein}} & \\
+Prüfungen wiederverwendbar & \textcolor{gruen}{teilweise} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Drei von vier Erwartungen sind nicht eingetreten. Die erste ist die aufschlussreichste: Jede neue Regel war eine neue Klasse mit neuem Code --- die Maschine hat den Code nicht erspart, sondern eine Hülle darum gelegt.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: umgebaut}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{def grenzwertpruefung(befund: Befund,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vorher: Befund | None) -> set[Anlass]: ...}\\
+\\
+\code{def plausibilitaetspruefung(befund: Befund,}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ grenzen: Grenzen) -> set[Fehler]: ...}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Zwei Funktionen mit klaren Signaturen statt einer Maschine mit vier Konstruktorargumenten. Die sechs Regeln bleiben als sechs Funktionen erhalten --- sie waren nie das Problem, sondern das Gerüst um sie herum.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Umgebaut} & \\
+\midrule
+Zeilen gesamt & $\mathbf{580}$ & $\mathbf{310}$ & $-47\,\%$\\
+Typprüfung & \textcolor{akzent}{teilweise} & \textcolor{gruen}{\textbf{vollständig}} & \\
+Verstehenszeit & $\mathbf{240}$ s & $\mathbf{55}$ s & $4{,}4\times$\\
+Neue Regel hinzufügen & $2$ h & $\mathbf{40}$ min & \\
+Aufwand & --- & $\mathbf{5}$ PT & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zweihundertsiebzig Zeilen weniger, und das Hinzufügen einer Regel wird schneller statt langsamer. Das ist das Kennzeichen einer verfrühten Abstraktion: Sie sollte künftige Arbeit ersparen und hat sie verteuert.}
+\end{minipage}
+\end{center}
+
+\textbf{Warum jetzt und nicht früher?}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Zeitpunkt} & \textbf{Wissen} & \\
+\midrule
+Vor $3$ Jahren & \textcolor{akzent}{\textbf{Vermutung}} & \textbf{dritte Verwendung}\\
+Nach $1$ Jahr & \textcolor{mittel}{Zweifel} & \\
+\textbf{Heute} & \textcolor{gruen}{\textbf{Gewissheit}} & \textcolor{gruen}{drei Jahre ohne}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Der Rückbau war vor drei Jahren nicht möglich, weil niemand wissen konnte, dass die dritte Verwendung ausbleibt. Er ist heute möglich, weil man es weiß --- und das ist der einzige Unterschied.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Abstraktion ist schlecht} & \textcolor{akzent}{\textbf{nein}} & \\
+\enquote{Keine Rahmenwerke bauen} & \textcolor{akzent}{nein} & \textcolor{akzent}{ab drei Fällen richtig}\\
+\enquote{Der Erbauer hat sich geirrt} & \textcolor{akzent}{\textbf{nein}} & \textbf{er konnte es nicht wissen}\\
+\textbf{\enquote{Verallgemeinern, wenn der dritte Fall da ist}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist mir wichtig: Die Maschine war eine vertretbare Entscheidung unter Unsicherheit. Falsch war nicht ihr Bau, sondern dass drei Jahre lang niemand geprüft hat, ob die Annahme eingetreten ist.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt eine Betriebsregel, keine Entwurfsregel: Jede Verallgemeinerung, die auf einer Erwartung beruht, bekommt einen Termin. Nach einem Jahr wird geprüft, ob die Erwartung eingetreten ist --- und wenn nicht, wird zurückgebaut.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Ous\-ter\-hout\zit{23} nennt die Merk\-ma\-le einer Ab\-strak\-tion, die nichts ver\-birgt; Dijkstra\zit{7} mahnte früh, dass All\-ge\-mein\-heit ohne An\-lass die Ein\-sicht ver\-stellt.

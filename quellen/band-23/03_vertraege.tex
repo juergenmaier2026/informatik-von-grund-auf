@@ -1,0 +1,307 @@
+\chapter{Verträge}\label{kap:vertraege}
+
+\begin{merksatz}
+\boxtitel{Was ein Nahtvertrag festlegt}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.4cm}@{}}
+\toprule
+\textbf{Punkt} & \textbf{Beispiel} & \\
+\midrule
+Felder und Typen & \code{wert: int64} & \textbf{das Offensichtliche}\\
+\textbf{Einheit} & \code{mmol/l} & \textcolor{akzent}{\textbf{oft fehlend}}\\
+\textbf{Genauigkeit} & \code{exp: -2} & \textcolor{akzent}{oft fehlend}\\
+Pflicht oder optional & --- & \\
+\textbf{Wertebereich} & $0$ bis $20$ & \textcolor{gruen}{\textbf{Plausibilität}}\\
+Bedeutung des Fehlens & \textbf{nicht gemessen?} & \textcolor{akzent}{\textbf{nie festgelegt}}\\
+Verhalten bei Wiederholung & idempotent & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Punkte, von denen die meisten Schemasprachen nur den ersten und vierten ausdrücken können. Die übrigen stehen im besten Fall im Kommentar --- und im Normalfall nirgends.}
+\end{minipage}
+\end{center}
+
+\textbf{Die sechste Zeile im Einzelnen.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{6.4cm}@{}}
+\toprule
+\textbf{Feld fehlt} & Kann bedeuten: nicht gemessen, nicht auswertbar, nicht übermittelt, nicht erlaubt\\
+\textbf{Der Unterschied} & \textbf{Klinisch erheblich --- Band 20, Kap.~2}\\
+\textbf{Die Abhilfe} & Kein Weglassen, sondern ein ausdrücklicher Wert\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Ein fehlender Kaliumwert und ein nicht auswertbarer Kaliumwert sind verschiedene Sachverhalte. Wer beide durch \enquote{Feld nicht vorhanden} darstellt, hat Information vernichtet, bevor sie die Naht erreicht.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Was ein Schema leistet und was nicht}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Prüft} & \textbf{Schema} & \\
+\midrule
+Feld vorhanden & \textcolor{gruen}{\textbf{ja}} & \\
+Typ richtig & \textcolor{gruen}{ja} & \\
+Wertebereich & \textcolor{mittel}{teils} & \\
+\textbf{Einheit passt zur Größe} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Fachlogik}}\\
+Zeitpunkt plausibel & \textcolor{akzent}{nein} & \\
+Kennung eindeutig & \textcolor{akzent}{nein} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Ein Schema ist die untere Hälfte des Vertrags --- notwendig und bei weitem nicht hinreichend. Die drei unteren Zeilen verlangen fachliche Prüfungen an der Naht, und die schreibt niemand, wenn das Schema grün meldet.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Änderungen ohne Bruch}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Änderung} & \textbf{Bricht?} & \\
+\midrule
+Optionales Feld hinzu & \textcolor{gruen}{\textbf{nein}} & \textbf{der sichere Weg}\\
+Pflichtfeld hinzu & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{alte Sender}\\
+Feld entfernen & \textcolor{akzent}{ja} & \textcolor{akzent}{alte Empfänger}\\
+Typ ändern & \textcolor{akzent}{\textbf{ja}} & \\
+Feld umbenennen & \textcolor{akzent}{ja} & \textbf{= entfernen + hinzu}\\
+Bedeutung ändern & \textcolor{akzent}{\textbf{ja, unbemerkt}} & \textcolor{akzent}{\textbf{das Schlimmste}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die gefährlichste, weil kein Werkzeug sie erkennt: Wenn \code{zeitpunkt} von der Abnahme auf die Validierung umgedeutet wird, bleibt das Schema gültig und alle Verläufe sind falsch. Kapitel~\ref{kap:zeit} behandelt genau diesen Fall.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Regel für beide Seiten.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Als Sender} & Sende genau, was vereinbart ist --- streng\\
+\textbf{Als Empfänger} & \textbf{Nimm entgegen, was du verstehst; ignoriere Unbekanntes}\\
+\textbf{Die Grenze} & \textbf{Nicht: rate, was gemeint war}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Postels Regel, streng gelesen. Sie erlaubt, ein neues optionales Feld einzuführen, ohne alle Empfänger gleichzeitig umzustellen. Die dritte Zeile ist der heute übliche Vorbehalt: Großzügigkeit beim Deuten hat mehr Sicherheitslücken erzeugt als Nachsicht Nutzen brachte.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Reihenfolge beim Umstellen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{1.0cm}P{7.6cm}@{}}
+\toprule
+$1$ & \textbf{Empfänger versteht altes und neues Format}\\
+$2$ & Empfänger ausrollen, warten, prüfen\\
+$3$ & \textbf{Sender auf neues Format umstellen}\\
+$4$ & Warten, bis kein altes Format mehr auftritt\\
+$5$ & \textbf{Erst dann altes Format entfernen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf Schritte über Wochen, für eine Änderung, die im Programm eine Minute dauert. Das ist der Preis der Naht --- und wer die Schritte zwei und vier überspringt, verliert Daten in dem Zeitfenster, in dem beide Seiten nicht zusammenpassen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Schritt vier verlangt eine Messung: Wie viele Nachrichten kommen noch im alten Format? Ohne diese Zahl ist Schritt fünf ein Ratespiel --- Kapitel~\ref{kap:beobachtbarkeit} liefert sie.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Schreiben Sie den Vertrag für die Befundnaht.
+\item Bewerten Sie ein fachliches Austauschformat.
+\item Bestimmen Sie, wer die Prüfung leistet.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Der Vertrag für die Befundnaht.}
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{Befund}\\
+\code{\ \ kennung\ \ \ \ \ Pflicht\ \ Gerät+Probe+Code+Abnahme}\\
+\code{\ \ groesse\ \ \ \ \ Pflicht\ \ LOINC-Code}\\
+\code{\ \ art\ \ \ \ \ \ \ \ \ Pflicht\ \ zahl|grenze|qualitativ|nichtauswertbar}\\
+\code{\ \ betrag\ \ \ \ \ \ bei art=zahl\ \ int64}\\
+\code{\ \ exponent\ \ \ \ bei art=zahl\ \ int8, Zehnerpotenz}\\
+\code{\ \ einheit\ \ \ \ \ bei art=zahl\ \ UCUM}\\
+\code{\ \ abnahme\ \ \ \ \ Pflicht\ \ RFC 3339 mit Zonenversatz}\\
+\code{\ \ eingang\ \ \ \ \ Pflicht\ \ RFC 3339 mit Zonenversatz}\\
+\code{\ \ validierung\ optional\ \ RFC 3339, fehlt = nicht validiert}\\
+\code{\ \ ersetzt\ \ \ \ \ optional\ \ Kennung des ersetzten Befunds}\\
+\code{\ \ grund\ \ \ \ \ \ \ bei art=nichtauswertbar\ \ Text}
+\end{minipage}
+\end{center}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Entscheidung} & \textbf{Gewählt} & \textbf{Warum}\\
+\midrule
+Wert & \textbf{Betrag + Exponent} & \textcolor{gruen}{\textbf{Band 21, Kap.~8}}\\
+Einheit & \textbf{eigenes Feld} & \textcolor{gruen}{prüfbar}\\
+Zeitpunkte & \textbf{drei getrennt} & \textcolor{gruen}{Band 20, Kap.~2}\\
+Fehlen & \textbf{ausdrücklich geregelt} & \\
+Ersetzung & \textbf{Verweis} & \textcolor{gruen}{Historie bleibt}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile beseitigt den Fall aus dem Vorwort: Wer alle drei Zeitpunkte überträgt, zwingt den Empfänger zur Entscheidung, welchen er meint --- statt ihn raten zu lassen. Ein Feld mehr, eine Fehlerklasse weniger.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vorletzte Zeile ist der Satz, der am häufigsten fehlt: \enquote{Fehlt \code{validierung}, so ist der Befund nicht validiert} --- eine Zeile, die entscheidet, ob ein vorläufiger Wert als endgültig behandelt wird.}
+\end{center}
+
+\medskip
+\textbf{(b) Ein fachliches Austauschformat.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Eigenes Format} & \textbf{Fachstandard}\\
+\midrule
+Aufwand anfangs & \textcolor{gruen}{\textbf{gering}} & \textcolor{akzent}{hoch}\\
+Passt genau & \textcolor{gruen}{ja} & \textcolor{akzent}{\textbf{überladen}}\\
+Fremdsysteme & \textcolor{akzent}{\textbf{Übersetzer je System}} & \textcolor{gruen}{\textbf{direkt}}\\
+Codelisten vorhanden & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{LOINC, UCUM}}\\
+Regulatorisch & \textcolor{akzent}{begründungs\-pflichtig} & \textcolor{gruen}{erwartet}\\
+Werkzeuge & \textcolor{akzent}{selbst} & \textcolor{gruen}{vorhanden}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist der unterschätzte Gewinn: Ein Fachstandard bringt die Codelisten mit --- welche Messgröße welchen Code hat, welche Einheiten zulässig sind. Diese Listen selbst zu pflegen ist teurer als das ganze Format.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist der Preis: Ein Fachstandard, der viele Häuser bedienen muss, hat für jeden einzelnen zu viele Felder und zu viel Freiheit. Die übliche Antwort ist eine Einschränkung --- ein Profil, das festlegt, welcher Teil verwendet wird.}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Empfehlung} & \textbf{Wo} & \\
+\midrule
+Fachstandard & \textbf{nach außen} & \textcolor{gruen}{andere Häuser}\\
+Eigenes Format & \textbf{innen} & \textcolor{gruen}{Erfassung, Übertragung}\\
+Übersetzung & \textbf{an einer Stelle} & \textcolor{gruen}{\textbf{prüfbar}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+\textbf{(c) Wer die Prüfung leistet.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Prüfung} & \textbf{Sender} & \textbf{Empfänger}\\
+\midrule
+Schema & \textcolor{gruen}{ja} & \textcolor{gruen}{\textbf{ja}}\\
+Wertebereich & \textcolor{gruen}{ja} & \textcolor{gruen}{\textbf{ja}}\\
+Einheit passt & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Kennung eindeutig & \textcolor{mittel}{kann nicht} & \textcolor{gruen}{\textbf{ja}}\\
+Zeitpunkt plausibel & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Beide Seiten prüfen --- das ist keine Verschwendung, sondern die Regel. Der Sender prüft, um keinen Unsinn zu senden; der Empfänger prüft, weil er dem Sender nicht trauen darf. Band 19 nennt das Vertrauensgrenze.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Nur Sender prüft} & \textbf{Folge} & \\
+\midrule
+Fehlerhafter Sender & \textcolor{akzent}{\textbf{Unsinn gespeichert}} & \\
+Neuer Sender & \textcolor{akzent}{prüft anders} & \\
+Angriff & \textcolor{akzent}{\textbf{ungeprüft}} & \textbf{Band 19, Kap.~4}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist der Alltagsfall: Ein Gerät bekommt eine neue Betriebsfassung und sendet plötzlich Werte in anderer Einheit. Der Empfänger, der nicht prüft, speichert sie --- und die Warnungen kommen für Wochen falsch.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Was bei Zurückweisung geschieht}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Vorgehen} & \textbf{Tauglich?} & \\
+\midrule
+Stillschweigend verwerfen & \textcolor{akzent}{\textbf{nie}} & \textcolor{akzent}{\textbf{Datenverlust}}\\
+Ganzen Block ablehnen & \textcolor{mittel}{teils} & \textcolor{akzent}{ein Fehler blockiert $500$}\\
+Fehlerhaften Wert markieren & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Rest wird gespeichert}}\\
+In Sonderablage & \textcolor{gruen}{ja} & \textbf{mit Meldung}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die richtige Antwort und verlangt, dass der Vertrag den Fall vorsieht: Der Empfänger nimmt den Block an, speichert die gültigen Werte und meldet die ungültigen einzeln zurück. Ohne diese Vorsehung bleibt nur die zweite Zeile.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile ist die Betriebsseite: Zurückgewiesene Werte verschwinden nicht, sondern landen in einer Ablage, die jemand ansieht. Eine Ablage, die niemand ansieht, ist dasselbe wie die erste Zeile.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Die FHIR-Spe\-zi\-fi\-ka\-tion\zit{27} zeigt einen aus\-ge\-ar\-bei\-te\-ten Fach\-ver\-trag samt Code\-lis\-ten; Evans\zit{7} begründet, warum Fach\-be\-grif\-fe und nicht Ob\-jek\-te über die Naht gehen; Postels Regel\zit{20} legt fest, wie streng jede Seite sein soll.

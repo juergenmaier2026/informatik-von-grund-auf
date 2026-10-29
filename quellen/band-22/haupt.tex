@@ -1,0 +1,138 @@
+\documentclass[11pt,a4paper,twoside]{book}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage[scaled=0.90]{helvet}
+\usepackage{courier}
+\usepackage[a4paper,inner=3.0cm,outer=2.4cm,top=2.6cm,bottom=2.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[german=quotes]{csquotes}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{tief}{HTML}{1F3A5F}
+\definecolor{mittel}{HTML}{2E5F8A}
+\definecolor{akzent}{HTML}{A34A28}
+\definecolor{sand}{HTML}{F4F1EA}
+\definecolor{grau}{HTML}{5A5A5A}
+\definecolor{gruen}{HTML}{2F6B4F}
+\definecolor{purpur}{HTML}{5B3A72}
+
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\newcommand{\kursiv}[1]{{\itshape\color{grau}#1}}
+\newcommand{\code}[1]{{\ttfamily\small #1}}
+\newcommand{\Person}[1]{\textbf{#1}}
+\newcommand{\Begriff}[1]{\textbf{#1}}
+\newcommand{\zit}[1]{\textsuperscript{[#1]}}
+\newcommand{\Oh}{\mathcal{O}}
+\newcommand{\boxtitel}[1]{{\bfseries\color{tief}#1}\par\vspace{6pt}}
+\newcommand{\boxtitelr}[1]{{\bfseries\color{akzent}#1}\par\vspace{6pt}}
+\newcommand{\loesung}{\par\vspace{8pt}{\bfseries\color{mittel}Lösung}\par\vspace{4pt}}
+
+\newtcolorbox{grundbox}[1][tief]{
+  breakable, enhanced, colback=sand, colframe=sand,
+  boxrule=0pt, leftrule=3pt, borderline west={3pt}{0pt}{#1},
+  left=12pt, right=10pt, top=10pt, bottom=10pt,
+  sharp corners, before skip=12pt, after skip=12pt}
+
+\newenvironment{merksatz}{\begin{grundbox}[tief]}{\end{grundbox}}
+\newenvironment{warnung}{\begin{grundbox}[akzent]}{\end{grundbox}}
+\newenvironment{technik}{\begin{grundbox}[mittel]}{\end{grundbox}}
+\newenvironment{aktuell}{\begin{grundbox}[gruen]}{\end{grundbox}}
+\newenvironment{definition}{\begin{grundbox}[purpur]}{\end{grundbox}}
+\newenvironment{aufgabe}{\begin{grundbox}[grau]\boxtitel{Übungsaufgaben}}{\end{grundbox}}
+\newtcolorbox{geschichte}[1][]{
+  breakable, enhanced, colback=sand, colframe=sand,
+  boxrule=0pt, borderline west={3pt}{0pt}{purpur},
+  left=12pt, right=10pt, top=10pt, bottom=10pt,
+  sharp corners, before skip=12pt, after skip=12pt,
+  title=\relax, #1}
+\tcbset{gestitel/.style={}}
+
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{tief}}{\Large\color{grau}Kapitel \thechapter}{8pt}{\Huge}
+\titleformat{\part}[display]
+  {\normalfont\huge\bfseries\color{tief}\filcenter}{\Large\color{grau}Teil \thepart}{10pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{10pt}{28pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,LO]{\small\itshape\color{grau}\leftmark}
+\fancyfoot[LE,LO]{\small\color{grau}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\hyphenation{be-grün-den Ent-wurfs-do-ku-men-te Sprich-wort-samm-lung
+Aus-las-sung Aus-las-sun-gen Schnitt-stel-len Zu-sam-men-set-zung
+Ne-ben-läu-fig-keit Feh-ler-be-hand-lung Über-tra-gungs-schicht
+Spei-cher-be-rei-ni-gung Wie-der-ho-lung Vor-her-sag-bar-keit
+Da-ten-mo-dell Ge-ne-ri-zi-tät Pro-gram-mie-rer Ver-er-bung}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\renewcommand{\arraystretch}{1.4}
+
+\title{Die Kunst des Weglassens}
+\author{}
+\date{}
+
+\begin{document}
+\frontmatter
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2.2cm}
+{\color{grau}\scshape\large Informatik von Grund auf --- Band 22}\\[1.8cm]
+{\color{tief}\fontsize{36}{42}\selectfont\bfseries Die Kunst des\\[4pt] Weglassens}\\[1.0cm]
+{\color{akzent}\Large Programmieren in Go}\\[1.6cm]
+\begin{tikzpicture}[scale=0.95]
+  \node[left, font=\scriptsize, color=grau] at (0.45,2.62) {weggelassen};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (1.55,2.62) {Ausnahmen};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (3.65,2.62) {Vererbung};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (5.75,2.62) {Makros};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (7.85,2.62) {Operator\-überladung};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (1.55,2.00) {Konstruktoren};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (3.65,2.00) {Annotationen};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (5.75,2.00) {Klassen};
+  \node[draw=grau!55, dashed, line width=0.5pt, rounded corners=2pt, inner sep=3pt, minimum width=1.85cm, font=\tiny, color=grau!85, align=center] at (7.85,2.00) {implizite Umwandlung};
+  \draw[grau!40, line width=0.5pt] (0.5,1.52)--(8.9,1.52);
+  \node[left, font=\scriptsize, color=tief] at (0.45,0.85) {geblieben};
+  \node[draw=tief, fill=tief!8, line width=1.0pt, rounded corners=2pt, inner sep=5pt, minimum width=2.15cm, font=\scriptsize, text=tief] at (2.20,0.85) {Schnittstellen};
+  \node[draw=tief, fill=tief!8, line width=1.0pt, rounded corners=2pt, inner sep=5pt, minimum width=2.15cm, font=\scriptsize, text=tief] at (4.75,0.85) {Kanäle};
+  \node[draw=tief, fill=tief!8, line width=1.0pt, rounded corners=2pt, inner sep=5pt, minimum width=2.15cm, font=\scriptsize, text=tief] at (7.30,0.85) {Fehler als Werte};
+  \node[font=\scriptsize, color=akzent] at (4.70,0.05) {weniger, dafür tragfähig};
+\end{tikzpicture}\\[1.6cm]
+{\color{grau}Was fehlt und warum}\\[4pt]
+{\color{grau}Jeder Schritt erklärt. Mit vollständig entwickelten Programmen.}\\[2.6cm]
+{\color{grau}\small Stand der Forschung: August 2026}
+\end{center}
+\input{impressum}
+\cleardoublepage
+\tableofcontents
+\mainmatter
+\input{00_vorwort}
+\input{01_auslassungen}
+\input{02_fehler}
+\input{03_schnittstellen}
+\input{04_goroutinen}
+\input{05_kanaele}
+\input{06_schiefgeht}
+\input{07_pakete}
+\input{08_zusammensetzung}
+\input{09_nullwert}
+\input{10_werkzeuge}
+\input{11_pruefen}
+\input{12_leistung}
+\input{13_zweiter}
+\input{14_wann}
+\input{15_aktuell}
+\input{A_anhang}
+\end{document}

@@ -1,0 +1,285 @@
+\chapter{Prüfen}\label{kap:pruefen}
+
+\begin{merksatz}
+\boxtitel{Die Tabellenprüfung}
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{func TestAnlaesse(t *testing.T) \{}\\
+\code{\ \ \ \ faelle := []struct \{}\\
+\code{\ \ \ \ \ \ \ \ name\ \ \ \ string}\\
+\code{\ \ \ \ \ \ \ \ wert\ \ \ \ Ergebnis}\\
+\code{\ \ \ \ \ \ \ \ vorher\ *Befund}\\
+\code{\ \ \ \ \ \ \ \ will\ \ \ \ []Anlass}\\
+\code{\ \ \ \ \}\{}\\
+\code{\ \ \ \ \ \ \ \ \{"kein Vorbefund", zahl(4.2), nil, nil\},}\\
+\code{\ \ \ \ \ \ \ \ \{"genau auf Grenze", zahl(3.5), nil, nil\},}\\
+\code{\ \ \ \ \ \ \ \ \{"neu ausserhalb", zahl(2.8), nil, []Anlass\{Aussen\}\},}\\
+\code{\ \ \ \ \}}\\
+\code{\ \ \ \ for \_, f := range faelle \{}\\
+\code{\ \ \ \ \ \ \ \ t.Run(f.name, func(t *testing.T) \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ got := Anlaesse(f.wert, f.vorher)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ if !slices.Equal(got, f.will) \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ t.Errorf("got \%v, will \%v", got, f.will)}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ \}) }\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Form ist in Go so verbreitet, dass sie einen Namen hat. Ihr Wert liegt in der zweiten Hälfte: Ein neuer Fall ist eine Zeile in der Tabelle, kein neuer Prüfling --- und der Name erscheint bei einem Fehlschlag im Protokoll.}
+\end{minipage}
+\end{center}
+
+\textbf{Was sie leistet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Wert} & \\
+\midrule
+Neuer Fall & \textbf{eine Zeile} & \textcolor{gruen}{Hemmschwelle sinkt}\\
+Fälle einzeln laufbar & \textcolor{gruen}{\textbf{ja}} & \code{-run}\\
+Name im Protokoll & \textcolor{gruen}{ja} & \\
+Nebenläufig prüfbar & \textcolor{gruen}{\textbf{ja}} & \code{t.Parallel}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die entscheidende und dieselbe Einsicht wie in Band 20, Kapitel~5: Nicht die Möglichkeit zu prüfen entscheidet, sondern die Bequemlichkeit. Wenn ein Fall eine Zeile kostet, schreibt man dreißig; wenn er zwanzig kostet, schreibt man drei.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Was Go mitliefert}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Mittel} & \textbf{Eingebaut?} & \\
+\midrule
+Prüfrahmen & \textcolor{gruen}{\textbf{ja}} & \textbf{kein Zusatz nötig}\\
+Abdeckungs\-messung & \textcolor{gruen}{ja} & \code{-cover}\\
+Messläufe & \textcolor{gruen}{\textbf{ja}} & \code{Benchmark}\\
+Zufallsprüfung & \textcolor{gruen}{ja} & \textcolor{gruen}{seit 1.18}\\
+Beispiele als Prüfung & \textcolor{gruen}{\textbf{ja}} & \textbf{in der Dokumentation}\\
+Behauptungs\-bibliothek & \textcolor{akzent}{nein} & \textcolor{akzent}{absichtlich}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die vorletzte Zeile ist eine Eigenheit: Ein Beispiel in der Dokumentation wird beim Prüflauf ausgeführt und seine Ausgabe verglichen. Damit kann Dokumentation nicht veralten --- eine Antwort auf das Problem aus Band 17, Kapitel~12.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist umstritten: Go liefert kein \code{assertEqual}, weil man Vergleiche mit \code{if} ausschreiben soll. Das ist mehr Text und liest sich beim Fehlschlag klarer --- man sieht, was verglichen wurde.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Was die Abdeckung sagt}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Aussage} & \textbf{Zutreffend?} & \\
+\midrule
+Nicht abgedeckt $\to$ ungeprüft & \textcolor{gruen}{\textbf{ja}} & \textbf{brauchbar}\\
+Abgedeckt $\to$ geprüft & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{nur ausgeführt}\\
+Höhere Zahl $\to$ besser & \textcolor{akzent}{nein} & \textcolor{akzent}{Band 17, Kap.~7}\\
+$100\,\%$ als Ziel & \textcolor{akzent}{\textbf{nein}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Abdeckung ist eine Aussage in eine Richtung: Was nicht ausgeführt wurde, ist sicher ungeprüft. Was ausgeführt wurde, kann trotzdem ungeprüft sein --- eine Zeile ohne Zusicherung zählt genauso wie eine mit.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Deshalb ist der nützliche Gebrauch nicht die Zahl, sondern die Karte: Welche Zweige sind nie durchlaufen worden? Meist sind es die Fehlerpfade --- und dort sitzen die Fehler aus Band 21, Kapitel~12.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Prüfen im selben Paket oder daneben?}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \code{paket} & \code{paket\_test}\\
+\midrule
+Sieht Internes & \textcolor{gruen}{ja} & \textcolor{akzent}{nein}\\
+Prüft die Schnittstelle & \textcolor{mittel}{teils} & \textcolor{gruen}{\textbf{ja}}\\
+Bricht bei Umbau & \textcolor{akzent}{\textbf{ja}} & \textcolor{gruen}{\textbf{nein}}\\
+Empfehlung & für Einzelteile & \textcolor{gruen}{\textbf{voreingestellt}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der Befund aus Band 20, Kapitel~9: Prüfungen, die gegen die innere Struktur laufen, brechen bei jedem Umbau. Go bietet dafür ein eigenes Paket --- ein Zeichen im Namen, und die Prüfung sieht nur, was ein Benutzer sieht.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Prüfen Sie eine nebenläufige Stufe.
+\item Messen Sie mit einem Messlauf.
+\item Bestimmen Sie, was Attrappen ersetzt.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine nebenläufige Stufe prüfen.}
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{func TestRechne(t *testing.T) \{}\\
+\code{\ \ \ \ ctx, ab := context.WithCancel(context.Background())}\\
+\code{\ \ \ \ defer ab()}\\
+\\
+\code{\ \ \ \ ein := make(chan Rohwert)}\\
+\code{\ \ \ \ aus := rechne(ctx, ein)}\\
+\\
+\code{\ \ \ \ go func() \{ ein <- roh(42); close(ein) \}()}\\
+\\
+\code{\ \ \ \ got, ok := <-aus}\\
+\code{\ \ \ \ if !ok || got.Wert != 4.2 \{ t.Fatalf("got \%v", got) \}}\\
+\code{\ \ \ \ if \_, ok := <-aus; ok \{ t.Error("Kanal nicht geschlossen") \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Geprüft wird} & \textbf{Zeile} & \\
+\midrule
+Wert richtig & $10$ & \\
+\textbf{Kanal wird geschlossen} & $11$ & \textcolor{gruen}{\textbf{oft vergessen}}\\
+Abbruch wirkt & \textcolor{akzent}{fehlt} & \textbf{eigener Prüfling}\\
+Kein Leck & \textcolor{akzent}{fehlt} & \textcolor{gruen}{Kap.~\ref{kap:schiefgeht}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die Prüfung, die fast immer fehlt: Ein Kanal, der nicht geschlossen wird, lässt jeden Leser hängen. Eine Zeile prüft es --- und deckt einen der häufigsten Fehler aus Kapitel~\ref{kap:kanaele} ab.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die beiden fehlenden Zeilen gehören in eigene Prüflinge. Bei einer nebenläufigen Stufe braucht man mindestens drei: der gute Fall, der Abbruch, die Leckfreiheit.}
+\end{center}
+
+\medskip
+\textbf{(b) Ein Messlauf.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func BenchmarkAnlaesse(b *testing.B) \{}\\
+\code{\ \ \ \ w := zahl(4.2)}\\
+\code{\ \ \ \ b.ReportAllocs()}\\
+\code{\ \ \ \ for i := 0; i < b.N; i++ \{}\\
+\code{\ \ \ \ \ \ \ \ \_ = Anlaesse(w, nil)}\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{1.8cm}P{1.8cm}P{2.2cm}@{}}
+\toprule
+\textbf{Fassung} & \textbf{ns/Op} & \textbf{Byte/Op} & \textbf{Bele\-gungen}\\
+\midrule
+Erster Entwurf & $\mathbf{412}$ & $\mathbf{192}$ & $\mathbf{4}$\\
+Abschnitt vorbelegt & $186$ & $64$ & $1$\\
+\textbf{Feld statt Abschnitt} & $\mathbf{31}$ & $\mathbf{0}$ & $\mathbf{0}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Spalte ist die wichtigste und wird oft übersehen: Belegungen kosten nicht nur Zeit, sie erzeugen Arbeit für die Speicherbereinigung. Null Belegungen bedeutet, dass diese Funktion die Bereinigungspausen nicht verlängert.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{\code{ReportAllocs} ist eine Zeile und macht den Unterschied sichtbar. Wer nur Nanosekunden misst, sieht Faktor dreizehn; wer Belegungen misst, sieht auch, woher er kommt.}
+\end{center}
+
+\medskip
+\textbf{(c) Was Attrappen ersetzt.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{3.4cm}P{2.0cm}@{}}
+\toprule
+\textbf{Statt} & \textbf{In Go} & \\
+\midrule
+Attrappe für Datei & \code{bytes.Buffer} & \textcolor{gruen}{\textbf{eingebaut}}\\
+Attrappe für Netz & \textbf{\code{httptest.Server}} & \textcolor{gruen}{\textbf{echter Bedienteil}}\\
+Attrappe für Uhr & Funktionsfeld & \textcolor{gruen}{Band 20, Kap.~3}\\
+Attrappe für Gerät & \textbf{eigene $4$-Zeilen-Umsetzung} & \textcolor{gruen}{Kap.~\ref{kap:schnittstellen}}\\
+Attrappen\-rahmenwerk & \textcolor{akzent}{selten nötig} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die wertvollste: Statt den Netzverkehr nachzubilden, startet man einen echten Bedienteil auf einem freien Anschluss. Die Prüfung geht durch den vollständigen Netzstapel --- und findet damit Fehler, die eine Attrappe verdeckt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die vierte Zeile folgt aus den kleinen Schnittstellen: Eine Schnittstelle mit einer Methode braucht eine Ersatzumsetzung von vier Zeilen. Wer große Schnittstellen baut, braucht ein Rahmenwerk --- die Verbindung zwischen Kapitel~\ref{kap:schnittstellen} und diesem hier.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Prüfungen, die nur manchmal fehlschlagen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Ursache} & \textbf{Abhilfe} & \\
+\midrule
+Feste Wartezeiten & \textbf{Zustand abfragen} & \textcolor{akzent}{nie \code{Sleep}}\\
+Reihenfolge angenommen & \textcolor{gruen}{sortieren} & \\
+Echte Uhrzeit & \textbf{Zeit hereinreichen} & \textcolor{gruen}{Band 20, Kap.~3}\\
+Freier Anschluss fest & Anschluss $0$ & \\
+Gemeinsamer Zustand & \textcolor{gruen}{\textbf{je Prüfling eigener}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine Prüfung, die in einem von zwanzig Läufen fehlschlägt, wird nach zwei Wochen abgeschaltet --- und mit ihr die Fehler, die sie gefunden hätte. Sprödigkeit ist deshalb kein Schönheitsfehler, sondern ein Angriff auf den gesamten Prüfbestand.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die häufigste Ursache in nebenläufigem Code. Statt eine Zehntelsekunde zu warten, fragt man den Zustand in kurzen Abständen ab, bis er stimmt oder eine großzügige Frist abläuft.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Bodner\zit{1} zeigt üb\-li\-che Prüf\-for\-men mit ihren Ab\-wä\-gun\-gen; Ken\-ne\-dy\zit{14} behandelt Mess\-läu\-fe und Be\-le\-gun\-gen; Fowler\zit{8} liefert die Schritte, mit denen man Prüf\-bar\-keit nach\-träg\-lich herstellt.

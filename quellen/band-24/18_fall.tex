@@ -1,0 +1,169 @@
+\chapter{Die doppelte Prüfung}\label{fall:doppelpruefung}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Naht zwischen Übertragung und Speicherung. Beide Seiten prüfen dasselbe.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Prüfung} & \textbf{Sender} & \textbf{Empfänger}\\
+\midrule
+Schema & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Einheit passt zur Größe & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Wert im möglichen Bereich & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Zeitpunkt plausibel & \textcolor{gruen}{ja} & \textcolor{gruen}{ja}\\
+Kennung eindeutig & \textcolor{akzent}{kann nicht} & \textcolor{gruen}{ja}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier von fünf Prüfungen laufen zweimal --- einmal beim Sender, einmal beim Empfänger. Zusammen etwa hundertvierzig Zeilen, die dasselbe tun. Die Aufforderung, das zu bereinigen, kommt regelmäßig.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\textbf{Was jede Seite leistet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{6.4cm}@{}}
+\toprule
+\textbf{Sender} & Verhindert, dass Unsinn das Haus verlässt --- meldet früh, wo der Fehler entsteht\\
+\textbf{Empfänger} & \textbf{Schützt den Bestand vor einem fehlerhaften oder fremden Sender}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Zwei verschiedene Zwecke, die zufällig dieselben Bedingungen prüfen. Wer eine Seite entfernt, entfernt einen Zweck --- nicht eine Doppelung.}
+\end{minipage}
+\end{center}
+
+\textbf{Was in drei Jahren tatsächlich eintrat.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ereignis} & \textbf{Gefangen von} & \\
+\midrule
+Fehler in der Umrechnung & \textbf{Sender} & \textcolor{gruen}{früh gemeldet}\\
+Gerät mit neuer Betriebsfassung & \textcolor{akzent}{\textbf{Empfänger}} & \textcolor{akzent}{\textbf{andere Einheit}}\\
+Fremdhaus, falsches Schema & \textbf{Empfänger} & \\
+Prüfstand versehentlich verbunden & \textcolor{akzent}{\textbf{Empfänger}} & \textcolor{akzent}{Testdaten}\\
+Eigener Fehler nach Umbau & \textbf{Sender} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf Ereignisse, drei davon nur vom Empfänger gefangen --- und alle drei betreffen Sender, die man nicht kontrolliert. Die zweite Zeile ist der Fall aus Band 23, Kapitel~3: Ein Gerät bekam eine neue Betriebsfassung und sendete plötzlich in mg/dl.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: so gelassen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.0cm}P{2.4cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Gewählt?} & \\
+\midrule
+Sender\-prüfung entfernen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{späte Meldung}\\
+Empfänger\-prüfung entfernen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{Vertrauens\-grenze}}\\
+Gemeinsame Bibliothek & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{koppelt beide}}\\
+Nichts & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die dritte Zeile ist der Vorschlag, der am vernünftigsten klingt und am schlechtesten ist: Eine gemeinsame Prüfbibliothek koppelt Sender und Empfänger an dieselbe Umsetzung. Ein Fehler darin wird von beiden Seiten gemacht --- und die Prüfung des Empfängers hätte ihn gerade fangen sollen.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.2cm}P{2.4cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Beide} & \textbf{Nur Empfänger} & \\
+\midrule
+Zeilen & $\mathbf{140}$ & $\mathbf{70}$ & \\
+Fehler früh gemeldet & \textcolor{gruen}{ja} & \textcolor{akzent}{\textbf{nein}} & \\
+Aufwand Aufklärung & $\approx20$ min & \textcolor{akzent}{$\approx3$ h} & \\
+Gefangene Ereignisse & $\mathbf{5}$ & $3$ & \\
+Laufzeit je Block & $\mathbf{0{,}9}$ ms & $0{,}5$ ms & \textcolor{gruen}{unerheblich}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Siebzig gesparte Zeilen gegen zwei ungefangene Ereignisse und drei Stunden statt zwanzig Minuten Aufklärung je Vorfall. Der Grund für den Unterschied: Der Sender kennt den Zusammenhang, in dem der Wert entstand --- der Empfänger sieht nur eine Zahl.}
+\end{minipage}
+\end{center}
+
+\textbf{Die regulatorische Seite.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Anforderung} & \textbf{Erfüllt durch} & \\
+\midrule
+Plausibilität am Eingang & \textbf{Empfänger} & \textcolor{gruen}{zwingend}\\
+Fehler an der Quelle & Sender & \textcolor{gruen}{gefordert}\\
+\textbf{Unabhängige Prüfung} & \textbf{beide} & \textcolor{gruen}{\textbf{ausdrücklich}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile macht die Entscheidung leicht: Bei Medizinprodukten ist die unabhängige Prüfung an der Vertrauensgrenze keine Empfehlung. Eine gemeinsame Bibliothek würde die Unabhängigkeit aufheben und wäre begründungspflichtig.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Doppelte Prüfung ist immer gut} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{innerhalb sinnlos}}\\
+\enquote{Nie eine gemeinsame Bibliothek} & \textcolor{akzent}{nein} & \textbf{innerhalb ja}\\
+\enquote{Der Sender ist überflüssig} & \textcolor{akzent}{nein} & \\
+\textbf{\enquote{An der Vertrauensgrenze prüfen beide}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die Übertreibung: Dieselbe Prüfung an drei Stellen \kursiv{innerhalb} eines Programms ist Verschwendung --- dort gibt es keine Vertrauensgrenze. Der Fall trägt nur, weil zwischen Sender und Empfänger eine liegt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Prüffrage lautet deshalb: Liegt zwischen den beiden Stellen eine Grenze, an der die eine Seite der anderen nicht vertrauen kann? Innerhalb eines Prozesses lautet die Antwort nein, über eine Naht fast immer ja.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent McConnell\zit{21} sammelt die Be\-le\-ge zu de\-fen\-si\-ver Pro\-gram\-mie\-rung und ihren Grenzen; Ra\-mal\-ho\zit{26} zeigt, wo Prü\-fun\-gen inner\-halb eines Pro\-gramms ent\-behr\-lich sind.

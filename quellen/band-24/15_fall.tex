@@ -1,0 +1,169 @@
+\part{Wann man es lässt}
+
+\chapter{Der Code, der schon gut war}\label{fall:gut}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Auswertung, Python. Bestimmt die Anlässe für eine Warnung. Eine Funktion, $58$ Zeilen.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{def anlaesse(b: Befund, vorher: Befund | None) -> set[Anlass]:}\\
+\code{\ \ \ \ a: set[Anlass] = set()}\\
+\code{\ \ \ \ if b.art is ErgArt.NICHTAUSWERTBAR:}\\
+\code{\ \ \ \ \ \ \ \ return \{Anlass.UNGUELTIG\}}\ \ \ \ \code{\# 6 Zeilen}\\
+\code{\ \ \ \ ...}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{\# 9 Zeilen Bereichsprüfung}\\
+\code{\ \ \ \ ...}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{\# 14 Zeilen kritische Grenzen}\\
+\code{\ \ \ \ ...}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{\# 18 Zeilen Änderung zum Vorbefund}\\
+\code{\ \ \ \ ...}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \code{\# 11 Zeilen Steigung}\\
+\code{\ \ \ \ return a}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Achtundfünfzig Zeilen in einer Funktion, fünf erkennbare Abschnitte. Die naheliegende Empfehlung lautet: zerlegen. Fünf Funktionen zu je zehn bis fünfzehn Zeilen, jede mit einem Namen --- so steht es in jedem Buch über Lesbarkeit.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Geprüft} & \textbf{Befund} & \\
+\midrule
+Zuständigkeit & \textcolor{gruen}{\textbf{eine}} & \textbf{ohne \enquote{und} sagbar}\\
+Argumente & $2$ & \textcolor{gruen}{gut}\\
+Zustand & \textcolor{gruen}{keiner} & \textcolor{gruen}{rein}\\
+Prüffälle & $\mathbf{34}$ & \textcolor{gruen}{$2$ ms}\\
+Verstehenszeit & $\mathbf{47}$ s & \textcolor{gruen}{gut}\\
+Zweige & $9$ & \textcolor{gruen}{flach}\\
+Änderungen in $2$ Jahren & $\mathbf{6}$ & \textcolor{gruen}{je eine Stelle}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Sieben Prüfungen, sieben gute Befunde. Die einzige Auffälligkeit ist die Zeilenzahl --- und die ist nach Band 20, Kapitel~5 ausdrücklich kein Maßstab. Der Maßstab ist die Zuständigkeit, und die ist eine: \enquote{Liefert die Anlässe, aus denen dieser Befund eine Warnung auslöst.}}
+\end{minipage}
+\end{center}
+
+\textbf{Was eine Zerlegung ändern würde.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Vorlage} & \textbf{Zerlegt} & \\
+\midrule
+Funktionen & $1$ & $6$ & \\
+Zeilen & $58$ & $\mathbf{74}$ & $+28\,\%$\\
+Verstehenszeit & $\mathbf{47}$ s & $\mathbf{61}$ s & \textcolor{akzent}{$1{,}3\times$}\\
+Sprünge beim Lesen & $\mathbf{0}$ & $\mathbf{5}$ & \\
+Namen zu finden & --- & \textcolor{akzent}{$5$} & \textcolor{akzent}{\enquote{pruefe2}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die Zerlegung macht es schlechter --- gemessen, nicht vermutet. Der Grund steht in der vorletzten Zeile: Die fünf Abschnitte sind Schritte eines Verfahrens, keine eigenen Zuständigkeiten. Wer sie herauslöst, muss beim Lesen fünfmal springen.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: so gelassen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Gewählt?} & \\
+\midrule
+Zerlegen & \textcolor{akzent}{\textbf{nein}} & \textbf{macht es schlechter}\\
+Umbenennen & \textcolor{akzent}{nein} & \textcolor{gruen}{Namen sind gut}\\
+Kommentare ergänzen & \textcolor{akzent}{nein} & \textcolor{gruen}{Code ist klar}\\
+\textbf{Nichts} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Der einzige Eingriff war eine Zeile in der Durchsichtsvorlage: ein Hinweis, dass die Länge geprüft und für richtig befunden wurde. Damit muss der nächste Prüfer die Frage nicht erneut stellen.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Die Prüffrage} & Kann ich in einem Satz ohne \enquote{und} sagen, was sie garantiert?\\
+\textbf{Die Antwort} & \textbf{Ja --- \enquote{die Anlässe zu diesem Befund}}\\
+\textbf{Die Folge} & Sie hat eine Zuständigkeit und bleibt eine Funktion\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Band 20, Kapitel~5 nennt die Zeilenzahl ausdrücklich als untauglichen Maßstab und die Zuständigkeit als tauglichen. Dieser Fall ist die Probe darauf: Eine Regel wird gegen den ersten Eindruck angewandt, und das Ergebnis ist Zurückhaltung.}
+\end{minipage}
+\end{center}
+
+\textbf{Wann das Urteil kippen würde.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.0cm}P{2.4cm}@{}}
+\toprule
+\textbf{Wenn} & \textbf{Dann} & \\
+\midrule
+Ein Abschnitt anderswo gebraucht & \textcolor{akzent}{zerlegen} & \textbf{Wieder\-verwendung}\\
+Ein Abschnitt einzeln prüfbar sein muss & \textcolor{akzent}{zerlegen} & \\
+Verstehenszeit steigt über $\approx90$ s & \textcolor{akzent}{\textbf{prüfen}} & \\
+Zweige über $\approx15$ & \textcolor{akzent}{prüfen} & \\
+Nur die Zeilen wachsen & \textcolor{gruen}{\textbf{nichts}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Bedingungen, unter denen das Urteil anders ausfiele --- und keine davon ist heute erfüllt. Damit ist das Urteil überprüfbar und nicht endgültig: Wenn die Funktion auf hundert Zeilen wächst, wird erneut gemessen.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Lange Funktionen sind in Ordnung} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{diese ist es}}\\
+\enquote{Zerlegen schadet} & \textcolor{akzent}{nein} & \\
+\enquote{Messen entscheidet immer} & \textcolor{mittel}{fast} & \\
+\textbf{\enquote{Der erste Eindruck ist eine Frage, keine Antwort}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die Verallgemeinerung, die dieser Fall gerade nicht stützt. Achtundfünfzig Zeilen waren hier richtig, weil sieben Prüfungen es zeigten --- nicht weil Länge unerheblich wäre. Bei einer anderen Funktion derselben Länge kann das Urteil umgekehrt ausfallen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der eigentliche Ertrag ist die letzte Zeile: \enquote{Das sieht lang aus} ist ein Anlass hinzusehen, kein Befund. Wer aus dem Anlass sofort eine Maßnahme macht, hat die Prüfung übersprungen --- und in diesem Fall hätte er es verschlechtert.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Pikes Merk\-sät\-ze\zit{25} halten fest, dass man vor der Än\-de\-rung misst; Kennedy\zit{14} zeigt, wie man Ver\-ste\-hens\-zeit als Maß\-stab ver\-wen\-det.

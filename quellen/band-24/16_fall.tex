@@ -1,0 +1,168 @@
+\chapter{Die Optimierung, die bleibt}\label{fall:optimierung}
+
+\begin{merksatz}
+\boxtitel{Die Vorlage}
+\textbf{Zusammenhang.} Messerfassung, C. Wandelt Rohwerte in Messwerte um. Läuft $500$ mal je Sekunde, harte Schranke von $2$ ms.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{/* Umrechnung ueber Tabelle statt Division.}\\
+\code{\ \ \ Gemessen 2024-03: Division 41 ns, Tabelle 3 ns.}\\
+\code{\ \ \ Bei 500/s und 2 ms Schranke relevant, siehe Messung. */}\\
+\code{static const int32\_t kehrwert[257] = \{ ... \};}\\
+\\
+\code{static inline int32\_t umrechne(int32\_t roh, uint8\_t kanal) \{}\\
+\code{\ \ \ \ return (int32\_t)(((int64\_t)roh * kehrwert[kanal]) >> 16);}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Eine Festkommamultiplikation mit Verschiebung statt einer Division, dazu eine Tabelle mit zweihundertsiebenundfünfzig vorberechneten Kehrwerten. Das ist genau die Sorte Code, die in jeder Durchsicht als verfrühte Optimierung angestrichen wird.}
+\end{minipage}
+\end{center}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Die Diagnose}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Prüffrage} & \textbf{Antwort} & \\
+\midrule
+Gemessen? & \textcolor{gruen}{\textbf{ja}} & \textbf{im Kommentar}\\
+Auf der Zielhardware? & \textcolor{gruen}{ja} & \textcolor{gruen}{nicht am Schreibtisch}\\
+Im heißen Pfad? & \textcolor{gruen}{\textbf{ja}} & $500$/s\\
+Schranke betroffen? & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{$2$ ms hart}\\
+Genauigkeit geprüft? & \textcolor{gruen}{ja} & \textcolor{gruen}{$41$ Prüffälle}\\
+Verstehenszeit & $\mathbf{72}$ s & \textcolor{mittel}{erhöht}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf von fünf Voraussetzungen erfüllt, und der Preis --- zweiundsiebzig Sekunden Verstehenszeit gegen etwa zwanzig für eine Division --- ist im Kommentar begründet. Das unterscheidet diesen Fall von einer verfrühten Optimierung.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Nachmessung auf heutiger Hardware.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+\textbf{Fassung} & \textbf{2024} & \textbf{2026} & \\
+\midrule
+Division & $41$ ns & $\mathbf{38}$ ns & \\
+Tabelle & $\mathbf{3}$ ns & $\mathbf{3}$ ns & $12{,}7\times$\\
+Anteil am Zyklus & --- & $\mathbf{1{,}9\,\%}$ & \\
+Ohne Tabelle & --- & \textcolor{mittel}{$\mathbf{2{,}8\,\%}$} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die Nachmessung ist der eigentliche Beitrag dieses Falls --- und sie schwächt die Begründung: Neunhundertstel eines Prozents des Zyklus. Ohne die Tabelle wäre die Schranke immer noch mit großem Abstand eingehalten.}
+\end{center}
+\end{merksatz}
+
+\begin{technik}
+\boxtitel{Das Urteil: so gelassen}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Erwägung} & \textbf{Gewicht} & \\
+\midrule
+Gewinn ist gering & \textcolor{akzent}{gegen} & $0{,}9\,\%$\\
+Code ist schwerer & \textcolor{akzent}{gegen} & $72$ s\\
+\textbf{Läuft seit $2$ Jahren} & \textcolor{gruen}{\textbf{dafür}} & \textcolor{gruen}{\textbf{$41$ Prüffälle grün}}\\
+\textbf{Medizinprodukt} & \textcolor{gruen}{\textbf{dafür}} & \textcolor{gruen}{\textbf{Änderung = Nachweis}}\\
+Begründung dokumentiert & \textcolor{gruen}{dafür} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die vierte Zeile entscheidet: In einem zugelassenen Medizinprodukt zieht jede Änderung an der Messkette einen Nachweis nach sich --- Prüfung, Dokumentation, Freigabe. Etwa acht Personentage, um neunhundertstel Prozent Laufzeit zurückzugeben und die Lesbarkeit zu verbessern.}
+\end{minipage}
+\end{center}
+\end{technik}
+
+\begin{merksatz}
+\boxtitel{Die Begründung}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.2cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Lassen} & \textbf{Ersetzen} & \\
+\midrule
+Aufwand & $\mathbf{0}$ & $\mathbf{8}$ PT & \\
+Risiko & \textcolor{gruen}{keins} & \textcolor{mittel}{Messkette} & \\
+Verstehenszeit & $72$ s & $\mathbf{21}$ s & \textcolor{gruen}{$3{,}4\times$}\\
+Zyklusanteil & $1{,}9\,\%$ & $2{,}8\,\%$ & \\
+Wer liest den Code? & \multicolumn{2}{l}{\textbf{$\approx2$ mal im Jahr}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die entscheidende Größe und wird fast nie erhoben: Diese Funktion wird etwa zweimal im Jahr gelesen. Einundfünfzig Sekunden Ersparnis je Lesevorgang, zweimal im Jahr --- gegen acht Personentage.}
+\end{minipage}
+\end{center}
+
+\textbf{Was stattdessen geschah.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Aufwand} & \\
+\midrule
+Nachmessung eingetragen & \textcolor{gruen}{$20$ min} & \textbf{Kommentar ergänzt}\\
+Vermerk: entbehrlich & \textcolor{gruen}{$5$ min} & \textcolor{gruen}{\textbf{bei nächster Änderung}}\\
+Code geändert & \textcolor{gruen}{$\mathbf{0}$} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Fünfundzwanzig Minuten statt acht Personentage. Der Kommentar trägt jetzt die Nachmessung von 2026 und den Hinweis, dass die Optimierung entbehrlich geworden ist --- damit fällt sie beim nächsten ohnehin fälligen Eingriff.}
+\end{center}
+\end{merksatz}
+
+\begin{warnung}
+\boxtitelr{Der Fehlschluss}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.2cm}P{2.2cm}P{2.4cm}@{}}
+\toprule
+\textbf{Naheliegend} & \textbf{Richtig?} & \\
+\midrule
+\enquote{Optimierungen behält man} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{diese wird fallen}}\\
+\enquote{Verfrühte Optimierung ist schlimm} & \textcolor{mittel}{teils} & \textbf{diese war begründet}\\
+\enquote{Nachmessen lohnt nicht} & \textcolor{akzent}{\textbf{nein}} & \textcolor{gruen}{es hat entschieden}\\
+\textbf{\enquote{Der Aufwand des Rückbaus zählt mit}} & \textcolor{gruen}{\textbf{ja}} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die Verallgemeinerung, die dieser Fall nicht stützt. Die Optimierung bleibt nicht, weil sie gut ist, sondern weil ihr Rückbau in diesem regulatorischen Umfeld teurer ist als ihr Nachteil. In einem gewöhnlichen Dienst wäre sie längst gefallen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Knuths Satz über verfrühte Optimierung wird meist ohne seinen zweiten Teil zitiert: Er richtet sich gegen Optimierung \kursiv{ohne Messung}, nicht gegen Optimierung. Dieser Code ist gemessen, dokumentiert und geprüft --- er war nie das, wogegen der Satz sich richtet.}
+\end{center}
+\end{warnung}
+\vspace{-4pt}
+\noindent Knuth\zit{19} formulierte den Satz über ver\-früh\-te Op\-ti\-mie\-rung --- samt der Ein\-schrän\-kung, die meist fehlt; Bentley\zit{2} zeigt, wie man den Ge\-winn misst, bevor man ihn be\-haup\-tet.

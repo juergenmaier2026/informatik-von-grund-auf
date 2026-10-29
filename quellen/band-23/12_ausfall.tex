@@ -1,0 +1,301 @@
+\chapter{Ausfall und Wiederanlauf}\label{kap:ausfall}
+
+\begin{merksatz}
+\boxtitel{Was bei einem Ausfall verloren geht}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Ort} & \textbf{Verloren} & \\
+\midrule
+Im Arbeitsspeicher & \textcolor{akzent}{\textbf{alles}} & \\
+In der Warteschlange & \textcolor{gruen}{nichts} & \textcolor{gruen}{wenn dauerhaft}\\
+Auf der Platte, ungeschrieben & \textcolor{akzent}{\textbf{Puffer}} & \textcolor{akzent}{\textbf{bis $\mathbf{30}$ s}}\\
+In der Datenbank & \textcolor{gruen}{nichts} & \textcolor{gruen}{wenn bestätigt}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile überrascht regelmäßig: Ein geschriebener Datensatz liegt zunächst im Puffer des Betriebssystems, nicht auf der Platte. Bei einem Stromausfall sind bis zu dreißig Sekunden Schreibvorgänge fort --- obwohl das Programm sie als erfolgreich gemeldet hat.}
+\end{minipage}
+\end{center}
+
+\textbf{Was eine Bestätigung bedeutet.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Bestätigt heißt} & \textbf{Sicher bei} & \\
+\midrule
+Angenommen & \textcolor{akzent}{nichts} & \textcolor{akzent}{\textbf{noch im Speicher}}\\
+Geschrieben & Programm\-absturz & \textcolor{akzent}{nicht Stromausfall}\\
+\textbf{Durchgeschrieben} & \textbf{Stromausfall} & \textcolor{gruen}{\textbf{teuer}}\\
+Auf zwei Rechnern & Plattenschaden & \textcolor{gruen}{teurer}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Stufen mit vier Preisen. Die dritte kostet etwa Faktor zwanzig gegenüber der zweiten --- und für Befunddaten ist sie die richtige Wahl, für ein Betriebsprotokoll nicht.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Die Kette der Zusicherungen}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+\textbf{Stelle} & \textbf{Bestätigt wann} & \\
+\midrule
+Gerät & \textbf{nach Bestätigung} & \textcolor{gruen}{puffert bis dahin}\\
+Übertragung & nach Speicherbestätigung & \textcolor{gruen}{reicht durch}\\
+Speicherung & \textbf{nach Durchschreiben} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die Zusicherung ist nur so stark wie ihr schwächstes Glied. Wenn die Übertragung bestätigt, bevor die Speicherung geschrieben hat, verspricht sie etwas, das sie nicht halten kann --- und das Gerät löscht seinen Puffer.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die praktische Regel: Ein Bestandteil bestätigt erst, wenn der nächste bestätigt hat. Das kostet Verzögerung und macht die Kette so verlässlich wie ihr Ende.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Der Wiederanlauf}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Antwort nötig} & \\
+\midrule
+Wo weitermachen? & \textbf{letzter Stand} & \textcolor{gruen}{dauerhaft merken}\\
+Was war halb fertig? & \textbf{erkennen} & \textcolor{akzent}{\textbf{häufigste Lücke}}\\
+Wie lange dauert es? & \textbf{gemessen} & \\
+Verträgt die Gegenseite es? & \textbf{Last beim Anlauf} & \textcolor{akzent}{Kap.~\ref{kap:zwischenspeicher}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist die häufigste Lücke: Ein Vorgang, der aus drei Schritten besteht und nach dem zweiten abbricht, hinterlässt einen Zustand, den niemand vorgesehen hat. Entweder man macht ihn unteilbar, oder man erkennt und bereinigt ihn beim Anlauf.}
+\end{minipage}
+\end{center}
+
+\textbf{Zwei Wege für den halben Vorgang.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+& \textbf{Unteilbar} & \textbf{Erkennen und bereinigen}\\
+\midrule
+Möglich bei & \textbf{einer Datenbank} & \textbf{über Nähte}\\
+Aufwand & \textcolor{gruen}{gering} & \textcolor{akzent}{hoch}\\
+Zwischenzustand sicht\-bar & \textcolor{gruen}{nein} & \textcolor{akzent}{\textbf{ja}}\\
+Braucht & Transaktion & \textbf{Zustandsfeld}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die entscheidende Einschränkung: Eine Transaktion endet an der Datenbankgrenze. Über eine Naht hinweg gibt es keine --- und der Versuch, eine zu bauen, ist die schwerste Aufgabe der verteilten Programmierung.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die verteilte Transaktion}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Wert} & \\
+\midrule
+Möglich & \textcolor{gruen}{ja} & \textbf{zweiphasig}\\
+Verfügbarkeit & \textcolor{akzent}{\textbf{schlechter als jeder Teil}} & \\
+Bei Ausfall des Koordinators & \textcolor{akzent}{\textbf{alle blockiert}} & \textcolor{akzent}{\textbf{das Problem}}\\
+In der Praxis & \textcolor{akzent}{selten} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist der Grund für die Seltenheit: Wenn der Koordinator zwischen den beiden Phasen ausfällt, halten alle Beteiligten ihre Sperren und warten --- unbegrenzt. Ein Verfahren, das die Verfügbarkeit senkt, um Konsistenz zu sichern, ist selten der richtige Handel.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der übliche Ausweg: Man verzichtet auf die Unteilbarkeit und arbeitet mit Ausgleichsschritten --- was getan wurde, wird rückgängig gemacht. Das ist fachlich zu entwerfen, nicht technisch zu lösen.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Entwerfen Sie den Wiederanlauf der Übertragung.
+\item Bestimmen Sie, was ein Ausgleichsschritt leistet.
+\item Prüfen Sie die Kette durch Versuche.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Wiederanlauf der Übertragung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{1.0cm}P{3.4cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+& \textbf{Schritt} & \textbf{Dauer} & \textbf{Kritisch}\\
+\midrule
+$1$ & Letzten Stand lesen & $\mathbf{40}$ ms & \\
+$2$ & \textbf{Offene Blöcke erkennen} & $120$ ms & \textcolor{gruen}{\textbf{Zustands\-feld}}\\
+$3$ & Verbindungen aufbauen & $2{,}1$ s & \textcolor{akzent}{$1000$ Geräte}\\
+$4$ & \textbf{Puffer der Geräte leeren} & \textcolor{akzent}{$\mathbf{34}$ \textbf{s}} & \textcolor{akzent}{\textbf{Lastspitze}}\\
+$5$ & Regelbetrieb & --- & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vierunddreißig Sekunden für Schritt vier, und dort liegt die Gefahr: Tausend Geräte senden gleichzeitig ihre Puffer --- die zwanzigfache Regellast auf ein System, das gerade anläuft. Das ist der Ansturm aus Kapitel~\ref{kap:zwischenspeicher} in anderer Gestalt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Maßnahme} & \textbf{Wirkung} & \\
+\midrule
+Geräte gestaffelt zulassen & \textcolor{gruen}{\textbf{flache Last}} & \textbf{Streuung}\\
+Last begrenzen & \textcolor{gruen}{ja} & \textcolor{gruen}{Band 22, Kap.~4}\\
+Erst danach Regelbetrieb & \textcolor{gruen}{ja} & \\
+Anlaufdauer messen & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{\textbf{Zielvorgabe}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine Betriebsanforderung, die selten formuliert wird: Wie lange darf ein Wiederanlauf dauern? Ohne diese Zahl kann niemand entscheiden, ob vierunddreißig Sekunden gut oder schlecht sind.}
+\end{center}
+
+\medskip
+\textbf{(b) Ausgleichsschritte.}
+
+\textbf{Der Fall.} Ein Befund wird gespeichert, die Warnung wird versendet, dann kommt eine Korrektur.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Schritt} & \textbf{Rückgängig?} & \\
+\midrule
+Befund speichern & \textcolor{gruen}{\textbf{ja}} & \textbf{Ersetzung eintragen}\\
+Warnung erzeugen & \textcolor{gruen}{ja} & zurückziehen\\
+\textbf{Warnung angezeigt} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{\textbf{gesehen ist gesehen}}\\
+Medikation angepasst & \textcolor{akzent}{nein} & \textcolor{akzent}{fachliche Folge}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile zeigt die Grenze jedes technischen Ausgleichs: Was ein Mensch gesehen hat, lässt sich nicht zurücknehmen. Der Ausgleich besteht darin, ihn zu benachrichtigen --- und das ist eine fachliche Festlegung, keine technische.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Daraus folgt eine Entwurfsregel: Schritte mit unumkehrbaren Folgen kommen zuletzt. Erst speichern, prüfen, bestätigen --- dann benachrichtigen. Wer die Reihenfolge umdreht, kann nicht mehr ausgleichen.}
+\end{center}
+
+\medskip
+\textbf{(c) Die Kette durch Versuche prüfen.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.6cm}@{}}
+\toprule
+\textbf{Versuch} & \textbf{Erwartet} & \textbf{Gefunden}\\
+\midrule
+Speicherung anhalten & \textbf{Puffer füllt sich} & \textcolor{gruen}{richtig}\\
+Netz trennen & Wiederholung & \textcolor{gruen}{richtig}\\
+\textbf{Netz verlangsamen} & Zeitschranke & \textcolor{akzent}{\textbf{hing $30$ s}}\\
+Halbe Antwort & Fehler & \textcolor{akzent}{\textbf{Absturz}}\\
+Uhr verstellen & Ablehnung & \textcolor{akzent}{gespeichert}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Fünf Versuche, drei Befunde. Die ersten beiden Fälle sind die, an die jeder denkt --- und sie funktionieren. Die letzten drei sind die, an die niemand denkt, und dort liegen die Fehler.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der dritte Fall ist der lehrreichste: Ein langsames Netz ist schlimmer als ein getrenntes, weil die Zeitschranke greift statt eines sofortigen Fehlers. Genau das ist die Lage, die zur Kaskade aus Kapitel~\ref{kap:fehler} führt.}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Aufwand} & \textbf{Wert} & \\
+\midrule
+Versuchsaufbau & $\approx3$ PT & \textbf{einmalig}\\
+Je Versuch & $\approx20$ min & \\
+Gefundene Fehler & $\mathbf{3}$ & \textcolor{gruen}{\textbf{davon $2$ schwer}}\\
+Im Betrieb gefunden & --- & \textcolor{akzent}{während einer Störung}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Drei Personentage gegen zwei schwere Fehler, die sonst während einer Störung gefunden würden --- also zu dem Zeitpunkt, an dem sie am teuersten sind. Das ist dieselbe Rechnung wie bei den Prüfungen in Band 20, Kapitel~9.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Der Wiederanlauf wird nie geübt}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{Geübt?} & \\
+\midrule
+Neustart eines Dienstes & \textcolor{gruen}{ständig} & \textcolor{gruen}{funktioniert}\\
+Wiederanlauf nach Ausfall & \textcolor{akzent}{selten} & \\
+\textbf{Rücksicherung} & \textcolor{akzent}{\textbf{fast nie}} & \textcolor{akzent}{\textbf{funktioniert oft nicht}}\\
+Ausweichbetrieb & \textcolor{akzent}{nie} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist ein wiederkehrender Befund: Sicherungen werden angelegt und nie zurückgespielt. Erst im Ernstfall stellt sich heraus, dass sie unvollständig sind, die Rücksicherung sechs Stunden dauert oder ein Schlüssel fehlt.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Eine Sicherung, die nie zurückgespielt wurde, ist keine Sicherung, sondern eine Hoffnung. Die Übung gehört in den Betriebsplan --- einmal im Quartal, mit gemessener Dauer.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Nygard\zit{18} behandelt Aus\-fall und Wie\-der\-an\-lauf als Frage des Ent\-wurfs; Bernstein und New\-comer\zit{2} erklären die Ver\-fah\-ren zur Un\-teil\-bar\-keit; Tanen\-baum und van Steen\zit{22} ordnen sie theo\-re\-tisch ein.

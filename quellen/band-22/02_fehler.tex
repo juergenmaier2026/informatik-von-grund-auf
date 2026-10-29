@@ -1,0 +1,285 @@
+\chapter{Fehler als Werte}\label{kap:fehler}
+
+\begin{merksatz}
+\boxtitel{Der Handel}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Ausnahmen} & \textbf{Werte}\\
+\midrule
+Fehlerpfad & \textcolor{akzent}{\textbf{unsichtbar}} & \textcolor{gruen}{\textbf{ausgeschrieben}}\\
+Ignorierbar & \textcolor{gruen}{nein} & \textcolor{akzent}{ja --- mit \code{\_}}\\
+Zeilen & \textcolor{gruen}{wenige} & \textcolor{akzent}{\textbf{viele}}\\
+Wo geht es weiter? & \textcolor{akzent}{\textbf{irgendwo oben}} & \textcolor{gruen}{nächste Zeile}\\
+Aufräumen & \code{finally} & \code{defer}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste und die dritte Zeile sind die beiden Seiten desselben Handels: Der Fehlerpfad wird sichtbar, weil er dasteht --- und deshalb sind es viele Zeilen. Man kann nicht beides haben.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Form.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{wert, err := lies(pfad)}\\
+\code{if err != nil \{}\\
+\code{\ \ \ \ return nil, fmt.Errorf("lesen von \%s: \%w", pfad, err)}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Vier Zeilen für eine Operation. Die dritte ist die wichtige: Sie fügt Zusammenhang hinzu und behält den ursprünglichen Fehler --- damit entsteht eine Kette, die den Weg durch das Programm beschreibt.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Was die Fehlerkette leistet}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.4cm}@{}}
+\toprule
+\textbf{Meldung} & \code{uebertragung: geraet 4711:}\\ \code{lesen von /dev/ttyS0: keine Berechtigung}\\
+\textbf{Was sie sagt} & \textbf{Wo, für wen, was, warum --- in einer Zeile}\\
+\textbf{Prüfbar} & \code{errors.Is} und \code{errors.As} finden die Ursache in der Kette\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Das ist der Ersatz für die Ablaufverfolgung einer Ausnahme --- und in einer Hinsicht besser: Die Kette enthält, was der Programmierer für wichtig hielt, nicht jeden Zwischenaufruf. Sie ist kürzer und aussagekräftiger, wenn sie gepflegt wird.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Haken steht in der Bedingung: \kursiv{wenn} sie gepflegt wird. Ein blankes \code{return err} ohne Zusammenhang erzeugt am Ende die Meldung \enquote{keine Berechtigung} ohne jeden Hinweis, wo.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{\code{defer} und was es löst}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{2.8cm}P{3.2cm}@{}}
+\toprule
+& \textbf{C, Band 21} & \textbf{Go}\\
+\midrule
+Aufräumen & \textbf{ein Ausgang mit \code{goto}} & \textbf{\code{defer} bei der Belegung}\\
+Abstand & \textcolor{akzent}{Funktionsende} & \textcolor{gruen}{\textbf{eine Zeile}}\\
+Bei frühem Verlassen & \textcolor{mittel}{Sprung nötig} & \textcolor{gruen}{automatisch}\\
+Vergessbar & \textcolor{akzent}{ja} & \textcolor{gruen}{kaum}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile ist der eigentliche Gewinn: Die Freigabe steht \kursiv{neben} der Belegung, nicht vierzig Zeilen später. Damit sieht man beim Lesen sofort, ob eine Belegung eine Freigabe hat --- das quadratische Problem aus Band 21, Kapitel~5 verschwindet.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{f, err := os.Open(pfad)}\\
+\code{if err != nil \{ return err \}}\\
+\code{defer f.Close()\ \ \ \ \ \ \ \ \ \ \ \ // steht hier, laeuft am Ende}
+\end{minipage}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Drei Fallen bei \code{defer}}
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.6cm}P{2.6cm}@{}}
+\toprule
+\textbf{Falle} & \textbf{Folge} & \\
+\midrule
+\code{defer} in der Schleife & \textcolor{akzent}{\textbf{läuft erst am Funktionsende}} & \textbf{Dateien häufen sich}\\
+Argumente sofort ausgewertet & \textcolor{akzent}{alter Wert} & \textcolor{akzent}{überraschend}\\
+Fehler von \code{Close} ignoriert & \textcolor{akzent}{\textbf{Daten verloren}} & \textbf{Band 21, Kap.~5}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Falle ist die häufigste: Eine Schleife über zehntausend Dateien mit \code{defer f.Close()} hält alle zehntausend offen, bis die Funktion endet. Die Abhilfe ist eine eigene Funktion je Durchlauf --- oder das Schließen von Hand.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Falle ist dieselbe wie in C: \code{Close} kann fehlschlagen, weil erst dort geschrieben wird. Wer beim Schreiben \code{defer f.Close()} benutzt, erfährt nie, dass die Datei unvollständig ist.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Zählen Sie die Fehlerzeilen.
+\item Entwerfen Sie eigene Fehlertypen.
+\item Bestimmen Sie, wann \code{panic} richtig ist.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Fehlerzeilen zählen.}
+
+\textbf{Der Fall.} Die Übertragungsschicht, dieselbe Aufgabe in drei Sprachen.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.0cm}P{2.2cm}P{2.2cm}@{}}
+\toprule
+& \textbf{Zeilen} & \textbf{davon Fehler} & \textbf{Anteil}\\
+\midrule
+Python & $310$ & $42$ & $14\,\%$\\
+\textbf{Go} & $\mathbf{480}$ & $\mathbf{146}$ & $\mathbf{30\,\%}$\\
+C & $890$ & $394$ & $44\,\%$\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Dreißig Prozent des Go-Codes sind Fehlerbehandlung --- mehr als doppelt so viel wie in Python. Das ist die Kritik aus dem Vorwort in Zahlen, und sie trifft zu.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Gegenrechnung.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.0cm}P{1.8cm}@{}}
+\toprule
+& \textbf{Python} & \textbf{Go} & \\
+\midrule
+Unbehandelte Fehler & $\mathbf{11}$ & $\mathbf{2}$ & \\
+Davon im Betrieb & $4$ & $0$ & \\
+Fehlermeldung nützlich & \textcolor{mittel}{teils} & \textcolor{gruen}{\textbf{fast immer}} & \textbf{Kette}\\
+Zeit bis Ursache & $\approx45$ min & \textcolor{gruen}{$\approx\mathbf{6}$ \textbf{min}} & \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Elf unbehandelte Fehler gegen zwei --- weil in Python eine Ausnahme ungefangen durchrutschen kann, ohne dass es beim Schreiben auffällt. In Go steht der Fehlerwert da und wird vom Prüfer bemängelt, wenn man ihn ignoriert.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist der Gewinn, für den man die hundertvier zusätzlichen Zeilen bezahlt: sechs Minuten statt fünfundvierzig bis zur Ursache. Ob sich das lohnt, hängt davon ab, wie oft man sucht --- und Band 20 hat gezeigt, dass es ein Viertel der Zeit ist.}
+\end{center}
+
+\medskip
+\textbf{(b) Eigene Fehlertypen.}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{var ErrGeraetUnbekannt = errors.New("geraet unbekannt")}\\
+\\
+\code{type WertFehler struct \{}\\
+\code{\ \ \ \ Geraet\ \ GeraetID}\\
+\code{\ \ \ \ Zeile\ \ \ int}\\
+\code{\ \ \ \ Ursache error}\\
+\code{\}}\\
+\\
+\code{func (e *WertFehler) Error() string \{}\\
+\code{\ \ \ \ return fmt.Sprintf("geraet \%s zeile \%d: \%v",}\\
+\code{\ \ \ \ \ \ \ \ e.Geraet, e.Zeile, e.Ursache)}\\
+\code{\}}\\
+\code{func (e *WertFehler) Unwrap() error \{ return e.Ursache \}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Art} & \textbf{Wofür} & \\
+\midrule
+Wächter (\code{Err…}) & \textbf{Vergleich} & \code{errors.Is}\\
+Eigener Typ & \textbf{Zusatzdaten} & \code{errors.As}\\
+Nur Text & einfache Fälle & \textcolor{akzent}{nicht prüfbar}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Wahl folgt aus der Frage, was der Aufrufer tun soll. Wenn er nur melden will, genügt Text. Wenn er unterscheiden muss, braucht er einen Wächter. Wenn er Einzelheiten braucht --- welche Zeile, welches Gerät --- einen eigenen Typ.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Fehler, den man dabei macht: einen eigenen Typ zu bauen, bevor irgendein Aufrufer die Einzelheiten braucht. Die Regel der drei Fälle aus Band 20, Kapitel~14 gilt auch hier.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann \code{panic} richtig ist.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Lage} & \code{panic}\textbf{?} & \\
+\midrule
+Datei fehlt & \textcolor{akzent}{\textbf{nein}} & \textbf{erwarteter Fall}\\
+Netz weg & \textcolor{akzent}{nein} & \\
+Ungültige Eingabe & \textcolor{akzent}{nein} & \\
+Unmöglicher Zustand & \textcolor{gruen}{\textbf{ja}} & \textbf{Programmfehler}\\
+Beim Programmstart & \textcolor{gruen}{ja} & Konfiguration fehlt\\
+Über Paketgrenze & \textcolor{akzent}{\textbf{nie}} & \textcolor{akzent}{\textbf{fangen und wandeln}}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Dieselbe Unterscheidung wie in Band 17, Kapitel~6: \code{panic} ist die Zusicherung, kein Fehlerweg. Sie bedeutet \enquote{hier ist ein Programmfehler}, nicht \enquote{etwas ist schiefgegangen}.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die Regel für Bibliotheken: Ein \code{panic}, das die Paketgrenze überschreitet, zwingt jeden Aufrufer zu einem Fangblock --- also zu genau dem, was die Sprache vermeiden wollte. An der Grenze wird gefangen und in einen Fehlerwert verwandelt.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die Wiederholung ist der Preis}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Vorschlag} & \textbf{Hilft?} & \\
+\midrule
+Hilfsfunktion \code{check} & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{versteckt den Pfad}\\
+Fehler sammeln & \textcolor{mittel}{teils} & bei Formularen\\
+\textbf{Ablauf umbauen} & \textcolor{gruen}{\textbf{ja}} & \textbf{weniger Aufrufe}\\
+Damit leben & \textcolor{gruen}{oft} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist die einzige echte Abhilfe und keine Sprachfrage: Eine Funktion mit zwölf Fehlerprüfungen tut zu viel. Wer sie zerlegt, hat weniger Prüfungen je Funktion --- Band 20, Kapitel~5 in Go-Anwendung.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist die ehrlichste: Ein Teil der Wiederholung bleibt, und man gewöhnt sich daran oder nicht. Wer sie unerträglich findet, sollte Go nicht wählen --- und das ist ein legitimes Urteil.}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Die Beiträge zur Fehlerbehandlung\zit{25} erklären Kette, \code{Is} und \code{As}; Donovan und Kernighan\zit{6} führen die Formen mit ihren Abwägungen vor; Cheney\zit{2} hat die Diskussion über Fehlerbehandlung in Go am gründlichsten geführt.

@@ -1,0 +1,299 @@
+\chapter{Kanäle}\label{kap:kanaele}
+
+\begin{merksatz}
+\boxtitel{Der Leitsatz}
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Nicht} & Speicher durch gemeinsamen Zugriff teilen\\
+\textbf{Sondern} & \textbf{Speicher teilen, indem man ihn weiterreicht}\\
+\textbf{Der Unterschied} & Ein Wert hat zu jeder Zeit genau einen Besitzer\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist derselbe Begriff wie in Band 21, Kapitel~3 --- nur wird er hier nicht vereinbart, sondern durch die Bauform nahegelegt. Wer einen Wert über einen Kanal schickt, gibt ihn ab; wer ihn behält und zugleich verschickt, hat einen Wettlauf.}
+\end{minipage}
+\end{center}
+
+\textbf{Die zwei Arten.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{2.8cm}P{3.0cm}@{}}
+\toprule
+& \textbf{Ohne Puffer} & \textbf{Mit Puffer}\\
+\midrule
+Senden blockiert & \textbf{bis empfangen} & bis Puffer voll\\
+Wirkung & \textbf{Gleichschritt} & \textbf{Entkopplung}\\
+Gegendruck & \textcolor{gruen}{\textbf{sofort}} & \textcolor{mittel}{verzögert}\\
+Verwendung & Übergabe, Signal & \textcolor{gruen}{Lastspitzen}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die dritte Zeile ist die wichtigste für die Übertragungsschicht: Ein Kanal ohne Puffer bremst den Sender genau dann, wenn der Empfänger nicht nachkommt. Das ist Gegendruck ohne eine einzige Zeile Code --- und die Eigenschaft, an der ein System unter Last steht oder fällt.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Wie groß der Puffer sein soll}
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.6cm}P{2.6cm}P{3.0cm}@{}}
+\toprule
+\textbf{Größe} & \textbf{Wirkung} & \\
+\midrule
+$0$ & \textcolor{gruen}{\textbf{voller Gegendruck}} & \textbf{Vorgabe}\\
+Klein ($8$--$64$) & \textcolor{gruen}{glättet Schwankungen} & \\
+Groß ($10^5$) & \textcolor{akzent}{\textbf{verbirgt das Problem}} & \textcolor{akzent}{Speicher, Verzögerung}\\
+Unbegrenzt & \textcolor{akzent}{gibt es nicht} & \textcolor{gruen}{aus gutem Grund}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Die dritte Zeile beschreibt den häufigsten Fehler: Ein großer Puffer lässt ein überlastetes System eine Weile gesund aussehen und macht den Zusammenbruch später und schwerer. Ein Puffer glättet Schwankungen; er ersetzt keine Kapazität.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile ist eine bewusste Auslassung: Go bietet keinen unbegrenzten Kanal, weil er das Gegendrucksignal zerstört --- man würde den Speicher füllen, statt den Sender zu bremsen.}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{\code{select} und die Regeln}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{select \{}\\
+\code{case m := <-eingang:}\\
+\code{\ \ \ \ verarbeite(m)}\\
+\code{case <-zeit.After(5 * time.Second):}\\
+\code{\ \ \ \ return ErrZeitueberschreitung}\\
+\code{case <-ctx.Done():}\\
+\code{\ \ \ \ return ctx.Err()}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Regel} & \textbf{Verhalten} & \\
+\midrule
+Mehrere bereit & \textbf{zufällig einer} & \textcolor{gruen}{keine Bevorzugung}\\
+Keiner bereit & blockiert & \\
+Mit \code{default} & \textcolor{akzent}{\textbf{nie blockierend}} & \textcolor{akzent}{Vorsicht}\\
+Auf \code{nil}-Kanal & \textbf{nie bereit} & \textcolor{gruen}{\textbf{nützlich}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile verhindert Aushungern: Wenn zwei Fälle bereit sind, wird gewürfelt statt der erste genommen. Die letzte Zeile ist ein Kunstgriff --- einen Kanal auf \code{nil} zu setzen schaltet seinen Zweig ab, ohne den \code{select} umzubauen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der dritte Fall ist die häufigste Falle: Ein \code{select} mit \code{default} in einer Schleife wartet nie und verbraucht einen Kern vollständig --- eine beschäftigte Warteschleife, die keine sein sollte.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Wer schließt den Kanal?}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Handlung} & \textbf{Erlaubt?} & \\
+\midrule
+Sender schließt & \textcolor{gruen}{\textbf{ja}} & \textbf{die Regel}\\
+Empfänger schließt & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Sender stürzt ab}\\
+Zweimal schließen & \textcolor{akzent}{\textbf{nein}} & \code{panic}\\
+Auf geschlossenen senden & \textcolor{akzent}{nein} & \code{panic}\\
+Von geschlossenem lesen & \textcolor{gruen}{ja} & \textcolor{gruen}{Nullwert, \code{ok=false}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Asymmetrie ist der Kern: Schließen ist eine Aussage des Senders --- \enquote{es kommt nichts mehr}. Der Empfänger kann diese Aussage nicht treffen. Bei mehreren Sendern braucht es deshalb einen eigenen Mechanismus, meist eine Zählgruppe.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Bauen Sie eine Verarbeitungskette.
+\item Messen Sie die Wirkung des Gegendrucks.
+\item Bestimmen Sie, wann Sperren besser sind.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Eine Verarbeitungskette.}
+
+\textbf{Die Aufgabe.} Messwerte lesen, umrechnen, prüfen, bündeln, senden.
+
+\begin{center}
+\begin{minipage}{0.92\textwidth}
+\code{func rechne(ctx context.Context, ein <-chan Rohwert)}\\
+\code{\ \ \ \ \ \ \ \ <-chan Messwert \{}\\
+\code{\ \ \ \ aus := make(chan Messwert)}\\
+\code{\ \ \ \ go func() \{}\\
+\code{\ \ \ \ \ \ \ \ defer close(aus)\ \ \ \ \ \ \ \ // Sender schliesst}\\
+\code{\ \ \ \ \ \ \ \ for r := range ein \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ select \{}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ case aus <- umrechne(r):}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ case <-ctx.Done(): return}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \}()}\\
+\code{\ \ \ \ return aus}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Vier Eigenschaften, die zusammengehören: Die Funktion erzeugt ihren Ausgangskanal, schließt ihn selbst, beachtet den Abbruch und gibt einen Nur-Lese-Kanal zurück. Wer alle vier einhält, kann Stufen beliebig verketten, ohne über Lebensdauern nachzudenken.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Kette.}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\code{roh := lies(ctx, geraet)}\\
+\code{mess := rechne(ctx, roh)}\\
+\code{gut := pruefe(ctx, mess)}\\
+\code{pakete := buendle(ctx, gut, 500)}\\
+\code{err := sende(ctx, pakete, ziel)}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Eigenschaft} & \textbf{Ergebnis} & \\
+\midrule
+Stufen einzeln prüfbar & \textcolor{gruen}{\textbf{ja}} & \textbf{Kanal hinein, Kanal heraus}\\
+Reihenfolge änderbar & \textcolor{gruen}{ja} & \\
+Abbruch wirkt überall & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{ein Kontext}\\
+Zwischenpuffer & \textcolor{gruen}{je Stufe wählbar} & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist der Prüfgewinn: Jede Stufe ist eine reine Abbildung von Kanal auf Kanal und lässt sich mit einer Liste von Eingaben prüfen --- ohne Gerät, ohne Netz, ohne Attrappe. Das ist die Trennung aus Band 20, Kapitel~6 in nebenläufiger Form.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Wirkung des Gegendrucks.}
+
+\textbf{Der Versuch.} Der Empfänger wird langsamer als die Sender.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.0cm}P{2.2cm}P{2.2cm}@{}}
+\toprule
+\textbf{Puffer} & \textbf{Speicher} & \textbf{Verlust} & \textbf{Verzögerung}\\
+\midrule
+$0$ & \textcolor{gruen}{$\mathbf{2}$ MB} & \textcolor{gruen}{$\mathbf{0}$} & \textcolor{gruen}{$\mathbf{12}$ ms}\\
+$1000$ & $6$ MB & $0$ & $310$ ms\\
+$10^5$ & \textcolor{akzent}{$140$ MB} & $0$ & \textcolor{akzent}{$\mathbf{31}$ \textbf{s}}\\
+$10^6$ & \textcolor{akzent}{$\mathbf{1{,}4}$ \textbf{GB}} & \textcolor{akzent}{\textbf{Absturz}} & \textcolor{akzent}{---}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile zeigt den eigentlichen Schaden: Kein Verlust, aber einunddreißig Sekunden Verzögerung --- ein Messwert erreicht die Klinik eine halbe Minute zu spät. Bei einer Grenzwertwarnung ist das schlimmer als ein sauberer Verlust mit Meldung.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die erste Zeile ist die richtige Wahl: Ohne Puffer bremst der Gegendruck bis zum Gerät durch, und das Gerät kann selbst entscheiden, was es verwirft. Die Entscheidung fällt dort, wo man sie fachlich treffen kann.}
+\end{center}
+
+\medskip
+\textbf{(c) Wann Sperren besser sind.}
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.4cm}P{2.0cm}P{2.6cm}@{}}
+\toprule
+\textbf{Lage} & \textbf{Kanal?} & \textbf{Sperre?}\\
+\midrule
+Werte weiterreichen & \textcolor{gruen}{\textbf{ja}} & nein\\
+Ablauf koordinieren & \textcolor{gruen}{ja} & nein\\
+\textbf{Zwischen\-speicher schützen} & \textcolor{akzent}{nein} & \textcolor{gruen}{\textbf{ja}}\\
+Zähler erhöhen & \textcolor{akzent}{nein} & \textcolor{gruen}{atomar}\\
+Konfiguration lesen & nein & \textcolor{gruen}{Lesesperre}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile widerspricht dem Leitsatz und ist trotzdem richtig: Für einen Zwischenspeicher, auf den viele lesend zugreifen, ist eine Sperre einfacher und schneller als eine Goroutine, die ihn verwaltet. Der Leitsatz ist eine Voreinstellung, kein Verbot.}
+\end{minipage}
+\end{center}
+
+\textbf{Die Messung.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.0cm}P{2.0cm}P{1.6cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{Kanal} & \textbf{Sperre} & \\
+\midrule
+Zähler erhöhen & $260$ ns & $\mathbf{18}$ ns & $14\times$\\
+Wert übergeben & $\mathbf{95}$ ns & $110$ ns & \\
+Zwischenspeicher lesen & $240$ ns & $\mathbf{6}$ ns & $40\times$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Ein Kanal kostet etwa hundert Nanosekunden --- viel für einen Zähler, wenig für eine Netzübertragung. Die Wahl folgt aus der Häufigkeit: Was millionenfach je Sekunde geschieht, braucht keine Nachrichten.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Kanäle lösen keine Entwurfsfehler}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Erwartung} & \textbf{Erfüllt?} & \\
+\midrule
+Keine Wettläufe mehr & \textcolor{akzent}{\textbf{nein}} & \textbf{wenn man Zeiger schickt}\\
+Keine Verklemmungen & \textcolor{akzent}{\textbf{nein}} & \textcolor{akzent}{Kap.~\ref{kap:schiefgeht}}\\
+Automatisch schneller & \textcolor{akzent}{nein} & \\
+Übersichtlicher Ablauf & \textcolor{gruen}{\textbf{ja}} & \textcolor{gruen}{der eigentliche Gewinn}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist die verbreitetste Fehlannahme: Wer einen Zeiger über einen Kanal schickt und ihn danach weiter benutzt, hat denselben Wettlauf wie mit gemeinsamem Speicher. Der Kanal überträgt den Besitz nur, wenn man ihn tatsächlich abgibt.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Hoare\zit{13} beschrieb die kommunizierenden Prozesse, aus denen die Kanäle stammen; die Mus\-ter\-vor\-trä\-ge\zit{21} zeigen die wiederkehrenden Bau\-for\-men; das Speichermodell\zit{10} legt fest, welche Sicht\-bar\-keits\-zu\-si\-che\-run\-gen daraus folgen.

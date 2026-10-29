@@ -1,0 +1,294 @@
+\part{Nebenläufigkeit}
+
+\chapter{Goroutinen}\label{kap:goroutinen}
+
+\begin{merksatz}
+\boxtitel{Was sie kosten}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.2cm}P{1.6cm}@{}}
+\toprule
+& \textbf{System\-faden} & \textbf{Goroutine} & \textbf{Faktor}\\
+\midrule
+Keller anfangs & $\approx8$ MB & $\mathbf{2}$ \textbf{KB} & $4000$\\
+Erzeugen & $\approx12$ µs & $\mathbf{0{,}3}$ µs & $40$\\
+Umschalten & $\approx1{,}5$ µs & $\mathbf{0{,}1}$ µs & $15$\\
+Praktisch möglich & $\approx10^4$ & $\mathbf{10^6}$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist der Kern: Ein Systemfaden reserviert acht Megabyte Kellerbereich, eine Goroutine zwei Kilobyte, die bei Bedarf wachsen. Deshalb sind eine Million Goroutinen möglich und eine Million Fäden nicht.}
+\end{minipage}
+\end{center}
+
+\textbf{Was das für die Übertragungsschicht bedeutet.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.6cm}P{2.8cm}@{}}
+\toprule
+\textbf{Bauform} & \textbf{Bei $1000$ Geräten} & \\
+\midrule
+Ein Faden je Gerät & \textcolor{akzent}{$\approx8$ GB Keller} & \textcolor{akzent}{unmöglich}\\
+Ereignisschleife & \textcolor{gruen}{ein Faden} & \textcolor{akzent}{\textbf{Ablauf zerrissen}}\\
+\textbf{Eine Goroutine je Gerät} & \textcolor{gruen}{$\approx\mathbf{20}$ \textbf{MB}} & \textcolor{gruen}{\textbf{Ablauf zusammenhängend}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Die zweite Zeile ist die Bauform, die man in anderen Sprachen wählen muss: eine Ereignisschleife mit Rückrufen, in der ein logischer Ablauf über zehn Funktionen verteilt liegt. Die dritte Zeile schreibt denselben Ablauf hintereinander --- lesbar wie ein sequentielles Programm.}
+\end{center}
+
+\begin{technik}
+\boxtitel{Nebenläufigkeit ist nicht Parallelität}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.4cm}P{2.8cm}P{3.2cm}@{}}
+\toprule
+& \textbf{Nebenläufigkeit} & \textbf{Parallelität}\\
+\midrule
+Ist & \textbf{eine Entwurfsform} & \textbf{eine Ausführungsform}\\
+Betrifft & \textbf{Zerlegung} & Hardware\\
+Nützt bei & Warten & \textbf{Rechnen}\\
+Auf einem Kern & \textcolor{gruen}{sinnvoll} & \textcolor{akzent}{unmöglich}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\kursiv{Pikes Unterscheidung ist die nützlichste des Kapitels: Nebenläufigkeit heißt, ein Programm in unabhängig fortschreitende Teile zu zerlegen. Ob diese Teile gleichzeitig laufen, ist eine andere Frage --- und für die Übertragungsschicht, die überwiegend wartet, die unwichtigere.}
+\end{minipage}
+\end{center}
+\end{technik}
+\end{merksatz}
+
+\begin{merksatz}
+\boxtitel{Wer beendet die Goroutine?}
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{@{}P{2.8cm}P{6.2cm}@{}}
+\toprule
+\textbf{Die Regel} & Wer eine Goroutine startet, muss wissen, wann sie endet\\
+\textbf{Der Grund} & \textbf{Es gibt keinen Weg, sie von außen abzubrechen}\\
+\textbf{Das Mittel} & Ein Abbruchsignal, das sie selbst beachtet\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die zweite Zeile überrascht viele: Go bietet kein \code{kill} für Goroutinen --- absichtlich, weil ein Abbruch von außen den Zustand in unbekanntem Zustand hinterlässt. Eine Goroutine endet, wenn ihre Funktion endet, und sonst nie.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{func lauscher(ctx context.Context, g Geraet, aus chan<- Messwert) \{}\\
+\code{\ \ \ \ for \{}\\
+\code{\ \ \ \ \ \ \ \ m, err := g.Lies()}\\
+\code{\ \ \ \ \ \ \ \ if err != nil \{ return \}}\\
+\code{\ \ \ \ \ \ \ \ select \{}\\
+\code{\ \ \ \ \ \ \ \ case aus <- m:}\\
+\code{\ \ \ \ \ \ \ \ case <-ctx.Done():\ \ \ \ // Abbruch beachtet}\\
+\code{\ \ \ \ \ \ \ \ \ \ \ \ return}\\
+\code{\ \ \ \ \ \ \ \ \}}\\
+\code{\ \ \ \ \}}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Der Abbruchkontext ist das erste Argument --- eine Vereinbarung, die durchgehalten wird. Ohne den \code{select} würde die Goroutine ewig auf einen Abnehmer warten, auch wenn niemand mehr zuhört. Das ist das Leck aus Kapitel~\ref{kap:schiefgeht}.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Die drei Enden}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.8cm}P{2.4cm}P{2.8cm}@{}}
+\toprule
+\textbf{Ende} & \textbf{Sauber?} & \\
+\midrule
+Funktion endet & \textcolor{gruen}{\textbf{ja}} & \textbf{der Normalfall}\\
+Abbruch über Kontext & \textcolor{gruen}{ja} & \\
+\code{panic} & \textcolor{akzent}{\textbf{reißt alles mit}} & \textcolor{akzent}{\textbf{das ganze Programm}}\\
+Programm endet & \textcolor{mittel}{abrupt} & kein Aufräumen\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die dritte Zeile ist eine harte Eigenschaft: Ein \code{panic} in irgendeiner Goroutine beendet das gesamte Programm --- es gibt keine Kapselung je Goroutine. Wer tausend Geräteverbindungen bedient, verliert alle, wenn eine davon einen Programmfehler auslöst.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die Abhilfe ist ein Fangblock am Anfang jeder langlebigen Goroutine: \code{defer func() \{ if r := recover(); r != nil \{ melde(r) \} \}()}. Das ist eine der wenigen Stellen, an denen \code{recover} richtig ist.}
+\end{center}
+\end{warnung}
+\end{merksatz}
+
+\begin{aufgabe}
+\begin{enumerate}[label=(\alph*)]
+\item Rechnen Sie die Bauformen gegeneinander.
+\item Begrenzen Sie die Zahl der Goroutinen.
+\item Untersuchen Sie das Fadenmodell darunter.
+\end{enumerate}
+
+\loesung
+\textbf{(a) Bauformen gegeneinander.}
+
+\textbf{Die Aufgabe.} $1000$ Geräte, je $500$ Messwerte je Sekunde, Weiterleitung über das Netz.
+
+\begin{center}
+{\small
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.8cm}P{2.0cm}P{2.0cm}P{2.0cm}@{}}
+\toprule
+\textbf{Bauform} & \textbf{Zeilen} & \textbf{Speicher} & \textbf{Durchsatz}\\
+\midrule
+Ereignisschleife & $\mathbf{680}$ & \textcolor{gruen}{$14$ MB} & $\mathbf{510}$ k/s\\
+Fadenbündel & $420$ & \textcolor{akzent}{$\approx400$ MB} & $180$ k/s\\
+\textbf{Goroutinen} & $\mathbf{310}$ & $\mathbf{22}$ MB & $\mathbf{495}$ \textbf{k/s}\\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die Goroutinen erreichen fast den Durchsatz der Ereignisschleife bei der Hälfte der Zeilen. Das ist der eigentliche Gewinn: Man schreibt den Ablauf hintereinander und bekommt die Leistung der zerrissenen Bauform.}
+\end{minipage}
+\end{center}
+
+\textbf{Der Vergleich beim Lesen.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Frage} & \textbf{Ereignis\-schleife} & \textbf{Goroutinen}\\
+\midrule
+Wo geht es weiter? & \textcolor{akzent}{\textbf{Rückruf suchen}} & \textcolor{gruen}{\textbf{nächste Zeile}}\\
+Zustand je Gerät & \textcolor{akzent}{eigene Struktur} & \textcolor{gruen}{lokale Variablen}\\
+Verstehenszeit & $\mathbf{175}$ s & \textcolor{gruen}{$\mathbf{48}$ s}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\kursiv{Faktor dreieinhalb bei der Verstehenszeit --- gemessen wie in Band 20, Kapitel~8. Der Grund steht in der zweiten Zeile: Bei Goroutinen ist der Zustand einer Verbindung in lokalen Variablen, nicht in einer von Hand geführten Struktur.}
+\end{center}
+
+\medskip
+\textbf{(b) Die Zahl begrenzen.}
+
+\textbf{Das Problem.} Eine Goroutine je eingehender Nachricht --- bei einer Lastspitze Millionen.
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\code{sem := make(chan struct\{\}, 64)\ \ \ // hoechstens 64 zugleich}\\
+\\
+\code{for m := range eingang \{}\\
+\code{\ \ \ \ sem <- struct\{\}\{\}}\\
+\code{\ \ \ \ go func(m Messwert) \{}\\
+\code{\ \ \ \ \ \ \ \ defer func() \{ <-sem \}()}\\
+\code{\ \ \ \ \ \ \ \ verarbeite(m)}\\
+\code{\ \ \ \ \}(m)}\\
+\code{\}}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{2.4cm}P{2.2cm}P{2.4cm}P{2.0cm}@{}}
+\toprule
+\textbf{Grenze} & \textbf{Speicher} & \textbf{Durchsatz} & \textbf{Wartezeit}\\
+\midrule
+Keine & \textcolor{akzent}{\textbf{unbegrenzt}} & \textcolor{akzent}{bricht ein} & \textcolor{akzent}{$\infty$}\\
+$8$ & \textcolor{gruen}{gering} & $180$ k/s & $44$ ms\\
+$\mathbf{64}$ & \textcolor{gruen}{$\approx3$ MB} & $\mathbf{495}$ \textbf{k/s} & $\mathbf{13}$ \textbf{ms}\\
+$512$ & $24$ MB & $501$ k/s & $19$ ms\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die erste Zeile ist der Fehler, den Goroutinen so leicht machen: Weil sie billig sind, startet man beliebig viele --- und bei einer Lastspitze belegen sie mehr Speicher, als da ist. Die Begrenzung kostet fünf Zeilen und macht das System belastbar.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Bemerkenswert ist die letzte Zeile: Mehr Nebenläufigkeit bringt keinen Durchsatz mehr und erhöht die Wartezeit. Das Optimum liegt dort, wo alle Kerne beschäftigt sind und die Warteschlangen kurz bleiben --- gemessen, nicht geraten.}
+\end{center}
+
+\medskip
+\textbf{(c) Das Fadenmodell darunter.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{2.6cm}P{6.2cm}@{}}
+\toprule
+\textbf{Goroutinen} & Viele, von der Laufzeitumgebung verwaltet\\
+\textbf{Systemfäden} & Wenige --- etwa so viele wie Kerne\\
+\textbf{Die Zuordnung} & \textbf{Die Laufzeitumgebung verteilt Goroutinen auf Fäden}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}P{3.4cm}P{2.2cm}P{2.6cm}@{}}
+\toprule
+\textbf{Vorgang} & \textbf{Faden blockiert?} & \\
+\midrule
+Kanaloperation & \textcolor{gruen}{\textbf{nein}} & \textbf{Goroutine wechselt}\\
+Netzarbeit & \textcolor{gruen}{nein} & \textcolor{gruen}{eigener Melder}\\
+Dateizugriff & \textcolor{mittel}{teils} & \\
+\textbf{Aufruf nach C} & \textcolor{akzent}{\textbf{ja}} & \textcolor{akzent}{\textbf{Band 21, Kap.~14}}\\
+Enge Rechenschleife & \textcolor{mittel}{unter\-brechbar} & seit Go 1.14\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die vierte Zeile ist die Warnung aus Band 21: Ein blockierender C-Aufruf hält den Systemfaden an. Bei wenigen Aufrufen erzeugt die Laufzeitumgebung einen neuen Faden; bei vielen bricht die Nebenläufigkeit zusammen.}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\kursiv{Die letzte Zeile war lange ein echtes Problem: Eine Rechenschleife ohne Funktionsaufruf konnte nicht unterbrochen werden und blockierte einen Kern. Seit Go 1.14 unterbricht die Laufzeitumgebung von sich aus --- eine der wenigen stillen Verbesserungen, die man bemerkt.}
+\end{center}
+
+\begin{warnung}
+\boxtitelr{Billig ist nicht kostenlos}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}P{3.0cm}P{2.2cm}P{2.8cm}@{}}
+\toprule
+\textbf{Zahl} & \textbf{Speicher} & \textbf{Bewertung}\\
+\midrule
+$10^3$ & $\approx4$ MB & \textcolor{gruen}{unbedenklich}\\
+$10^5$ & $\approx400$ MB & \textcolor{mittel}{spürbar}\\
+$10^6$ & \textcolor{akzent}{$\approx\mathbf{4}$ \textbf{GB}} & \textcolor{akzent}{\textbf{Grenze}}\\
+Nie endend & \textcolor{akzent}{wächst} & \textcolor{akzent}{\textbf{Leck}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{minipage}{0.88\textwidth}
+\kursiv{Die letzte Zeile ist die gefährlichste und Gegenstand von Kapitel~\ref{kap:schiefgeht}: Eine Goroutine, die auf einen Kanal wartet, den niemand mehr bedient, bleibt für immer. Sie verbraucht Speicher und erscheint in keiner Statistik über Speicherlecks.}
+\end{minipage}
+\end{center}
+\end{warnung}
+\end{aufgabe}
+\vspace{-4pt}
+\noindent Pike\zit{18} trennt Nebenläufigkeit von Parallelität in einem Vortrag, der die Verwechslung beendet; Hoare\zit{13} legte 1978 die theo\-re\-ti\-sche Grundlage; die Vor\-trä\-ge zu Ne\-ben\-läu\-fig\-keits\-mus\-tern\zit{21} zeigen die wiederkehrenden Bauformen.
